@@ -531,3 +531,128 @@ footer {
 @media (max-width: 360px) {
   .ofertas-grid { grid-template-columns: 1fr; }
 }
+
+/* ══════════════════════════════════════
+   BOTÓN COMPRAR
+══════════════════════════════════════ */
+.card-buy-btn {
+  width: 100%; padding: 9px 12px; border: none; border-radius: 7px;
+  color: #fff; font-family: 'DM Sans', sans-serif; font-size: .82rem;
+  font-weight: 700; cursor: pointer; margin-top: 10px;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: opacity .15s, transform .1s;
+}
+.card-buy-btn:hover  { opacity: .87; }
+.card-buy-btn:active { transform: scale(.97); }
+
+/* ══════════════════════════════════════
+   MODAL CONSULTA / COMPRAR
+══════════════════════════════════════ */
+.consulta-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.52); z-index: 500;
+  align-items: center; justify-content: center; padding: 1rem;
+}
+.consulta-overlay.open { display: flex; }
+
+.consulta-modal {
+  background: #fff; border-radius: 18px; width: 100%;
+  max-width: 430px; max-height: 92vh; overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,.3);
+  animation: cmSlideUp .22s ease;
+}
+@keyframes cmSlideUp {
+  from { transform: translateY(28px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* — Header producto — */
+.cm-header {
+  display: flex; gap: 12px; align-items: center;
+  padding: 1.1rem 1.4rem; border-bottom: 1px solid #eee; position: relative;
+}
+.cm-thumb {
+  width: 68px; height: 68px; border-radius: 10px; overflow: hidden;
+  flex-shrink: 0; background: #f0f2f5;
+  display: flex; align-items: center; justify-content: center; font-size: 2rem;
+}
+.cm-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.cm-prod      { flex: 1; min-width: 0; }
+.cm-prod-name {
+  font-weight: 700; font-size: .92rem; line-height: 1.3;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cm-prod-prices { display: flex; align-items: baseline; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+.cm-prod-price  { font-size: 1.15rem; font-weight: 700; }
+.cm-prod-orig   { font-size: .73rem; color: #bbb; text-decoration: line-through; }
+.cm-prod-off    {
+  display: inline-block; background: #00A650; color: #fff;
+  border-radius: 4px; padding: 2px 7px; font-size: .68rem; font-weight: 700;
+}
+.cm-close-btn {
+  position: absolute; top: 10px; right: 12px;
+  width: 28px; height: 28px; border-radius: 6px; border: none;
+  background: #f0f2f5; cursor: pointer; font-size: .85rem;
+  display: flex; align-items: center; justify-content: center;
+  color: #777; transition: background .15s;
+}
+.cm-close-btn:hover { background: #e0e3e8; }
+
+/* — Burbuja asistente IA — */
+.cm-bot-row {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 1.1rem 1.4rem .5rem;
+}
+.cm-bot-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(102,126,234,.35);
+}
+.cm-bot-bubble {
+  background: #f0f4ff; border-radius: 4px 14px 14px 14px;
+  padding: .7rem .95rem; font-size: .82rem; color: #333;
+  line-height: 1.55; flex: 1;
+}
+.cm-bot-name {
+  font-size: .63rem; font-weight: 700; color: #667eea;
+  margin-bottom: 3px; text-transform: uppercase; letter-spacing: .4px;
+}
+
+/* — Formulario — */
+.cm-form { padding: .5rem 1.4rem 1.4rem; }
+.cm-fr   { margin-bottom: .85rem; }
+.cm-fr label {
+  display: block; font-size: .68rem; font-weight: 700; color: #777;
+  text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px;
+}
+.cm-fi, .cm-ft {
+  width: 100%; padding: 10px 12px; border: 1.5px solid #dde3ec;
+  border-radius: 8px; font-family: 'DM Sans', sans-serif;
+  font-size: .9rem; color: #333; outline: none; transition: border-color .15s;
+}
+.cm-fi:focus, .cm-ft:focus { border-color: #3483FA; }
+.cm-ft { min-height: 70px; resize: vertical; }
+
+.cm-submit-btn {
+  width: 100%; padding: 12px; border: none; border-radius: 9px;
+  background: #25D366; color: #fff; font-family: 'DM Sans', sans-serif;
+  font-size: .95rem; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: opacity .15s, transform .1s; margin-top: .5rem;
+}
+.cm-submit-btn:hover  { opacity: .88; }
+.cm-submit-btn:active { transform: scale(.98); }
+
+/* — Pantalla éxito — */
+.cm-success      { padding: 1.5rem 1.4rem 2rem; text-align: center; }
+.cm-ok-ico       { font-size: 3.5rem; margin-bottom: .75rem; }
+.cm-success h3   { font-size: 1.1rem; font-weight: 700; margin-bottom: .5rem; }
+.cm-success p    { font-size: .85rem; color: #555; line-height: 1.6; }
+.cm-ok-sub       { margin-top: .5rem; color: #888; font-size: .78rem; }
+
+@media (max-width: 480px) {
+  .consulta-overlay { align-items: flex-end; padding: 0; }
+  .consulta-modal   { border-radius: 18px 18px 0 0; max-height: 88vh; }
+}
