@@ -533,126 +533,176 @@ footer {
 }
 
 /* ══════════════════════════════════════
-   BOTÓN COMPRAR
+   BOTÓN WHATSAPP (COMPRAR)
 ══════════════════════════════════════ */
 .card-buy-btn {
-  width: 100%; padding: 9px 12px; border: none; border-radius: 7px;
-  color: #fff; font-family: 'DM Sans', sans-serif; font-size: .82rem;
-  font-weight: 700; cursor: pointer; margin-top: 10px;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  transition: opacity .15s, transform .1s;
+  width: 100%; padding: 10px 14px; border: none; border-radius: 9px;
+  background: #25D366; color: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 700;
+  cursor: pointer; margin-top: 12px;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  box-shadow: 0 3px 12px rgba(37,211,102,.35);
+  transition: background .15s, box-shadow .15s, transform .1s;
 }
-.card-buy-btn:hover  { opacity: .87; }
+.card-buy-btn:hover  { background: #1ebe5d; box-shadow: 0 5px 18px rgba(37,211,102,.5); }
 .card-buy-btn:active { transform: scale(.97); }
 
 /* ══════════════════════════════════════
-   MODAL CONSULTA / COMPRAR
+   MODAL CONSULTA / COMPRAR  (rediseño)
 ══════════════════════════════════════ */
 .consulta-overlay {
   display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,.52); z-index: 500;
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  z-index: 500;
   align-items: center; justify-content: center; padding: 1rem;
 }
 .consulta-overlay.open { display: flex; }
 
 .consulta-modal {
-  background: #fff; border-radius: 18px; width: 100%;
-  max-width: 430px; max-height: 92vh; overflow-y: auto;
-  box-shadow: 0 24px 64px rgba(0,0,0,.3);
-  animation: cmSlideUp .22s ease;
+  background: #fff; border-radius: 22px; width: 100%;
+  max-width: 420px; max-height: 94vh; overflow-y: auto;
+  box-shadow: 0 32px 80px rgba(0,0,0,.35);
+  animation: cmPop .25s cubic-bezier(.34,1.56,.64,1);
 }
-@keyframes cmSlideUp {
-  from { transform: translateY(28px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+@keyframes cmPop {
+  from { transform: scale(.88) translateY(20px); opacity: 0; }
+  to   { transform: scale(1)   translateY(0);    opacity: 1; }
 }
 
-/* — Header producto — */
+/* — Header con gradiente del comercio — */
 .cm-header {
-  display: flex; gap: 12px; align-items: center;
-  padding: 1.1rem 1.4rem; border-bottom: 1px solid #eee; position: relative;
+  border-radius: 22px 22px 0 0;
+  padding: 1.4rem 1.4rem 1.2rem;
+  position: relative;
+  display: flex; gap: 14px; align-items: center;
+  /* background se pone por JS con el color del comercio */
 }
 .cm-thumb {
-  width: 68px; height: 68px; border-radius: 10px; overflow: hidden;
-  flex-shrink: 0; background: #f0f2f5;
-  display: flex; align-items: center; justify-content: center; font-size: 2rem;
+  width: 80px; height: 80px; border-radius: 14px; overflow: hidden;
+  flex-shrink: 0; background: rgba(255,255,255,.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.4rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,.18);
+  border: 2.5px solid rgba(255,255,255,.45);
 }
 .cm-thumb img { width: 100%; height: 100%; object-fit: cover; }
 .cm-prod      { flex: 1; min-width: 0; }
 .cm-prod-name {
-  font-weight: 700; font-size: .92rem; line-height: 1.3;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-weight: 700; font-size: 1rem; line-height: 1.3; color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,.25);
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
 }
-.cm-prod-prices { display: flex; align-items: baseline; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
-.cm-prod-price  { font-size: 1.15rem; font-weight: 700; }
-.cm-prod-orig   { font-size: .73rem; color: #bbb; text-decoration: line-through; }
-.cm-prod-off    {
-  display: inline-block; background: #00A650; color: #fff;
-  border-radius: 4px; padding: 2px 7px; font-size: .68rem; font-weight: 700;
+.cm-prod-prices {
+  display: flex; align-items: center; gap: 7px; margin-top: 6px; flex-wrap: wrap;
+}
+.cm-prod-price { font-size: 1.3rem; font-weight: 700; color: #fff; }
+.cm-prod-orig  {
+  font-size: .75rem; color: rgba(255,255,255,.65);
+  text-decoration: line-through;
+}
+.cm-prod-off {
+  display: inline-flex; align-items: center;
+  background: rgba(0,0,0,.22); color: #fff;
+  border-radius: 6px; padding: 2px 8px; font-size: .72rem; font-weight: 700;
+  border: 1px solid rgba(255,255,255,.3);
 }
 .cm-close-btn {
-  position: absolute; top: 10px; right: 12px;
-  width: 28px; height: 28px; border-radius: 6px; border: none;
-  background: #f0f2f5; cursor: pointer; font-size: .85rem;
+  position: absolute; top: 12px; right: 12px;
+  width: 30px; height: 30px; border-radius: 50%; border: none;
+  background: rgba(0,0,0,.22); cursor: pointer; font-size: .9rem;
   display: flex; align-items: center; justify-content: center;
-  color: #777; transition: background .15s;
+  color: rgba(255,255,255,.9); transition: background .15s;
 }
-.cm-close-btn:hover { background: #e0e3e8; }
+.cm-close-btn:hover { background: rgba(0,0,0,.38); }
 
 /* — Burbuja asistente IA — */
 .cm-bot-row {
   display: flex; gap: 10px; align-items: flex-start;
-  padding: 1.1rem 1.4rem .5rem;
+  padding: 1rem 1.3rem .4rem;
 }
 .cm-bot-avatar {
-  width: 38px; height: 38px; border-radius: 50%;
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.1rem; flex-shrink: 0;
-  box-shadow: 0 3px 10px rgba(102,126,234,.35);
+  display: flex; align-items: center; justify-content: center; font-size: 1rem;
+  box-shadow: 0 3px 10px rgba(102,126,234,.4);
 }
 .cm-bot-bubble {
-  background: #f0f4ff; border-radius: 4px 14px 14px 14px;
-  padding: .7rem .95rem; font-size: .82rem; color: #333;
+  background: #f0f4ff; border-radius: 4px 16px 16px 16px;
+  padding: .65rem .9rem; font-size: .8rem; color: #333;
   line-height: 1.55; flex: 1;
 }
 .cm-bot-name {
-  font-size: .63rem; font-weight: 700; color: #667eea;
-  margin-bottom: 3px; text-transform: uppercase; letter-spacing: .4px;
+  font-size: .6rem; font-weight: 700; color: #667eea;
+  margin-bottom: 3px; text-transform: uppercase; letter-spacing: .5px;
 }
 
 /* — Formulario — */
-.cm-form { padding: .5rem 1.4rem 1.4rem; }
-.cm-fr   { margin-bottom: .85rem; }
+.cm-form   { padding: .6rem 1.3rem 1.3rem; }
+.cm-fr     { margin-bottom: .8rem; }
 .cm-fr label {
-  display: block; font-size: .68rem; font-weight: 700; color: #777;
-  text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px;
+  display: block; font-size: .67rem; font-weight: 700; color: #888;
+  text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px;
 }
 .cm-fi, .cm-ft {
-  width: 100%; padding: 10px 12px; border: 1.5px solid #dde3ec;
-  border-radius: 8px; font-family: 'DM Sans', sans-serif;
-  font-size: .9rem; color: #333; outline: none; transition: border-color .15s;
+  width: 100%; padding: 10px 13px; border: 1.5px solid #e0e5ee;
+  border-radius: 9px; font-family: 'DM Sans', sans-serif;
+  font-size: .88rem; color: #222; outline: none;
+  background: #fafbfd; transition: border-color .15s, box-shadow .15s;
 }
-.cm-fi:focus, .cm-ft:focus { border-color: #3483FA; }
-.cm-ft { min-height: 70px; resize: vertical; }
+.cm-fi:focus, .cm-ft:focus {
+  border-color: #25D366;
+  box-shadow: 0 0 0 3px rgba(37,211,102,.12);
+  background: #fff;
+}
+.cm-ft { min-height: 68px; resize: vertical; }
 
 .cm-submit-btn {
-  width: 100%; padding: 12px; border: none; border-radius: 9px;
+  width: 100%; padding: 13px 16px; border: none; border-radius: 11px;
   background: #25D366; color: #fff; font-family: 'DM Sans', sans-serif;
-  font-size: .95rem; font-weight: 700; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  transition: opacity .15s, transform .1s; margin-top: .5rem;
+  font-size: 1rem; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  box-shadow: 0 4px 16px rgba(37,211,102,.4);
+  transition: background .15s, box-shadow .15s, transform .1s; margin-top: .6rem;
 }
-.cm-submit-btn:hover  { opacity: .88; }
+.cm-submit-btn:hover  { background: #1ebe5d; box-shadow: 0 6px 22px rgba(37,211,102,.5); }
 .cm-submit-btn:active { transform: scale(.98); }
 
 /* — Pantalla éxito — */
-.cm-success      { padding: 1.5rem 1.4rem 2rem; text-align: center; }
-.cm-ok-ico       { font-size: 3.5rem; margin-bottom: .75rem; }
-.cm-success h3   { font-size: 1.1rem; font-weight: 700; margin-bottom: .5rem; }
-.cm-success p    { font-size: .85rem; color: #555; line-height: 1.6; }
-.cm-ok-sub       { margin-top: .5rem; color: #888; font-size: .78rem; }
+.cm-success { padding: 2rem 1.4rem 2.2rem; text-align: center; }
+.cm-ok-circle {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1rem; font-size: 2rem;
+  box-shadow: 0 6px 20px rgba(37,211,102,.4);
+  animation: cmBounce .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes cmBounce {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.cm-success h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: .5rem; }
+.cm-success p  { font-size: .84rem; color: #555; line-height: 1.65; }
+.cm-ok-sub     { margin-top: .6rem; color: #aaa; font-size: .75rem; }
+.cm-ok-close   {
+  margin-top: 1.2rem; padding: 10px 28px; border: none; border-radius: 8px;
+  background: #f0f2f5; color: #444; font-family: 'DM Sans', sans-serif;
+  font-size: .88rem; font-weight: 600; cursor: pointer; transition: background .15s;
+}
+.cm-ok-close:hover { background: #e0e3e8; }
 
-@media (max-width: 480px) {
+/* Mobile: el modal sube desde abajo */
+@media (max-width: 500px) {
   .consulta-overlay { align-items: flex-end; padding: 0; }
-  .consulta-modal   { border-radius: 18px 18px 0 0; max-height: 88vh; }
+  .consulta-modal {
+    border-radius: 24px 24px 0 0; max-height: 90vh;
+    animation: cmSlideUp .28s cubic-bezier(.25,.46,.45,.94);
+  }
+  .cm-header { border-radius: 24px 24px 0 0; }
+  @keyframes cmSlideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
 }
