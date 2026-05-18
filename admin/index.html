@@ -295,12 +295,33 @@
     .gh-msg.ok  { background:#e8faf0; color:#1a6b35; display:block; }
     .gh-msg.err { background:#ffeef0; color:#c0392b; display:block; }
 
+    /* SAVE STATUS */
+    .save-status {
+      font-size:.75rem; display:inline-flex; align-items:center; gap:5px;
+      padding:5px 12px; border-radius:6px; color:rgba(255,255,255,.5);
+      transition:all .3s; white-space:nowrap;
+    }
+    .save-status.saving { color:#FFE600; }
+    .save-status.ok     { color:#4ade80; }
+    .save-status.err    { color:#f87171; }
+    .save-status.warn   { color:#fb923c; cursor:pointer; }
+
+    /* BANNER CONFIG */
+    .cfg-banner {
+      display:none; background:#fff3cd; border:1.5px solid #ffc107;
+      border-radius:var(--radius); padding:.85rem 1.2rem; margin-bottom:1.25rem;
+      font-size:.83rem; display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    }
+    .cfg-banner b { color:#856404; }
+    .cfg-banner button { margin-left:auto; }
+
     /* RESPONSIVE */
     @media (max-width:640px) {
       .wrap { padding:1rem; }
       .upload-row { grid-template-columns:1fr; }
       .fr2 { grid-template-columns:1fr; }
       .top-actions .btn-dark span { display:none; }
+      .save-status { display:none; }
     }
   </style>
 </head>
@@ -310,16 +331,20 @@
 <div class="topbar">
   <div class="brand">Ofertas<em>Locales</em> · Admin</div>
   <div class="top-actions">
+    <span class="save-status" id="saveStatus"></span>
     <a class="btn btn-outline-w" href="../index.html" target="_blank">🌐 Ver sitio</a>
     <button class="btn btn-outline-w" onclick="openGH()">⚙️ GitHub</button>
-    <button class="btn btn-dark" id="btnPub" onclick="publicar()">
-      🚀 <span>Publicar en GitHub</span>
-    </button>
   </div>
 </div>
 
 <!-- ══ WRAP ══ -->
 <div class="wrap">
+  <!-- Banner de configuración pendiente -->
+  <div class="cfg-banner" id="cfgBanner">
+    ⚠️ <b>Para guardar los cambios online configurá GitHub primero.</b>
+    Los cambios solo se guardan en este navegador hasta que configures el token.
+    <button class="btn btn-blue btn-sm" onclick="openGH()">⚙️ Configurar GitHub</button>
+  </div>
   <div class="tabs" id="tabs"></div>
   <div id="paneles"></div>
 </div>
@@ -620,6 +645,7 @@
     document.getElementById(`logoRm-${cid}`).style.display = '';
     refreshTab(cid);
     input.value = '';
+    autoPublish();
   };
 
   window.removeLogo = function(cid) {
@@ -633,6 +659,7 @@
     il.innerHTML = c.inicial;
     document.getElementById(`logoRm-${cid}`).style.display = 'none';
     refreshTab(cid);
+    autoPublish();
   };
 
   /* ═══════════════ IMAGEN PRODUCTO ═══════════════ */
@@ -771,6 +798,7 @@
     }
     document.getElementById('ovOferta').classList.remove('open');
     renderLista(cid);
+    autoPublish();
   };
 
   window.delOferta = delOferta;
@@ -778,6 +806,7 @@
     if (!confirm('¿Eliminar esta oferta?')) return;
     $db.deleteOferta(cid, oid);
     renderLista(cid);
+    autoPublish();
   }
 
   /* Imagen dentro del modal de oferta */
@@ -811,13 +840,68 @@
     } else { tag.style.display = 'none'; }
   };
 
+  /* ═══════════════ AUTO-GUARDADO EN GITHUB ═══════════════ */
+  function setSaveStatus(type, msg) {
+    const el = document.getElementById('saveStatus');
+    el.className = 'save-status' + (type ? ' ' + type : '');
+    el.textContent = msg;
+    if (type === 'warn') el.onclick = () => openGH();
+    else el.onclick = null;
+  }
+
+  async function autoPublish() {
+    const cfg = ghCfg();
+    if (!cfg.repo || !cfg.token) {
+      setSaveStatus('warn', '⚠️ Configurar GitHub para guardar');
+      return;
+    }
+    setSaveStatus('saving', '⏳ Guardando en GitHub…');
+    try {
+      const path   = 'src/data/comercios.js';
+      const apiUrl = `https://api.github.com/repos/${cfg.repo}/contents/${path}`;
+      const headers = {
+        Authorization: `token ${cfg.token}`,
+        'Content-Type': 'application/json',
+        Accept: 'application/vnd.github+json'
+      };
+      let sha = null;
+      const get = await fetch(`${apiUrl}?ref=${cfg.branch}`, { headers });
+      if (get.ok)              sha = (await get.json()).sha;
+      else if (get.status !== 404) throw new Error(`Error al leer archivo: ${get.status}`);
+      const put = await fetch(apiUrl, {
+        method: 'PUT', headers,
+        body: JSON.stringify({
+          message: '✨ Actualizar datos [admin]',
+          content: toB64($db.exportAsJS()),
+          branch: cfg.branch,
+          ...(sha ? { sha } : {})
+        })
+      });
+      if (!put.ok) { const e = await put.json(); throw new Error(e.message || put.status); }
+      setSaveStatus('ok', '✅ Guardado en GitHub');
+      setTimeout(() => setSaveStatus('', ''), 4000);
+    } catch(err) {
+      setSaveStatus('err', `❌ ${err.message}`);
+      setTimeout(() => setSaveStatus('warn', '⚠️ Configurar GitHub para guardar'), 6000);
+    }
+  }
+
   /* ═══════════════ GITHUB ═══════════════ */
   function loadGHFields() {
     const cfg = ghCfg();
     if (cfg.repo)   document.getElementById('ghRepo').value   = cfg.repo;
     if (cfg.branch) document.getElementById('ghBranch').value = cfg.branch;
     if (cfg.token)  document.getElementById('ghToken').value  = cfg.token;
-    if (cfg.repo && cfg.token) document.getElementById('btnPub').classList.add('published');
+    // Mostrar/ocultar banner según config
+    const banner = document.getElementById('cfgBanner');
+    if (cfg.repo && cfg.token) {
+      banner.style.display = 'none';
+      setSaveStatus('ok', '✅ GitHub configurado');
+      setTimeout(() => setSaveStatus('', ''), 3000);
+    } else {
+      banner.style.display = 'flex';
+      setSaveStatus('warn', '⚠️ Configurar GitHub');
+    }
   }
 
   function ghCfg() {
@@ -836,37 +920,13 @@
     if (!cfg.repo||!cfg.token) { alert('Completá el repositorio y el token.'); return; }
     localStorage.setItem('ol_gh', JSON.stringify(cfg));
     const msg = document.getElementById('ghMsg');
-    msg.className='gh-msg ok'; msg.textContent='✅ Guardado. Ya podés usar el botón Publicar.';
-    document.getElementById('btnPub').classList.add('published');
+    msg.className='gh-msg ok'; msg.textContent='✅ Guardado. Los cambios se publicarán automáticamente.';
+    document.getElementById('cfgBanner').style.display = 'none';
+    // Auto-publicar inmediatamente con la nueva config
+    document.getElementById('ovGH').classList.remove('open');
+    autoPublish();
   };
 
-  window.publicar = async function() {
-    const cfg = ghCfg();
-    if (!cfg.repo||!cfg.token) { openGH(); return; }
-    const btn = document.getElementById('btnPub');
-    btn.textContent = '⏳ Publicando…'; btn.disabled = true;
-    try {
-      const path    = 'src/data/comercios.js';
-      const apiUrl  = `https://api.github.com/repos/${cfg.repo}/contents/${path}`;
-      const headers = { Authorization:`token ${cfg.token}`, 'Content-Type':'application/json', Accept:'application/vnd.github+json' };
-      // Obtener SHA actual
-      let sha = null;
-      const get = await fetch(`${apiUrl}?ref=${cfg.branch}`, { headers });
-      if (get.ok)              sha = (await get.json()).sha;
-      else if (get.status!==404) throw new Error(`Error al leer archivo: ${get.status}`);
-      // Commit
-      const put = await fetch(apiUrl, {
-        method:'PUT', headers,
-        body: JSON.stringify({ message:'✨ Actualizar ofertas [admin]', content: toB64($db.exportAsJS()), branch:cfg.branch, ...(sha?{sha}:{}) }),
-      });
-      if (!put.ok) { const e=await put.json(); throw new Error(e.message||put.status); }
-      btn.textContent = '✅ ¡Publicado!'; btn.classList.add('published');
-      setTimeout(() => { btn.innerHTML='🚀 <span>Publicar en GitHub</span>'; btn.disabled=false; }, 4000);
-    } catch(err) {
-      alert(`❌ No se pudo publicar:\n\n${err.message}`);
-      btn.innerHTML='🚀 <span>Publicar en GitHub</span>'; btn.disabled=false;
-    }
-  };
 
   /* ═══════════════ UTILS ═══════════════ */
   async function resizeImg(file, maxW, maxH, q=.85) {
