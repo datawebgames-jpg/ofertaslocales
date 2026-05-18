@@ -603,6 +603,7 @@
   }
 
   /* ═══════════════ LOGO ═══════════════ */
+
   window.onLogoFile = async function(cid, input) {
     const file = input.files[0]; if (!file) return;
     const b64 = await resizeImg(file, 300, 300, .92);
@@ -652,7 +653,9 @@
     input.value = '';
   };
 
-  window.clearProd = function(e, cid) {
+  // Declaración de función (hoisting) para que saveOferta() pueda llamarla
+  window.clearProd = clearProd;
+  function clearProd(e, cid) {
     e.stopPropagation();
     prodBuffer[cid] = null;
     const prev = document.getElementById(`prodPrev-${cid}`);
@@ -663,12 +666,15 @@
   };
 
   // Abre el modal de oferta con la imagen ya cargada
-  window.continuarConImagen = function(cid) {
+  window.continuarConImagen = continuarConImagen;
+  function continuarConImagen(cid) {
     openOferta(cid, null, prodBuffer[cid]);
-  };
+  }
 
   /* ═══════════════ LISTA OFERTAS ═══════════════ */
-  window.renderLista = function(cid) {
+  // Declaración de función (hoisting) para que buildPaneles() y delOferta() puedan llamarla
+  window.renderLista = renderLista;
+  function renderLista(cid) {
     const c = $db.getAll().find(x=>x.id===cid);
     document.getElementById(`cnt-${cid}`).textContent = c.ofertas.length;
     const lista = document.getElementById(`lista-${cid}`);
@@ -705,7 +711,9 @@
   };
 
   /* ═══════════════ MODAL OFERTA ═══════════════ */
-  window.openOferta = function(cid, oid=null, imgPreload=null) {
+  // Declaración de función (hoisting) para que continuarConImagen() pueda llamarla
+  window.openOferta = openOferta;
+  function openOferta(cid, oid=null, imgPreload=null) {
     document.getElementById('fCid').value = cid;
     document.getElementById('fOid').value = oid||'';
     document.getElementById('frmOferta').reset();
@@ -741,7 +749,8 @@
     document.getElementById('ovOferta').classList.remove('open');
   };
 
-  window.saveOferta = function(e) {
+  window.saveOferta = saveOferta;
+  function saveOferta(e) {
     e.preventDefault();
     const cid    = parseInt(document.getElementById('fCid').value);
     const oid    = parseInt(document.getElementById('fOid').value)||null;
@@ -764,11 +773,12 @@
     renderLista(cid);
   };
 
-  window.delOferta = function(cid, oid) {
+  window.delOferta = delOferta;
+  function delOferta(cid, oid) {
     if (!confirm('¿Eliminar esta oferta?')) return;
     $db.deleteOferta(cid, oid);
     renderLista(cid);
-  };
+  }
 
   /* Imagen dentro del modal de oferta */
   window.onMipFile = async function(input) {
