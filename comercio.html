@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comercio — OfertasLocales</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0d;
+      --surface: #161616;
+      --surface2: #1e1e1e;
+      --border: rgba(255,255,255,0.07);
+      --accent: #F4A261;
+      --text: #f0ece4;
+      --muted: rgba(240,236,228,0.5);
+      --radius: 16px;
+      --color: #F4A261;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13,13,13,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 900;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo span { color: var(--accent); }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+
+    .back-btn:hover { color: var(--text); }
+
+    /* HERO COMERCIO */
+    .hero {
+      padding: 3rem 2rem 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .hero-circulo {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 2.5px solid var(--color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+
+    .hero-info h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .hero-rubro {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--color);
+      margin-top: 0.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-desc { color: var(--muted); font-size: 0.95rem; }
+
+    /* OFERTAS */
+    .section-ofertas {
+      padding: 2.5rem 2rem;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+
+    .ofertas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .oferta-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.2s;
+    }
+
+    .oferta-card:hover {
+      border-color: var(--color);
+      transform: translateY(-3px);
+    }
+
+    .oferta-card.destacada {
+      border-color: color-mix(in srgb, var(--color) 40%, transparent);
+    }
+
+    .oferta-imagen {
+      height: 160px;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      position: relative;
+    }
+
+    .oferta-imagen img { width: 100%; height: 100%; object-fit: cover; }
+
+    .badge-destacada {
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+      background: var(--color);
+      color: #1a0a00;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-descuento {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: #E63946;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .oferta-body {
+      padding: 1.25rem;
+    }
+
+    .oferta-titulo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .oferta-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 1rem;
+    }
+
+    .oferta-precios {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+    }
+
+    .precio-actual {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--color);
+    }
+
+    .precio-original {
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    /* ESTADO VACÍO */
+    .empty {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--muted);
+    }
+
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+
+    footer {
+      margin-top: 3rem;
+      padding: 1.5rem 2rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="logo">Ofertas<span>Locales</span></a>
+    <a href="index.html" class="back-btn">← Volver al inicio</a>
+  </header>
+
+  <div id="app"></div>
+
+  <footer>
+    <p>&copy; 2025 OfertasLocales — Hecho con ❤️ para nuestra ciudad</p>
+  </footer>
+
+  <script type="module">
+    import { comercios } from './src/data/comercios.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get('id'));
+    const comercio = comercios.find(c => c.id === id);
+    const app = document.getElementById('app');
+
+    if (!comercio) {
+      app.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><p>Comercio no encontrado.</p></div>`;
+    } else {
+      document.title = `${comercio.nombre} — OfertasLocales`;
+
+      function descuento(precio, original) {
+        return Math.round(((original - precio) / original) * 100);
+      }
+
+      const ofertasHTML = comercio.ofertas.length === 0
+        ? `<div class="empty"><div class="empty-icon">🏷️</div><p>Este comercio no tiene ofertas activas por el momento.</p></div>`
+        : `<div class="ofertas-grid">
+            ${comercio.ofertas.map(o => `
+              <div class="oferta-card${o.destacada ? ' destacada' : ''}">
+                <div class="oferta-imagen" style="background: color-mix(in srgb, ${comercio.color} 8%, #1e1e1e)">
+                  ${o.imagen ? `<img src="${o.imagen}" alt="${o.titulo}" />` : `<span>🏷️</span>`}
+                  ${o.destacada ? `<span class="badge-destacada">⭐ Destacada</span>` : ''}
+                  <span class="badge-descuento">${descuento(o.precio, o.precioOriginal)}% OFF</span>
+                </div>
+                <div class="oferta-body">
+                  <h3 class="oferta-titulo">${o.titulo}</h3>
+                  <p class="oferta-desc">${o.descripcion}</p>
+                  <div class="oferta-precios">
+                    <span class="precio-actual">$${o.precio.toLocaleString('es-AR')}</span>
+                    <span class="precio-original">$${o.precioOriginal.toLocaleString('es-AR')}</span>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>`;
+
+      app.innerHTML = `
+        <div class="hero" style="--color: ${comercio.color}">
+          <div class="hero-circulo" style="background: color-mix(in srgb, ${comercio.color} 10%, #161616); color: ${comercio.color}">
+            ${comercio.inicial}
+          </div>
+          <div class="hero-info">
+            <h1>${comercio.nombre}</h1>
+            <p class="hero-rubro">${comercio.rubro}</p>
+            <p class="hero-desc">${comercio.descripcion}</p>
+          </div>
+        </div>
+        <section class="section-ofertas" style="--color: ${comercio.color}">
+          <p class="section-label">${comercio.ofertas.length} oferta${comercio.ofertas.length !== 1 ? 's' : ''} disponible${comercio.ofertas.length !== 1 ? 's' : ''}</p>
+          ${ofertasHTML}
+        </section>
+      `;
+    }
+  </script>
+</body>
+</html>

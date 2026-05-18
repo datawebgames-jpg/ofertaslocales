@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — OfertasLocales</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --blue:#3483FA; --green:#00A650; --red:#E63946; --yellow:#FFE600;
+      --bg:#f0f2f5; --white:#fff; --text:#1a1a1a; --muted:#777;
+      --border:#dde3ec; --radius:10px;
+    }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; min-height:100vh; }
+
+    /* TOPBAR */
+    .topbar {
+      background:#1a1a2e; color:#fff; height:56px;
+      padding:0 1.5rem; display:flex; align-items:center;
+      justify-content:space-between; gap:1rem;
+      position:sticky; top:0; z-index:100;
+    }
+    .brand { font-weight:700; font-size:1rem; }
+    .brand em { color:var(--yellow); font-style:normal; }
+    .top-actions { display:flex; gap:8px; align-items:center; }
+
+    /* BOTONES */
+    .btn {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:9px 18px; border-radius:7px; border:none; cursor:pointer;
+      font-family:'DM Sans',sans-serif; font-size:.84rem; font-weight:600;
+      text-decoration:none; transition:opacity .15s, transform .1s; white-space:nowrap;
+    }
+    .btn:hover { opacity:.85; } .btn:active { transform:scale(.97); }
+    .btn-blue   { background:var(--blue); color:#fff; }
+    .btn-green  { background:var(--green); color:#fff; }
+    .btn-ghost  { background:#eee; color:var(--text); }
+    .btn-red    { background:var(--red); color:#fff; }
+    .btn-dark   { background:#24292e; color:#fff; }
+    .btn-dark.published { background:var(--green); }
+    .btn-outline-w { background:transparent; border:1.5px solid rgba(255,255,255,.3); color:#fff; font-size:.8rem; padding:7px 14px; border-radius:6px; }
+    .btn-outline-w:hover { background:rgba(255,255,255,.1); opacity:1; }
+    .btn-sm { padding:7px 14px; font-size:.78rem; }
+
+    /* WRAP */
+    .wrap { max-width:980px; margin:0 auto; padding:1.5rem; }
+
+    /* TABS */
+    .tabs {
+      display:flex; background:var(--white); border-radius:var(--radius);
+      overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.07);
+      margin-bottom:1.5rem; overflow-x:auto; scrollbar-width:none;
+    }
+    .tabs::-webkit-scrollbar { display:none; }
+    .tab {
+      flex:1; min-width:120px; padding:12px 10px; border:none; background:none;
+      cursor:pointer; font-family:'DM Sans',sans-serif; font-size:.8rem;
+      color:var(--muted); border-bottom:3px solid transparent;
+      transition:all .2s; text-align:center;
+    }
+    .tab-icon {
+      width:38px; height:38px; border-radius:10px; margin:0 auto 6px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:.82rem; font-weight:700; color:#fff; overflow:hidden;
+    }
+    .tab-icon img { width:100%; height:100%; object-fit:contain; }
+    .tab-name { display:block; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .tab.active { color:var(--text); border-bottom-color:var(--blue); background:#f4f7ff; font-weight:600; }
+
+    /* PANEL */
+    .panel { display:none; }
+    .panel.active { display:block; }
+
+    /* COMERCIO INFO BAR */
+    .info-bar {
+      background:var(--white); border-radius:var(--radius);
+      padding:1rem 1.25rem; margin-bottom:1.25rem;
+      display:flex; align-items:center; gap:12px;
+      box-shadow:0 2px 8px rgba(0,0,0,.06); flex-wrap:wrap;
+    }
+    .info-logo {
+      width:48px; height:48px; border-radius:12px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.1rem; font-weight:700; color:#fff; overflow:hidden;
+    }
+    .info-logo img { width:100%; height:100%; object-fit:contain; }
+    .info-txt { flex:1; min-width:140px; }
+    .info-badge {
+      display:inline-block; padding:2px 10px; border-radius:999px;
+      font-size:.65rem; font-weight:700; color:#fff; margin-bottom:4px;
+    }
+    .info-name { font-size:.95rem; font-weight:700; }
+    .info-desc { font-size:.75rem; color:var(--muted); margin-top:1px; }
+
+    /* ════════════════════════════
+       LAS DOS TARJETAS DE CARGA
+    ════════════════════════════ */
+    .upload-row {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-bottom:1.5rem;
+    }
+
+    .upload-card {
+      background:var(--white); border-radius:var(--radius);
+      box-shadow:0 2px 8px rgba(0,0,0,.07); overflow:hidden;
+      display:flex; flex-direction:column;
+    }
+
+    .upload-card-head {
+      padding:.9rem 1.1rem; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:8px;
+    }
+    .upload-card-head .uc-icon { font-size:1.2rem; }
+    .upload-card-head .uc-title { font-size:.9rem; font-weight:700; }
+    .upload-card-head .uc-sub { font-size:.72rem; color:var(--muted); margin-top:1px; }
+
+    .upload-card-body {
+      padding:1.25rem;
+      display:flex; flex-direction:column; align-items:center;
+      gap:14px; flex:1;
+    }
+
+    /* — Logo preview — */
+    .logo-big {
+      width:110px; height:110px; border-radius:20px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:2.4rem; font-weight:700; color:#fff; overflow:hidden;
+      box-shadow:0 4px 16px rgba(0,0,0,.15); cursor:pointer;
+      position:relative; transition:filter .18s;
+    }
+    .logo-big:hover { filter:brightness(.8); }
+    .logo-big img { width:100%; height:100%; object-fit:contain; }
+    .logo-big .lb-overlay {
+      position:absolute; inset:0; background:rgba(0,0,0,.45);
+      display:flex; align-items:center; justify-content:center;
+      color:#fff; font-size:.65rem; font-weight:700; text-transform:uppercase;
+      letter-spacing:.5px; opacity:0; transition:opacity .18s; border-radius:20px;
+    }
+    .logo-big:hover .lb-overlay { opacity:1; }
+
+    /* — Imagen producto preview — */
+    .prod-prev {
+      width:100%; height:130px; border-radius:10px;
+      border:2px dashed var(--border); background:#f7f8fa;
+      display:flex; align-items:center; justify-content:center;
+      flex-direction:column; gap:6px; cursor:pointer;
+      position:relative; overflow:hidden; transition:border-color .18s, background .18s;
+    }
+    .prod-prev:hover { border-color:var(--blue); background:#f0f4ff; }
+    .prod-prev.has-img { border:2px solid var(--green); background:#f0faf4; }
+    .prod-prev img {
+      position:absolute; inset:0; width:100%; height:100%;
+      object-fit:cover; border-radius:8px;
+    }
+    .prod-prev .pp-hint { text-align:center; pointer-events:none; }
+    .prod-prev .pp-hint .pp-ico { font-size:2rem; opacity:.25; }
+    .prod-prev .pp-hint p { font-size:.72rem; color:var(--muted); margin-top:4px; }
+    .prod-prev.has-img .pp-hint { display:none; }
+    .prod-prev .pp-rm {
+      position:absolute; top:6px; right:6px; z-index:2;
+      width:26px; height:26px; border-radius:5px;
+      background:rgba(0,0,0,.55); border:none; cursor:pointer;
+      display:none; align-items:center; justify-content:center;
+      color:#fff; font-size:.8rem;
+    }
+    .prod-prev.has-img .pp-rm { display:flex; }
+
+    /* file inputs ocultos */
+    .f-hidden { display:none; }
+
+    .upload-hint { font-size:.72rem; color:var(--muted); text-align:center; line-height:1.5; }
+
+    /* OFERTA ROW */
+    .ofertas-sec-head {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:.85rem; flex-wrap:wrap; gap:8px;
+    }
+    .ofertas-sec-title { font-size:.95rem; font-weight:700; }
+    .ofertas-cnt {
+      background:#eef0f5; border-radius:999px;
+      padding:2px 10px; font-size:.72rem; color:var(--muted); font-weight:600;
+    }
+    .oferta-row {
+      background:var(--white); border-radius:var(--radius);
+      padding:.9rem 1.1rem; margin-bottom:9px;
+      display:flex; align-items:center; gap:12px;
+      box-shadow:0 1px 4px rgba(0,0,0,.05); transition:box-shadow .18s;
+    }
+    .oferta-row:hover { box-shadow:0 4px 14px rgba(0,0,0,.09); }
+    .row-thumb {
+      width:60px; height:60px; border-radius:10px;
+      overflow:hidden; flex-shrink:0; background:#f0f2f5;
+      display:flex; align-items:center; justify-content:center; font-size:1.5rem;
+    }
+    .row-thumb img { width:100%; height:100%; object-fit:cover; }
+    .row-body { flex:1; min-width:0; }
+    .row-tit  { font-weight:700; font-size:.88rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .row-desc { font-size:.73rem; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:2px 0 5px; }
+    .row-prices { display:flex; gap:7px; align-items:baseline; flex-wrap:wrap; }
+    .rp { font-size:.95rem; font-weight:700; }
+    .ro { font-size:.73rem; color:#bbb; text-decoration:line-through; }
+    .roff { font-size:.73rem; font-weight:700; color:var(--green); }
+    .dst-badge { font-size:.6rem; font-weight:700; padding:2px 6px; border-radius:4px; background:var(--green); color:#fff; text-transform:uppercase; }
+    .row-acts { display:flex; gap:6px; flex-shrink:0; }
+    .ico-btn {
+      width:34px; height:34px; border-radius:7px;
+      border:1.5px solid var(--border); background:#fff; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; font-size:.9rem;
+      transition:background .15s, border-color .15s;
+    }
+    .ico-btn:hover { background:#f0f2f5; }
+    .ico-btn.del:hover { background:#ffeef0; border-color:var(--red); }
+
+    /* EMPTY */
+    .empty { text-align:center; padding:2.5rem 1rem; color:var(--muted); }
+    .empty .ei { font-size:2.5rem; opacity:.2; margin-bottom:.75rem; }
+
+    /* OVERLAY */
+    .overlay {
+      display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,.5); z-index:200;
+      align-items:center; justify-content:center; padding:1rem;
+    }
+    .overlay.open { display:flex; }
+
+    /* MODAL */
+    .modal {
+      background:#fff; border-radius:14px; width:100%;
+      max-width:500px; max-height:93vh; overflow-y:auto;
+      box-shadow:0 24px 64px rgba(0,0,0,.28);
+    }
+    .mhead {
+      padding:1.1rem 1.4rem; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .mhead h3 { font-size:.95rem; font-weight:700; }
+    .mclose {
+      width:30px; height:30px; border-radius:6px; border:none;
+      background:#f0f2f5; cursor:pointer; font-size:.95rem;
+      display:flex; align-items:center; justify-content:center;
+      color:var(--muted); transition:background .15s;
+    }
+    .mclose:hover { background:#e0e3e8; }
+    .mbody { padding:1.4rem; }
+    .mfoot { padding:1rem 1.4rem; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
+
+    /* MODAL imagen */
+    .modal-img-prev {
+      width:100%; height:150px; border-radius:10px;
+      border:2px dashed var(--border); background:#f7f8fa;
+      cursor:pointer; overflow:hidden; position:relative;
+      display:flex; align-items:center; justify-content:center;
+      flex-direction:column; gap:6px; margin-bottom:8px;
+      transition:border-color .18s; font-size:.78rem; color:var(--muted);
+    }
+    .modal-img-prev:hover { border-color:var(--blue); }
+    .modal-img-prev.has { border:2px solid var(--green); }
+    .modal-img-prev img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:8px; }
+    .modal-img-prev .mip-rm {
+      position:absolute; top:6px; right:6px; z-index:2;
+      width:26px; height:26px; border-radius:5px; background:rgba(0,0,0,.55);
+      border:none; cursor:pointer; display:none;
+      align-items:center; justify-content:center; color:#fff; font-size:.8rem;
+    }
+    .modal-img-prev.has .mip-rm { display:flex; }
+    .modal-img-prev.has .mip-hint { display:none; }
+
+    /* FORM */
+    .fr { margin-bottom:.9rem; }
+    .fr label { display:block; font-size:.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:4px; }
+    .fi, .ft {
+      width:100%; padding:9px 12px; border:1.5px solid var(--border);
+      border-radius:7px; font-family:'DM Sans',sans-serif; font-size:.9rem;
+      color:var(--text); outline:none; transition:border-color .15s;
+    }
+    .fi:focus, .ft:focus { border-color:var(--blue); }
+    .ft { min-height:75px; resize:vertical; }
+    .fr2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .fck { display:flex; align-items:center; gap:9px; cursor:pointer; font-size:.87rem; }
+    .fck input { width:17px; height:17px; cursor:pointer; accent-color:var(--blue); }
+    .pct-tag {
+      display:none; align-items:center; gap:5px;
+      background:#e8faf0; color:var(--green); border-radius:6px;
+      padding:6px 12px; font-size:.83rem; font-weight:700; margin-top:4px;
+    }
+
+    /* GITHUB MODAL */
+    .gh-msg {
+      padding:10px 14px; border-radius:7px; font-size:.8rem; margin-top:10px; display:none;
+    }
+    .gh-msg.ok  { background:#e8faf0; color:#1a6b35; display:block; }
+    .gh-msg.err { background:#ffeef0; color:#c0392b; display:block; }
+
+    /* RESPONSIVE */
+    @media (max-width:640px) {
+      .wrap { padding:1rem; }
+      .upload-row { grid-template-columns:1fr; }
+      .fr2 { grid-template-columns:1fr; }
+      .top-actions .btn-dark span { display:none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<div class="topbar">
+  <div class="brand">Ofertas<em>Locales</em> · Admin</div>
+  <div class="top-actions">
+    <a class="btn btn-outline-w" href="../index.html" target="_blank">🌐 Ver sitio</a>
+    <button class="btn btn-outline-w" onclick="openGH()">⚙️ GitHub</button>
+    <button class="btn btn-dark" id="btnPub" onclick="publicar()">
+      🚀 <span>Publicar en GitHub</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══ WRAP ══ -->
+<div class="wrap">
+  <div class="tabs" id="tabs"></div>
+  <div id="paneles"></div>
+</div>
+
+<!-- ══ MODAL: OFERTA ══ -->
+<div class="overlay" id="ovOferta" onclick="closeOferta(event)">
+  <div class="modal">
+    <div class="mhead">
+      <h3 id="mTitulo">Nueva oferta</h3>
+      <button class="mclose" onclick="closeOferta()">✕</button>
+    </div>
+    <div class="mbody">
+      <form id="frmOferta" onsubmit="saveOferta(event)">
+        <input type="hidden" id="fCid"/>
+        <input type="hidden" id="fOid"/>
+        <input type="hidden" id="fImg"/>
+
+        <!-- IMAGEN -->
+        <div class="fr">
+          <label>Imagen del producto</label>
+          <div class="modal-img-prev" id="mip" onclick="document.getElementById('mipFile').click()">
+            <img id="mipImg" src="" alt="" style="display:none"/>
+            <button type="button" class="mip-rm" onclick="clearMip(event)">✕</button>
+            <div class="mip-hint" style="text-align:center;pointer-events:none">
+              <div style="font-size:2rem;opacity:.25">🖼️</div>
+              <p>Hacé clic para subir la foto del producto</p>
+            </div>
+          </div>
+          <input type="file" id="mipFile" class="f-hidden" accept="image/*" onchange="onMipFile(this)"/>
+        </div>
+
+        <!-- TÍTULO -->
+        <div class="fr">
+          <label>Título de la oferta *</label>
+          <input class="fi" type="text" id="fTit" placeholder="Ej: Zapatillas running 40% OFF" required maxlength="80"/>
+        </div>
+
+        <!-- DESCRIPCIÓN -->
+        <div class="fr">
+          <label>Descripción y características *</label>
+          <textarea class="ft" id="fDesc" placeholder="Describí el producto: tallas, colores, qué incluye…" required maxlength="300"></textarea>
+        </div>
+
+        <!-- PRECIOS -->
+        <div class="fr fr2">
+          <div>
+            <label>Precio con oferta *</label>
+            <input class="fi" type="number" id="fPrecio" placeholder="3500" required min="1" oninput="calcPct()"/>
+          </div>
+          <div>
+            <label>Precio original *</label>
+            <input class="fi" type="number" id="fPrecioOrig" placeholder="7000" required min="1" oninput="calcPct()"/>
+          </div>
+        </div>
+        <div class="pct-tag" id="pctTag">🎉 <span id="pctVal"></span>% de descuento</div>
+
+        <!-- DESTACADA -->
+        <div class="fr" style="margin-top:.6rem">
+          <label class="fck">
+            <input type="checkbox" id="fDest"/>
+            Marcar como oferta destacada ⭐
+          </label>
+        </div>
+      </form>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-ghost" onclick="closeOferta()">Cancelar</button>
+      <button class="btn btn-blue" onclick="document.getElementById('frmOferta').requestSubmit()" id="btnGuardar">Guardar oferta</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: GITHUB ══ -->
+<div class="overlay" id="ovGH" onclick="closeGH(event)">
+  <div class="modal" style="max-width:440px">
+    <div class="mhead">
+      <h3>⚙️ Configuración de GitHub</h3>
+      <button class="mclose" onclick="closeGH()">✕</button>
+    </div>
+    <div class="mbody">
+      <div class="fr">
+        <label>Repositorio (usuario/nombre-repo)</label>
+        <input class="fi" type="text" id="ghRepo" placeholder="miusuario/ofertas-locales"/>
+      </div>
+      <div class="fr">
+        <label>Rama</label>
+        <input class="fi" type="text" id="ghBranch" value="main"/>
+      </div>
+      <div class="fr">
+        <label>Personal Access Token</label>
+        <input class="fi" type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxx"/>
+        <p style="font-size:.7rem;color:var(--muted);margin-top:5px;line-height:1.5">
+          GitHub → Settings → Developer settings → Fine-grained tokens.<br/>
+          Permiso requerido: <strong>Contents: Read &amp; Write</strong>
+        </p>
+      </div>
+      <div class="gh-msg" id="ghMsg"></div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-ghost" onclick="closeGH()">Cerrar</button>
+      <button class="btn btn-blue" onclick="saveGH()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { getAll, addOferta, updateOferta, deleteOferta,
+           updateComercioInfo, resetToDefault, exportAsJS } from '../src/store.js';
+  import { RUBROS_ICONO, pct, fmt } from '../src/layout.js';
+
+  // Variables locales del módulo (necesario en ES modules — no alcanzan con window.*)
+  const $db = { getAll, addOferta, updateOferta, deleteOferta, updateComercioInfo, resetToDefault, exportAsJS };
+  const $ico = RUBROS_ICONO;
+  const $pct = pct;
+  const $fmt = fmt;
+
+  // Exponemos al scope global para los onclick inline del HTML generado
+  window.$db  = $db;
+  window.$ico = $ico;
+  window.$pct = $pct;
+  window.$fmt = $fmt;
+
+  // activarTab como declaración de función (hoisting) para que init() pueda llamarla
+  function activarTab(idx) {
+    document.querySelectorAll('.tab').forEach((t,i)   => t.classList.toggle('active', i===idx));
+    document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', i===idx));
+  }
+  window.activarTab = activarTab;
+
+  init();
+
+  function init() {
+    buildTabs();
+    buildPaneles();
+    activarTab(0);
+    loadGHFields();
+  }
+
+  /* ═══════════════ TABS ═══════════════ */
+  function buildTabs() {
+    document.getElementById('tabs').innerHTML =
+      $db.getAll().map((c, i) => `
+        <button class="tab" id="tab-${i}" onclick="activarTab(${i})">
+          <div class="tab-icon" style="background:${c.logo?'#e8e8e8':c.color}">
+            ${c.logo?`<img src="${c.logo}" alt="${c.nombre}"/>`:c.inicial}
+          </div>
+          <span class="tab-name">${c.nombre}</span>
+        </button>`).join('');
+  }
+
+  function refreshTab(cid) {
+    const all = $db.getAll(), c = all.find(x=>x.id===cid), idx = all.indexOf(c);
+    const tab = document.getElementById(`tab-${idx}`);
+    if (!tab) return;
+    const icon = tab.querySelector('.tab-icon');
+    icon.style.background = c.logo ? '#e8e8e8' : c.color;
+    icon.innerHTML = c.logo ? `<img src="${c.logo}" alt="${c.nombre}"/>` : c.inicial;
+  }
+
+  /* ═══════════════ PANELES ═══════════════ */
+  function buildPaneles() {
+    document.getElementById('paneles').innerHTML =
+      $db.getAll().map((c, i) => `
+        <div class="panel" id="panel-${i}">
+
+          <!-- Info bar -->
+          <div class="info-bar">
+            <div class="info-logo" id="infoLogo-${c.id}" style="background:${c.logo?'#e8e8e8':c.color}">
+              ${c.logo?`<img src="${c.logo}" alt="${c.nombre}"/>`:c.inicial}
+            </div>
+            <div class="info-txt">
+              <span class="info-badge" style="background:${c.color}">${c.rubro}</span>
+              <div class="info-name">${c.nombre}</div>
+              <div class="info-desc">${c.descripcion}</div>
+            </div>
+            <a class="btn btn-ghost btn-sm" href="../comercios/comercio-${c.id}/" target="_blank">👁 Ver página</a>
+          </div>
+
+          <!-- ════ LAS DOS TARJETAS DE CARGA ════ -->
+          <div class="upload-row">
+
+            <!-- TARJETA 1: LOGO -->
+            <div class="upload-card">
+              <div class="upload-card-head">
+                <span class="uc-icon">🏪</span>
+                <div>
+                  <div class="uc-title">Logo del comercio</div>
+                  <div class="uc-sub">Imagen que identifica al comercio</div>
+                </div>
+              </div>
+              <div style="padding:1.25rem;display:flex;flex-direction:column;align-items:center;gap:14px;flex:1">
+
+                <!-- Preview del logo -->
+                <div class="logo-big" id="logoBig-${c.id}"
+                     style="background:${c.logo?'#e8e8e8':c.color}"
+                     onclick="document.getElementById('logoFile-${c.id}').click()"
+                     title="Hacé clic para cambiar el logo">
+                  ${c.logo?`<img src="${c.logo}" alt="${c.nombre}"/>`:c.inicial}
+                  <div class="lb-overlay">Cambiar</div>
+                </div>
+
+                <input type="file" id="logoFile-${c.id}" class="f-hidden"
+                       accept="image/*" onchange="onLogoFile(${c.id},this)"/>
+
+                <p class="upload-hint">
+                  JPG · PNG · WebP<br/>Se redimensiona automáticamente
+                </p>
+
+                <!-- Botones -->
+                <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+                  <label class="btn btn-blue btn-sm" style="cursor:pointer"
+                         onclick="document.getElementById('logoFile-${c.id}').click()">
+                    📁 Subir archivo de logo
+                  </label>
+                  <button class="btn btn-ghost btn-sm" id="logoRm-${c.id}"
+                          style="${c.logo?'':'display:none'}"
+                          onclick="removeLogo(${c.id})">✕ Quitar</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- TARJETA 2: IMAGEN PRODUCTO -->
+            <div class="upload-card">
+              <div class="upload-card-head">
+                <span class="uc-icon">🖼️</span>
+                <div>
+                  <div class="uc-title">Imagen de producto</div>
+                  <div class="uc-sub">Foto para una nueva oferta</div>
+                </div>
+              </div>
+              <div style="padding:1.25rem;display:flex;flex-direction:column;align-items:center;gap:14px;flex:1">
+
+                <!-- Preview imagen producto -->
+                <div class="prod-prev" id="prodPrev-${c.id}"
+                     onclick="document.getElementById('prodFile-${c.id}').click()">
+                  <img id="prodImg-${c.id}" src="" alt="" style="display:none"/>
+                  <button type="button" class="pp-rm" onclick="clearProd(event,${c.id})">✕</button>
+                  <div class="pp-hint">
+                    <div class="pp-ico">📷</div>
+                    <p>Hacé clic para elegir<br/>la foto del producto</p>
+                  </div>
+                </div>
+
+                <input type="file" id="prodFile-${c.id}" class="f-hidden"
+                       accept="image/*" onchange="onProdFile(${c.id},this)"/>
+
+                <p class="upload-hint">
+                  JPG · PNG · WebP<br/>Después completás los detalles de la oferta
+                </p>
+
+                <!-- Botones -->
+                <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+                  <label class="btn btn-blue btn-sm" style="cursor:pointer"
+                         onclick="document.getElementById('prodFile-${c.id}').click()">
+                    📁 Subir imagen de producto
+                  </label>
+                  <button class="btn btn-ghost btn-sm" id="prodContinuar-${c.id}"
+                          style="display:none"
+                          onclick="continuarConImagen(${c.id})">
+                    Continuar →
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /upload-row -->
+
+          <!-- ════ LISTA DE OFERTAS ════ -->
+          <div class="ofertas-sec-head">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="ofertas-sec-title">Ofertas cargadas</span>
+              <span class="ofertas-cnt" id="cnt-${c.id}">0</span>
+            </div>
+            <button class="btn btn-blue btn-sm" onclick="openOferta(${c.id})">+ Nueva oferta</button>
+          </div>
+          <div id="lista-${c.id}"></div>
+
+        </div>`).join('');
+
+    $db.getAll().forEach(c => renderLista(c.id));
+  }
+
+  /* ═══════════════ LOGO ═══════════════ */
+  window.onLogoFile = async function(cid, input) {
+    const file = input.files[0]; if (!file) return;
+    const b64 = await resizeImg(file, 300, 300, .92);
+    $db.updateComercioInfo(cid, { logo: b64 });
+    // Update preview
+    const big = document.getElementById(`logoBig-${cid}`);
+    big.style.background = '#e8e8e8';
+    big.innerHTML = `<img src="${b64}" alt="logo"/><div class="lb-overlay">Cambiar</div>`;
+    // Update info bar logo
+    const il = document.getElementById(`infoLogo-${cid}`);
+    il.style.background = '#e8e8e8';
+    il.innerHTML = `<img src="${b64}" alt="logo"/>`;
+    // Show remove btn
+    document.getElementById(`logoRm-${cid}`).style.display = '';
+    refreshTab(cid);
+    input.value = '';
+  };
+
+  window.removeLogo = function(cid) {
+    const c = $db.getAll().find(x=>x.id===cid);
+    $db.updateComercioInfo(cid, { logo: null });
+    const big = document.getElementById(`logoBig-${cid}`);
+    big.style.background = c.color;
+    big.innerHTML = `${c.inicial}<div class="lb-overlay">Cambiar</div>`;
+    const il = document.getElementById(`infoLogo-${cid}`);
+    il.style.background = c.color;
+    il.innerHTML = c.inicial;
+    document.getElementById(`logoRm-${cid}`).style.display = 'none';
+    refreshTab(cid);
+  };
+
+  /* ═══════════════ IMAGEN PRODUCTO ═══════════════ */
+  // Buffer para la imagen del producto seleccionada
+  const prodBuffer = {};
+
+  window.onProdFile = async function(cid, input) {
+    const file = input.files[0]; if (!file) return;
+    const b64 = await resizeImg(file, 800, 600, .85);
+    prodBuffer[cid] = b64;
+    // Mostrar preview
+    const prev = document.getElementById(`prodPrev-${cid}`);
+    const img  = document.getElementById(`prodImg-${cid}`);
+    img.src = b64; img.style.display = 'block';
+    prev.classList.add('has-img');
+    // Mostrar botón Continuar
+    document.getElementById(`prodContinuar-${cid}`).style.display = '';
+    input.value = '';
+  };
+
+  window.clearProd = function(e, cid) {
+    e.stopPropagation();
+    prodBuffer[cid] = null;
+    const prev = document.getElementById(`prodPrev-${cid}`);
+    const img  = document.getElementById(`prodImg-${cid}`);
+    img.src = ''; img.style.display = 'none';
+    prev.classList.remove('has-img');
+    document.getElementById(`prodContinuar-${cid}`).style.display = 'none';
+  };
+
+  // Abre el modal de oferta con la imagen ya cargada
+  window.continuarConImagen = function(cid) {
+    openOferta(cid, null, prodBuffer[cid]);
+  };
+
+  /* ═══════════════ LISTA OFERTAS ═══════════════ */
+  window.renderLista = function(cid) {
+    const c = $db.getAll().find(x=>x.id===cid);
+    document.getElementById(`cnt-${cid}`).textContent = c.ofertas.length;
+    const lista = document.getElementById(`lista-${cid}`);
+
+    if (!c.ofertas.length) {
+      lista.innerHTML = `<div class="empty">
+        <div class="ei">🏷️</div>
+        <p>Todavía no hay ofertas.<br/>Usá <strong>+ Nueva oferta</strong> o subí una imagen arriba.</p>
+      </div>`;
+      return;
+    }
+
+    lista.innerHTML = c.ofertas.map(o => {
+      const off = $pct(o.precioOriginal, o.precio);
+      return `<div class="oferta-row">
+        <div class="row-thumb">
+          ${o.imagen?`<img src="${o.imagen}" alt="${o.titulo}"/>`:($ico[c.rubro]||'🏷️')}
+        </div>
+        <div class="row-body">
+          <div class="row-tit">${o.titulo}${o.destacada?' <span class="dst-badge">Destacada</span>':''}</div>
+          <div class="row-desc">${o.descripcion}</div>
+          <div class="row-prices">
+            <span class="rp" style="color:${c.color}">${$fmt(o.precio)}</span>
+            <span class="ro">${$fmt(o.precioOriginal)}</span>
+            <span class="roff">${off}% OFF</span>
+          </div>
+        </div>
+        <div class="row-acts">
+          <button class="ico-btn" onclick="openOferta(${cid},${o.id})">✏️</button>
+          <button class="ico-btn del" onclick="delOferta(${cid},${o.id})">🗑️</button>
+        </div>
+      </div>`;
+    }).join('');
+  };
+
+  /* ═══════════════ MODAL OFERTA ═══════════════ */
+  window.openOferta = function(cid, oid=null, imgPreload=null) {
+    document.getElementById('fCid').value = cid;
+    document.getElementById('fOid').value = oid||'';
+    document.getElementById('frmOferta').reset();
+    document.getElementById('fCid').value = cid;
+    clearMipInternal();
+    document.getElementById('pctTag').style.display = 'none';
+
+    if (oid) {
+      const o = $db.getAll().find(x=>x.id===cid).ofertas.find(x=>x.id===oid);
+      document.getElementById('mTitulo').textContent  = 'Editar oferta';
+      document.getElementById('btnGuardar').textContent = 'Actualizar oferta';
+      document.getElementById('fTit').value         = o.titulo;
+      document.getElementById('fDesc').value        = o.descripcion;
+      document.getElementById('fPrecio').value      = o.precio;
+      document.getElementById('fPrecioOrig').value  = o.precioOriginal;
+      document.getElementById('fDest').checked      = o.destacada;
+      if (o.imagen) { setMip(o.imagen); document.getElementById('fImg').value = o.imagen; }
+      calcPct();
+    } else {
+      document.getElementById('mTitulo').textContent  = 'Nueva oferta';
+      document.getElementById('btnGuardar').textContent = 'Guardar oferta';
+    }
+
+    // Imagen pre-cargada desde tarjeta de producto
+    if (imgPreload) { setMip(imgPreload); document.getElementById('fImg').value = imgPreload; }
+
+    document.getElementById('ovOferta').classList.add('open');
+    setTimeout(() => document.getElementById('fTit').focus(), 60);
+  };
+
+  window.closeOferta = function(e) {
+    if (e && e.target !== document.getElementById('ovOferta')) return;
+    document.getElementById('ovOferta').classList.remove('open');
+  };
+
+  window.saveOferta = function(e) {
+    e.preventDefault();
+    const cid    = parseInt(document.getElementById('fCid').value);
+    const oid    = parseInt(document.getElementById('fOid').value)||null;
+    const precio = parseFloat(document.getElementById('fPrecio').value);
+    const precOr = parseFloat(document.getElementById('fPrecioOrig').value);
+    if (precio >= precOr) { alert('El precio con oferta debe ser menor al precio original.'); return; }
+    const oferta = {
+      titulo:      document.getElementById('fTit').value.trim(),
+      descripcion: document.getElementById('fDesc').value.trim(),
+      precio, precioOriginal: precOr,
+      imagen:      document.getElementById('fImg').value || null,
+      destacada:   document.getElementById('fDest').checked,
+    };
+    oid ? $db.updateOferta(cid, oid, oferta) : $db.addOferta(cid, oferta);
+    // Limpiar buffer de producto si venía de ahí
+    if (!oid && prodBuffer[cid]) {
+      clearProd({ stopPropagation:()=>{} }, cid);
+    }
+    document.getElementById('ovOferta').classList.remove('open');
+    renderLista(cid);
+  };
+
+  window.delOferta = function(cid, oid) {
+    if (!confirm('¿Eliminar esta oferta?')) return;
+    $db.deleteOferta(cid, oid);
+    renderLista(cid);
+  };
+
+  /* Imagen dentro del modal de oferta */
+  window.onMipFile = async function(input) {
+    const file = input.files[0]; if (!file) return;
+    const b64 = await resizeImg(file, 800, 600, .85);
+    document.getElementById('fImg').value = b64;
+    setMip(b64); input.value = '';
+  };
+
+  window.clearMip = function(e) { e.stopPropagation(); clearMipInternal(); };
+
+  function setMip(src) {
+    const box = document.getElementById('mip'), img = document.getElementById('mipImg');
+    img.src = src; img.style.display = 'block'; box.classList.add('has');
+  }
+  function clearMipInternal() {
+    const box = document.getElementById('mip'), img = document.getElementById('mipImg');
+    img.src = ''; img.style.display = 'none'; box.classList.remove('has');
+    document.getElementById('fImg').value = '';
+  }
+
+  /* % descuento */
+  window.calcPct = function() {
+    const p = parseFloat(document.getElementById('fPrecio').value);
+    const o = parseFloat(document.getElementById('fPrecioOrig').value);
+    const tag = document.getElementById('pctTag');
+    if (p > 0 && o > p) {
+      document.getElementById('pctVal').textContent = Math.round((1-p/o)*100);
+      tag.style.display = 'inline-flex';
+    } else { tag.style.display = 'none'; }
+  };
+
+  /* ═══════════════ GITHUB ═══════════════ */
+  function loadGHFields() {
+    const cfg = ghCfg();
+    if (cfg.repo)   document.getElementById('ghRepo').value   = cfg.repo;
+    if (cfg.branch) document.getElementById('ghBranch').value = cfg.branch;
+    if (cfg.token)  document.getElementById('ghToken').value  = cfg.token;
+    if (cfg.repo && cfg.token) document.getElementById('btnPub').classList.add('published');
+  }
+
+  function ghCfg() {
+    try { return JSON.parse(localStorage.getItem('ol_gh')||'{}'); } catch { return {}; }
+  }
+
+  window.openGH  = () => { document.getElementById('ghMsg').className='gh-msg'; document.getElementById('ovGH').classList.add('open'); };
+  window.closeGH = (e) => { if (e && e.target!==document.getElementById('ovGH')) return; document.getElementById('ovGH').classList.remove('open'); };
+
+  window.saveGH = function() {
+    const cfg = {
+      repo:   document.getElementById('ghRepo').value.trim(),
+      branch: document.getElementById('ghBranch').value.trim()||'main',
+      token:  document.getElementById('ghToken').value.trim(),
+    };
+    if (!cfg.repo||!cfg.token) { alert('Completá el repositorio y el token.'); return; }
+    localStorage.setItem('ol_gh', JSON.stringify(cfg));
+    const msg = document.getElementById('ghMsg');
+    msg.className='gh-msg ok'; msg.textContent='✅ Guardado. Ya podés usar el botón Publicar.';
+    document.getElementById('btnPub').classList.add('published');
+  };
+
+  window.publicar = async function() {
+    const cfg = ghCfg();
+    if (!cfg.repo||!cfg.token) { openGH(); return; }
+    const btn = document.getElementById('btnPub');
+    btn.textContent = '⏳ Publicando…'; btn.disabled = true;
+    try {
+      const path    = 'src/data/comercios.js';
+      const apiUrl  = `https://api.github.com/repos/${cfg.repo}/contents/${path}`;
+      const headers = { Authorization:`token ${cfg.token}`, 'Content-Type':'application/json', Accept:'application/vnd.github+json' };
+      // Obtener SHA actual
+      let sha = null;
+      const get = await fetch(`${apiUrl}?ref=${cfg.branch}`, { headers });
+      if (get.ok)              sha = (await get.json()).sha;
+      else if (get.status!==404) throw new Error(`Error al leer archivo: ${get.status}`);
+      // Commit
+      const put = await fetch(apiUrl, {
+        method:'PUT', headers,
+        body: JSON.stringify({ message:'✨ Actualizar ofertas [admin]', content: toB64($db.exportAsJS()), branch:cfg.branch, ...(sha?{sha}:{}) }),
+      });
+      if (!put.ok) { const e=await put.json(); throw new Error(e.message||put.status); }
+      btn.textContent = '✅ ¡Publicado!'; btn.classList.add('published');
+      setTimeout(() => { btn.innerHTML='🚀 <span>Publicar en GitHub</span>'; btn.disabled=false; }, 4000);
+    } catch(err) {
+      alert(`❌ No se pudo publicar:\n\n${err.message}`);
+      btn.innerHTML='🚀 <span>Publicar en GitHub</span>'; btn.disabled=false;
+    }
+  };
+
+  /* ═══════════════ UTILS ═══════════════ */
+  async function resizeImg(file, maxW, maxH, q=.85) {
+    return new Promise((res,rej) => {
+      const rd = new FileReader(); rd.onerror=rej;
+      rd.onload = e => {
+        const im = new Image(); im.onerror=rej;
+        im.onload = () => {
+          let {width:w,height:h}=im;
+          if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+          if(h>maxH){w=Math.round(w*maxH/h);h=maxH;}
+          const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+          cv.getContext('2d').drawImage(im,0,0,w,h);
+          res(cv.toDataURL('image/jpeg',q));
+        };
+        im.src=e.target.result;
+      };
+      rd.readAsDataURL(file);
+    });
+  }
+
+  function toB64(str) {
+    const bytes=new TextEncoder().encode(str);
+    let bin=''; bytes.forEach(b=>bin+=String.fromCharCode(b));
+    return btoa(bin);
+  }
+</script>
+</body>
+</html>

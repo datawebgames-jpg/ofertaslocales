@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OfertasLocales — Las mejores ofertas de tu ciudad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="src/styles.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <a href="index.html" class="logo">Ofertas<span>Locales</span></a>
+    <div class="header-location">📍 <strong>Tu ciudad</strong></div>
+    <form class="search-form" onsubmit="buscar(event)">
+      <input class="search-input" type="text" id="searchInput" placeholder="Buscar ofertas, comercios, productos…" />
+      <button class="search-btn" type="submit">🔍</button>
+    </form>
+  </header>
+
+  <!-- NAV CATEGORÍAS -->
+  <nav class="nav-cats" id="navCats"></nav>
+
+  <!-- LAYOUT -->
+  <div class="main-layout">
+
+    <!-- SIDEBAR (desktop) -->
+    <aside class="sidebar">
+      <p class="sidebar-title">Filtrar por</p>
+
+      <div class="filter-group" id="sidebarComercios"></div>
+
+      <div class="filter-group">
+        <p class="filter-group-title">Precio</p>
+        <div class="price-range">
+          <input class="price-input" type="number" id="precioMin" placeholder="Mínimo $" />
+          <input class="price-input" type="number" id="precioMax" placeholder="Máximo $" />
+          <button class="price-btn" onclick="filtrarPrecio()">Aplicar</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <p class="filter-group-title">Descuento</p>
+        <button class="filter-option" id="dsc20" onclick="toggleDescuento(20)">Más del 20% OFF</button>
+        <button class="filter-option" id="dsc30" onclick="toggleDescuento(30)">Más del 30% OFF</button>
+        <button class="filter-option" id="dsc40" onclick="toggleDescuento(40)">Más del 40% OFF</button>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO -->
+    <div class="content">
+
+      <!-- CHIPS DE COMERCIOS -->
+      <div class="comercios-strip">
+        <p class="strip-title">Comercios adheridos</p>
+        <div class="chips-row" id="chipsRow"></div>
+      </div>
+
+      <!-- FILTROS MOBILE -->
+      <div class="mobile-filter-bar" id="mobileFilterBar"></div>
+
+      <div class="results-header">
+        <p class="results-count"><strong id="resultsCount">0</strong> ofertas encontradas</p>
+        <select class="sort-select" id="sortSelect" onchange="renderOfertas()">
+          <option value="relevancia">Más relevantes</option>
+          <option value="precio-asc">Menor precio</option>
+          <option value="precio-desc">Mayor precio</option>
+          <option value="descuento">Mayor descuento</option>
+        </select>
+      </div>
+
+      <div class="ofertas-grid" id="ofertasGrid"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 OfertasLocales — Conectando comercios locales con su comunidad</p>
+  </footer>
+
+  <script type="module">
+    import { getAll } from './src/store.js';
+    import { buildNav, buildMobileComercioChips, RUBROS_ICONO, pct, fmt } from './src/layout.js';
+
+    const comercios = getAll();
+    const rubros = [...new Set(comercios.map(c => c.rubro))];
+
+    let filtroComercio  = null;
+    let filtroCategoria = null;
+    let filtroMinPrecio = null;
+    let filtroMaxPrecio = null;
+    let filtroDescuento = null;
+
+    // Leer ?rubro= de la URL al cargar
+    const params = new URLSearchParams(location.search);
+    if (params.get('rubro')) filtroCategoria = params.get('rubro');
+
+    // ── NAV ──
+    buildNav(document.getElementById('navCats'), rubros, {
+      mode: 'filter',
+      activeRubro: filtroCategoria,
+      onFilter: (r) => {
+        filtroCategoria = r;
+        filtroComercio  = null;
+        document.getElementById('mobileFilterBar').querySelector('.mob-chip')?.click();
+        buildMobileComercioChips(document.getElementById('mobileFilterBar'), comercios, null, onMobileComercio);
+        renderOfertas();
+      }
+    });
+
+    // ── CHIPS DE COMERCIOS ──
+    const chipsRow = document.getElementById('chipsRow');
+    comercios.forEach(c => {
+      const a = document.createElement('a');
+      a.className = 'chip';
+      a.href = `comercios/comercio-${c.id}/`;
+      const logoInner = c.logo
+        ? `<img src="${c.logo}" alt="${c.nombre}" style="width:100%;height:100%;object-fit:contain;border-radius:50%" />`
+        : c.inicial;
+      a.innerHTML = `<span class="chip-circle" style="background:${c.logo ? '#f0f0f0' : c.color}">${logoInner}</span>${c.nombre}`;
+      chipsRow.appendChild(a);
+    });
+
+    // ── FILTROS MOBILE ──
+    function onMobileComercio(id) {
+      filtroComercio = id;
+      buildMobileComercioChips(document.getElementById('mobileFilterBar'), comercios, id, onMobileComercio);
+      renderOfertas();
+    }
+    buildMobileComercioChips(document.getElementById('mobileFilterBar'), comercios, null, onMobileComercio);
+
+    // ── SIDEBAR COMERCIOS ──
+    const sbCom = document.getElementById('sidebarComercios');
+    const sbTitle = document.createElement('p');
+    sbTitle.className = 'filter-group-title';
+    sbTitle.textContent = 'Comercio';
+    sbCom.appendChild(sbTitle);
+
+    comercios.forEach(c => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-option';
+      btn.innerHTML = `${c.nombre} <span class="filter-count">(${c.ofertas.length})</span>`;
+      btn.onclick = () => {
+        filtroComercio = filtroComercio === c.id ? null : c.id;
+        document.querySelectorAll('#sidebarComercios .filter-option').forEach(b => b.classList.remove('active'));
+        if (filtroComercio) btn.classList.add('active');
+        renderOfertas();
+      };
+      sbCom.appendChild(btn);
+    });
+
+    // ── BÚSQUEDA ──
+    window.buscar = (e) => { e.preventDefault(); renderOfertas(); };
+
+    // ── PRECIO ──
+    window.filtrarPrecio = () => {
+      filtroMinPrecio = parseFloat(document.getElementById('precioMin').value) || null;
+      filtroMaxPrecio = parseFloat(document.getElementById('precioMax').value) || null;
+      renderOfertas();
+    };
+
+    // ── DESCUENTO ──
+    window.toggleDescuento = (min) => {
+      filtroDescuento = filtroDescuento === min ? null : min;
+      [20, 30, 40].forEach(n => {
+        document.getElementById(`dsc${n}`)?.classList.toggle('active', filtroDescuento === n);
+      });
+      renderOfertas();
+    };
+
+    // ── RENDER ──
+    function getOfertas() {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      let lista = comercios.flatMap(c => c.ofertas.map(o => ({ ...o, comercio: c })));
+
+      if (filtroCategoria) lista = lista.filter(o => o.comercio.rubro === filtroCategoria);
+      if (filtroComercio)  lista = lista.filter(o => o.comercio.id === filtroComercio);
+      if (filtroMinPrecio) lista = lista.filter(o => o.precio >= filtroMinPrecio);
+      if (filtroMaxPrecio) lista = lista.filter(o => o.precio <= filtroMaxPrecio);
+      if (filtroDescuento) lista = lista.filter(o => pct(o.precioOriginal, o.precio) >= filtroDescuento);
+      if (q) lista = lista.filter(o =>
+        o.titulo.toLowerCase().includes(q) ||
+        o.descripcion.toLowerCase().includes(q) ||
+        o.comercio.nombre.toLowerCase().includes(q) ||
+        o.comercio.rubro.toLowerCase().includes(q)
+      );
+
+      const sort = document.getElementById('sortSelect').value;
+      if (sort === 'precio-asc')  lista.sort((a, b) => a.precio - b.precio);
+      if (sort === 'precio-desc') lista.sort((a, b) => b.precio - a.precio);
+      if (sort === 'descuento')   lista.sort((a, b) => pct(b.precioOriginal, b.precio) - pct(a.precioOriginal, a.precio));
+      if (sort === 'relevancia')  lista.sort((a, b) => (b.destacada ? 1 : 0) - (a.destacada ? 1 : 0));
+
+      return lista;
+    }
+
+    window.renderOfertas = function() {
+      const lista = getOfertas();
+      const grid  = document.getElementById('ofertasGrid');
+      document.getElementById('resultsCount').textContent = lista.length;
+
+      if (!lista.length) {
+        grid.innerHTML = `<div class="empty-state">
+          <div class="icon">🔍</div>
+          <p>No encontramos ofertas con esos filtros.</p>
+        </div>`;
+        return;
+      }
+
+      grid.innerHTML = lista.map(o => {
+        const off   = pct(o.precioOriginal, o.precio);
+        const icono = RUBROS_ICONO[o.comercio.rubro] || '🏷️';
+        return `
+          <a class="oferta-card" href="comercios/comercio-${o.comercio.id}/">
+            <div class="card-imagen">
+              ${o.imagen
+                ? `<img src="${o.imagen}" alt="${o.titulo}" />`
+                : `<span class="card-imagen-placeholder">${icono}</span>`}
+              ${o.destacada ? '<span class="badge-oferta">Destacada</span>' : ''}
+            </div>
+            <div class="card-body">
+              <p class="card-comercio">${o.comercio.nombre} · ${o.comercio.rubro}</p>
+              <p class="card-titulo">${o.titulo}</p>
+              <p class="card-desc">${o.descripcion}</p>
+              <p class="card-precio-original">${fmt(o.precioOriginal)}</p>
+              <div class="card-precio-row">
+                <span class="card-precio">${fmt(o.precio)}</span>
+                <span class="card-descuento">${off}% OFF</span>
+              </div>
+              <p class="card-envio">✓ Disponible en local</p>
+            </div>
+          </a>`;
+      }).join('');
+    };
+
+    renderOfertas();
+  </script>
+</body>
+</html>

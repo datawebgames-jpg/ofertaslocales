@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cargando… — OfertasLocales</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../src/styles.css" />
+</head>
+<body>
+  <header>
+    <a href="../../index.html" class="logo">Ofertas<span>Locales</span></a>
+    <div class="header-location">📍 <strong>Tu ciudad</strong></div>
+    <form class="search-form" onsubmit="buscar(event)">
+      <input class="search-input" type="text" id="searchInput" placeholder="Buscar en este comercio…" />
+      <button class="search-btn" type="submit">🔍</button>
+    </form>
+  </header>
+  <nav class="nav-cats" id="navCats"></nav>
+  <div class="main-layout">
+    <aside class="sidebar">
+      <p class="sidebar-title">Filtrar por</p>
+      <div class="filter-group">
+        <p class="filter-group-title">Precio</p>
+        <div class="price-range">
+          <input class="price-input" type="number" id="precioMin" placeholder="Mínimo $" />
+          <input class="price-input" type="number" id="precioMax" placeholder="Máximo $" />
+          <button class="price-btn" onclick="filtrarPrecio()">Aplicar</button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <p class="filter-group-title">Descuento</p>
+        <button class="filter-option" id="dsc20" onclick="toggleDescuento(20)">Más del 20% OFF</button>
+        <button class="filter-option" id="dsc30" onclick="toggleDescuento(30)">Más del 30% OFF</button>
+        <button class="filter-option" id="dsc40" onclick="toggleDescuento(40)">Más del 40% OFF</button>
+      </div>
+    </aside>
+    <div class="content">
+      <div class="comercio-banner" id="banner"></div>
+      <div class="mobile-filter-bar" id="mobileFilterBar"></div>
+      <div class="results-header">
+        <p class="results-count"><strong id="resultsCount">0</strong> ofertas</p>
+        <select class="sort-select" id="sortSelect" onchange="renderOfertas()">
+          <option value="relevancia">Más relevantes</option>
+          <option value="precio-asc">Menor precio</option>
+          <option value="precio-desc">Mayor precio</option>
+          <option value="descuento">Mayor descuento</option>
+        </select>
+      </div>
+      <div class="ofertas-grid" id="ofertasGrid"></div>
+    </div>
+  </div>
+  <footer><p>&copy; 2025 OfertasLocales — Conectando comercios locales con su comunidad</p></footer>
+  <script type="module">
+    import { getComercio } from '../../src/store.js';
+    import { buildNav, buildMobileDescuentoChips, RUBROS_ICONO, pct, fmt } from '../../src/layout.js';
+    const COMERCIO_ID = 3;
+    const c = getComercio(COMERCIO_ID);
+    document.title = `${c.nombre} — OfertasLocales`;
+    buildNav(document.getElementById('navCats'), [c.rubro], { mode: 'navigate', basePath: '../../', activeRubro: c.rubro });
+    document.getElementById('banner').style.borderLeftColor = c.color;
+    const logoInner = c.logo ? `<img src="${c.logo}" alt="${c.nombre}" style="width:100%;height:100%;object-fit:contain" />` : c.inicial;
+    document.getElementById('banner').innerHTML = `
+      <div class="banner-logo" style="background:${c.logo ? '#f0f0f0' : c.color}">${logoInner}</div>
+      <div class="banner-info">
+        <span class="banner-badge" style="background:${c.color}">${c.rubro}</span>
+        <div class="banner-nombre">${c.nombre}</div>
+        <div class="banner-desc">${c.descripcion}</div>
+      </div>
+      <a class="banner-link" href="../../index.html">Ver todos los comercios →</a>`;
+    let filtroMinPrecio = null, filtroMaxPrecio = null, filtroDescuento = null;
+    function onMobileDescuento(min) { filtroDescuento = min; buildMobileDescuentoChips(document.getElementById('mobileFilterBar'), min, onMobileDescuento); renderOfertas(); }
+    buildMobileDescuentoChips(document.getElementById('mobileFilterBar'), null, onMobileDescuento);
+    window.buscar = (e) => { e.preventDefault(); renderOfertas(); };
+    window.filtrarPrecio = () => { filtroMinPrecio = parseFloat(document.getElementById('precioMin').value)||null; filtroMaxPrecio = parseFloat(document.getElementById('precioMax').value)||null; renderOfertas(); };
+    window.toggleDescuento = (min) => { filtroDescuento = filtroDescuento===min?null:min; [20,30,40].forEach(n=>document.getElementById(`dsc${n}`)?.classList.toggle('active',filtroDescuento===n)); renderOfertas(); };
+    function getOfertas() {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      let lista = [...c.ofertas];
+      if (filtroMinPrecio) lista = lista.filter(o=>o.precio>=filtroMinPrecio);
+      if (filtroMaxPrecio) lista = lista.filter(o=>o.precio<=filtroMaxPrecio);
+      if (filtroDescuento) lista = lista.filter(o=>pct(o.precioOriginal,o.precio)>=filtroDescuento);
+      if (q) lista = lista.filter(o=>o.titulo.toLowerCase().includes(q)||o.descripcion.toLowerCase().includes(q));
+      const sort = document.getElementById('sortSelect').value;
+      if (sort==='precio-asc') lista.sort((a,b)=>a.precio-b.precio);
+      if (sort==='precio-desc') lista.sort((a,b)=>b.precio-a.precio);
+      if (sort==='descuento') lista.sort((a,b)=>pct(b.precioOriginal,b.precio)-pct(a.precioOriginal,a.precio));
+      if (sort==='relevancia') lista.sort((a,b)=>(b.destacada?1:0)-(a.destacada?1:0));
+      return lista;
+    }
+    window.renderOfertas = function() {
+      const lista=getOfertas(), grid=document.getElementById('ofertasGrid');
+      document.getElementById('resultsCount').textContent=lista.length;
+      if (!lista.length) { grid.innerHTML=`<div class="empty-state"><div class="icon">🏷️</div><p>${c.ofertas.length===0?'Las ofertas estarán disponibles muy pronto.':'No hay ofertas con esos filtros.'}</p></div>`; return; }
+      const icono=RUBROS_ICONO[c.rubro]||'🏷️';
+      grid.innerHTML=lista.map(o=>{const off=pct(o.precioOriginal,o.precio);return`<div class="oferta-card" style="cursor:default"><div class="card-imagen">${o.imagen?`<img src="${o.imagen}" alt="${o.titulo}"/>`:`<span class="card-imagen-placeholder">${icono}</span>`}${o.destacada?'<span class="badge-oferta">Destacada</span>':''}</div><div class="card-body"><p class="card-titulo">${o.titulo}</p><p class="card-desc">${o.descripcion}</p><p class="card-precio-original">${fmt(o.precioOriginal)}</p><div class="card-precio-row"><span class="card-precio" style="color:${c.color}">${fmt(o.precio)}</span><span class="card-descuento">${off}% OFF</span></div><p class="card-envio">✓ Disponible en local</p></div></div>`;}).join('');
+    };
+    renderOfertas();
+  </script>
+</body>
+</html>
