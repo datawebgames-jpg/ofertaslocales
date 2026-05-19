@@ -7,6 +7,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../../src/styles.css" />
+  <!-- PWA -->
+  <link rel="manifest" href="../../manifest.json" />
+  <link rel="apple-touch-icon" href="../../icons/icon.svg" />
+  <meta name="theme-color" content="#FFE600" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="OfertasLocales" />
 </head>
 <body>
 
@@ -81,6 +89,13 @@
     <p>&copy; 2025 OfertasLocales — Conectando comercios locales con su comunidad</p>
   </footer>
 
+  <script>
+    if ('serviceWorker' in navigator) {
+      const manifest = document.querySelector('link[rel="manifest"]');
+      const base = manifest ? new URL(manifest.href).href.replace('manifest.json', '') : '/';
+      navigator.serviceWorker.register(base + 'sw.js', { scope: base }).catch(() => {});
+    }
+  </script>
   <script type="module">
     import { getComercio } from '../../src/store.js';
     import { buildNav, buildMobileDescuentoChips, RUBROS_ICONO, pct, fmt } from '../../src/layout.js';

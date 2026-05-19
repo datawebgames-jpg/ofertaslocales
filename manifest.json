@@ -1,0 +1,35 @@
+{
+  "name": "OfertasLocales",
+  "short_name": "OfertasLocales",
+  "description": "Las mejores ofertas de tu ciudad. Comprá local y ahorrá más.",
+  "start_url": ".",
+  "id": ".",
+  "display": "standalone",
+  "background_color": "#FFE600",
+  "theme_color": "#FFE600",
+  "orientation": "portrait-primary",
+  "lang": "es",
+  "categories": ["shopping"],
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Ver todas las ofertas",
+      "short_name": "Ofertas",
+      "url": ".",
+      "icons": [{ "src": "icons/icon.svg", "sizes": "any" }]
+    }
+  ]
+}
