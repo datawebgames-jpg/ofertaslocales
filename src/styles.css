@@ -1,5 +1,79 @@
 /* OfertasLocales — Shared Styles */
 
+/* ── BANNER INSTALAR APP ── */
+.install-banner {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 9998;
+  padding: 0 1rem 1rem;
+  transform: translateY(110%);
+  transition: transform 0.4s cubic-bezier(.34,1.3,.64,1);
+  pointer-events: none;
+}
+.install-banner.show {
+  transform: translateY(0);
+  pointer-events: all;
+}
+.ib-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 -4px 32px rgba(0,0,0,.18), 0 2px 12px rgba(0,0,0,.08);
+  padding: 1rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  position: relative;
+}
+.ib-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  background: #FFE600;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 1.1rem; color: #3483FA;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(255,230,0,.4);
+}
+.ib-text {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.ib-text strong { font-size: .9rem; color: #1a1a1a; }
+.ib-text span   { font-size: .75rem; color: #666; line-height: 1.35; }
+.ib-btns {
+  display: flex; gap: 8px; flex-shrink: 0;
+}
+.ib-btn-yes {
+  background: #3483FA; color: #fff;
+  border: none; border-radius: 50px;
+  padding: 9px 20px; font-size: .82rem; font-weight: 700;
+  font-family: 'DM Sans', sans-serif; cursor: pointer;
+  box-shadow: 0 3px 12px rgba(52,131,250,.4);
+  transition: transform .15s, box-shadow .15s;
+}
+.ib-btn-yes:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(52,131,250,.5); }
+.ib-btn-no {
+  background: #f0f2f5; color: #555;
+  border: none; border-radius: 50px;
+  padding: 9px 16px; font-size: .82rem; font-weight: 600;
+  font-family: 'DM Sans', sans-serif; cursor: pointer;
+  transition: background .15s;
+}
+.ib-btn-no:hover { background: #e0e3e8; }
+.ib-ios {
+  width: 100%; text-align: center;
+  padding: .6rem 0 .2rem;
+  font-size: .82rem; color: #444;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.ib-ios svg { flex-shrink: 0; color: #3483FA; }
+.ib-close {
+  position: absolute; top: 10px; right: 12px;
+  background: none; border: none; cursor: pointer;
+  font-size: .85rem; color: #aaa; line-height: 1;
+  padding: 2px 4px;
+}
+.ib-close:hover { color: #555; }
+
 /* ── POPUP DE BIENVENIDA ── */
 #welcome-overlay {
   position: fixed;

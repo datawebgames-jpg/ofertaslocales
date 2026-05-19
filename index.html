@@ -18,6 +18,28 @@
 </head>
 <body>
 
+  <!-- BANNER INSTALAR APP -->
+  <div id="installBanner" class="install-banner" aria-hidden="true">
+    <div class="ib-card">
+      <div class="ib-icon">OL</div>
+      <div class="ib-text">
+        <strong>OfertasLocales</strong>
+        <span>Instalá la app y accedé a las mejores ofertas desde tu inicio</span>
+      </div>
+      <div class="ib-btns">
+        <button class="ib-btn-yes" id="installBtn">Instalar gratis</button>
+        <button class="ib-btn-no"  id="installNo">Ahora no</button>
+      </div>
+    </div>
+    <!-- instrucciones iOS (se muestra solo en Safari iPhone/iPad) -->
+    <div class="ib-ios" id="iosHint" style="display:none">
+      <span>Tocá</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      <span>y elegí <strong>Agregar a inicio</strong></span>
+    </div>
+    <button class="ib-close" id="installClose" aria-label="Cerrar">✕</button>
+  </div>
+
   <!-- POPUP DE BIENVENIDA -->
   <div id="welcome-overlay">
     <div class="welcome-box">
@@ -121,6 +143,67 @@
       const base = manifest ? new URL(manifest.href).href.replace('manifest.json', '') : '/';
       navigator.serviceWorker.register(base + 'sw.js', { scope: base }).catch(() => {});
     }
+
+    /* ── BANNER INSTALAR APP ── */
+    (function () {
+      // No mostrar si ya está instalada como app
+      if (window.matchMedia('(display-mode: standalone)').matches) return;
+      if (window.navigator.standalone) return; // iOS ya instalada
+
+      // No mostrar en desktop
+      const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (!isMobile) return;
+
+      // No mostrar si el usuario ya cerró el banner esta sesión
+      if (sessionStorage.getItem('ol_install_dismissed')) return;
+
+      const banner  = document.getElementById('installBanner');
+      const btnYes  = document.getElementById('installBtn');
+      const btnNo   = document.getElementById('installNo');
+      const btnX    = document.getElementById('installClose');
+      const iosHint = document.getElementById('iosHint');
+      let deferred  = null;
+
+      function show() {
+        banner.classList.add('show');
+        banner.setAttribute('aria-hidden', 'false');
+      }
+      function hide() {
+        banner.classList.remove('show');
+        sessionStorage.setItem('ol_install_dismissed', '1');
+      }
+
+      // Android / Chrome — capturamos el prompt antes de que desaparezca
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferred = e;
+        setTimeout(show, 4000); // mostramos 4s después de cargar
+      });
+
+      // Una vez instalada, ocultamos
+      window.addEventListener('appinstalled', hide);
+
+      // iOS Safari — no tiene beforeinstallprompt, mostramos instrucciones
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      if (isIOS && isSafari) {
+        iosHint.style.display = 'flex';
+        // Ocultamos el botón "Instalar" (no funciona en iOS)
+        btnYes.style.display = 'none';
+        setTimeout(show, 4000);
+      }
+
+      btnYes.addEventListener('click', async () => {
+        if (!deferred) return;
+        deferred.prompt();
+        const { outcome } = await deferred.userChoice;
+        deferred = null;
+        hide();
+      });
+
+      btnNo.addEventListener('click', hide);
+      btnX.addEventListener('click',  hide);
+    })();
   </script>
   <script type="module">
     import { getAll } from './src/store.js';
