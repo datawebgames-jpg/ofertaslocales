@@ -71,7 +71,10 @@ export const comercios = [
         "destacada": true,
         "id": 7
       }
-    ]
+    ],
+    "telefono": "2954320639",
+    "direccion": "Julio Sosa 1956 Santa Rosa La Pampa",
+    "horarios": "Lunes a Viernes de 09 a 17"
   },
   {
     "id": 2,
