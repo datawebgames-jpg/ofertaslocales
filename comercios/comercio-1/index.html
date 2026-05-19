@@ -45,6 +45,13 @@
         <button class="filter-option" id="dsc30" onclick="toggleDescuento(30)">Más del 30% OFF</button>
         <button class="filter-option" id="dsc40" onclick="toggleDescuento(40)">Más del 40% OFF</button>
       </div>
+
+      <!-- MAPA -->
+      <div class="filter-group" id="mapGroup">
+        <p class="filter-group-title">Dónde encontrarnos</p>
+        <div class="map-embed-wrap" id="mapEmbed"></div>
+        <a class="map-nav-btn" id="mapNavLink" href="#" target="_blank" rel="noopener">🗺️ Cómo llegar desde mi ubicación</a>
+      </div>
     </aside>
 
     <!-- CONTENIDO -->
@@ -103,9 +110,22 @@
         <span class="banner-badge" style="background:${c.color}">${c.rubro}</span>
         <div class="banner-nombre">${c.nombre}</div>
         <div class="banner-desc">${c.descripcion}</div>
+        ${c.direccion ? `<div class="banner-meta">📍 <a class="banner-addr" href="https://maps.google.com/maps/dir/?api=1&destination=${encodeURIComponent(c.direccion)}" target="_blank" rel="noopener">${c.direccion}</a></div>` : ''}
+        ${c.horarios ? `<div class="banner-meta">🕐 ${c.horarios}</div>` : ''}
       </div>
       <a class="banner-link" href="../../index.html">Ver todos los comercios →</a>
     `;
+
+    // ── MAPA ──
+    if (c.direccion) {
+      const enc = encodeURIComponent(c.direccion);
+      document.getElementById('mapEmbed').innerHTML =
+        `<iframe src="https://maps.google.com/maps?q=${enc}&output=embed&z=15" width="100%" height="160" style="border:0;border-radius:8px" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+      document.getElementById('mapNavLink').href =
+        `https://maps.google.com/maps/dir/?api=1&destination=${enc}`;
+    } else {
+      document.getElementById('mapGroup').style.display = 'none';
+    }
 
     // ── ESTADO ──
     let filtroMinPrecio = null;
@@ -190,7 +210,7 @@
       }).join('');
     };
 
-    const WHATSAPP_ADMIN = '542954321305';
+    const WHATSAPP_NUM = (c.telefono || '542954321305').replace(/\D/g, '');
 
     window.openConsulta = function(oid) {
       const o = c.ofertas.find(x => x.id === oid);
@@ -242,7 +262,7 @@
         `💰 *Precio oferta:* ${fmt(o.precio)} (${pct(o.precioOriginal, o.precio)}% OFF)\n` +
         `🏪 *Comercio:* ${c.nombre}` +
         (msg ? `\n💬 *Consulta:* ${msg}` : '');
-      window.open(`https://wa.me/${WHATSAPP_ADMIN}?text=${encodeURIComponent(msgAdmin)}`, '_blank');
+      window.open(`https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(msgAdmin)}`, '_blank');
       document.getElementById('frmConsulta').style.display = 'none';
       document.getElementById('cmSuccess').innerHTML = `
         <div class="cm-ok-circle">✅</div>

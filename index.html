@@ -10,6 +10,20 @@
 </head>
 <body>
 
+  <!-- POPUP DE BIENVENIDA -->
+  <div id="welcome-overlay">
+    <div class="welcome-box">
+      <h1 class="welcome-title">Ofertas<span>Locales</span></h1>
+      <div class="welcome-logos" id="welcomeLogos"></div>
+      <p class="welcome-slogan">
+        Descubrí las <strong>mejores ofertas</strong> de tu ciudad.<br>
+        Comprá local, ahorrá más y apoyá a los comercios de tu barrio.<br>
+        <strong>¡Las promociones te esperan!</strong>
+      </p>
+      <button class="welcome-btn" id="welcomeBtn">Ver ofertas →</button>
+    </div>
+  </div>
+
   <!-- HEADER -->
   <header>
     <a href="index.html" class="logo">Ofertas<span>Locales</span></a>
@@ -46,6 +60,20 @@
         <button class="filter-option" id="dsc20" onclick="toggleDescuento(20)">Más del 20% OFF</button>
         <button class="filter-option" id="dsc30" onclick="toggleDescuento(30)">Más del 30% OFF</button>
         <button class="filter-option" id="dsc40" onclick="toggleDescuento(40)">Más del 40% OFF</button>
+      </div>
+
+      <!-- BLOQUE CREADORES -->
+      <div class="sidebar-creadores">
+        <p class="creadores-slogan">Conectamos tu barrio<br>con las mejores ofertas</p>
+        <a class="creadores-ig" href="https://www.instagram.com/dataweb76/" target="_blank" rel="noopener" title="Seguinos en Instagram">
+          <svg class="ig-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/>
+          </svg>
+          <span>@dataweb76</span>
+        </a>
+        <p class="creadores-label">Creadores de la plataforma</p>
       </div>
     </aside>
 
@@ -85,6 +113,41 @@
 
     const comercios = getAll();
     const rubros = [...new Set(comercios.map(c => c.rubro))];
+
+    // ── POPUP DE BIENVENIDA ──
+    if (!sessionStorage.getItem('ol_welcome_shown')) {
+      const logosEl = document.getElementById('welcomeLogos');
+      comercios.forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'welcome-logo-item';
+        const circle = document.createElement('div');
+        circle.className = 'welcome-logo-circle';
+        circle.style.background = c.logo ? '#f0f0f0' : c.color;
+        circle.innerHTML = c.logo
+          ? `<img src="${c.logo}" alt="${c.nombre}" />`
+          : (c.inicial || c.nombre[0]);
+        const name = document.createElement('span');
+        name.className = 'welcome-logo-name';
+        name.textContent = c.nombre;
+        item.appendChild(circle);
+        item.appendChild(name);
+        logosEl.appendChild(item);
+      });
+
+      function cerrarPopup() {
+        const ov = document.getElementById('welcome-overlay');
+        ov.classList.add('fade-out');
+        sessionStorage.setItem('ol_welcome_shown', '1');
+        setTimeout(() => ov.remove(), 450);
+      }
+
+      document.getElementById('welcomeBtn').addEventListener('click', cerrarPopup);
+      document.getElementById('welcome-overlay').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) cerrarPopup();
+      });
+    } else {
+      document.getElementById('welcome-overlay').remove();
+    }
 
     let filtroComercio  = null;
     let filtroCategoria = null;

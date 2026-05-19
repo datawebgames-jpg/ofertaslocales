@@ -315,11 +315,25 @@
     .cfg-banner b { color:#856404; }
     .cfg-banner button { margin-left:auto; }
 
+    /* INFO CARD (teléfono / dirección / horarios) */
+    .info-card {
+      background:var(--white); border-radius:var(--radius);
+      box-shadow:0 2px 8px rgba(0,0,0,.07); overflow:hidden;
+      margin-bottom:1.5rem;
+    }
+    .info-card-head {
+      padding:.9rem 1.1rem; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:8px;
+    }
+    .info-card-body { padding:1.25rem; display:flex; flex-direction:column; gap:1rem; }
+    .info-fields-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+
     /* RESPONSIVE */
     @media (max-width:640px) {
       .wrap { padding:1rem; }
       .upload-row { grid-template-columns:1fr; }
       .fr2 { grid-template-columns:1fr; }
+      .info-fields-grid { grid-template-columns:1fr; }
       .top-actions .btn-dark span { display:none; }
       .save-status { display:none; }
     }
@@ -612,6 +626,37 @@
 
           </div><!-- /upload-row -->
 
+          <!-- ════ INFO DEL COMERCIO ════ -->
+          <div class="info-card">
+            <div class="info-card-head">
+              <span class="uc-icon">📋</span>
+              <div>
+                <div class="uc-title">Información del comercio</div>
+                <div class="uc-sub">Teléfono, dirección y horarios visibles en la página del comercio</div>
+              </div>
+            </div>
+            <div class="info-card-body">
+              <div class="info-fields-grid">
+                <div class="fr">
+                  <label>📱 Teléfono WhatsApp</label>
+                  <input class="fi" type="tel" id="iTel-${c.id}" value="${c.telefono||''}" placeholder="Ej: 5492954123456"/>
+                  <p style="font-size:.68rem;color:var(--muted);margin-top:4px;line-height:1.4">Sin + ni espacios. Ej: 5492954123456</p>
+                </div>
+                <div class="fr">
+                  <label>📍 Dirección del comercio</label>
+                  <input class="fi" type="text" id="iDir-${c.id}" value="${c.direccion||''}" placeholder="Av. San Martín 1234, Neuquén"/>
+                </div>
+                <div class="fr">
+                  <label>🕐 Horarios de atención</label>
+                  <input class="fi" type="text" id="iHor-${c.id}" value="${c.horarios||''}" placeholder="Lun-Vie 9 a 18hs · Sáb 9 a 13hs"/>
+                </div>
+              </div>
+              <div>
+                <button class="btn btn-green" onclick="saveInfoComercio(${c.id}, this)">💾 Guardar información del comercio</button>
+              </div>
+            </div>
+          </div>
+
           <!-- ════ LISTA DE OFERTAS ════ -->
           <div class="ofertas-sec-head">
             <div style="display:flex;align-items:center;gap:10px">
@@ -798,6 +843,19 @@
     }
     document.getElementById('ovOferta').classList.remove('open');
     renderLista(cid);
+    autoPublish();
+  };
+
+  /* ═══════════════ INFO DEL COMERCIO ═══════════════ */
+  window.saveInfoComercio = function(cid, btn) {
+    const telefono  = document.getElementById(`iTel-${cid}`).value.trim();
+    const direccion = document.getElementById(`iDir-${cid}`).value.trim();
+    const horarios  = document.getElementById(`iHor-${cid}`).value.trim();
+    $db.updateComercioInfo(cid, { telefono, direccion, horarios });
+    const orig = btn.textContent;
+    btn.textContent = '✅ Guardado';
+    btn.disabled = true;
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 2500);
     autoPublish();
   };
 
