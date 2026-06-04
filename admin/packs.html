@@ -446,7 +446,7 @@ function buildPackBody(pack) {
     <div class="com-tabs" id="comTabs-${pack.id}">${comTabs}</div>
     <div id="comForms-${pack.id}">${comForms}</div>
     <div class="sep"></div>
-    <button class="btn-save" onclick="savePack(${pack.id})">💾 Guardar pack</button>`;
+    <button class="btn-save" onclick="savePackNombre(${pack.id})">💾 Guardar nombre del pack</button>`;
 }
 
 function buildComercioForm(pack, ci, c) {
@@ -515,6 +515,9 @@ function buildComercioForm(pack, ci, c) {
     </div>
 
     <div class="sep"></div>
+    <button class="btn-save" onclick="saveComercio('${pack.id}',${ci},${c.id})" style="margin-bottom:16px">
+      💾 Guardar datos de este comercio
+    </button>
 
     <div class="ofertas-admin">
       <div class="ofertas-admin-title">
@@ -642,18 +645,40 @@ window.handleLogo = async (input, packId, ci, comercioId) => {
   const file = input.files[0];
   if (!file) return;
   const prog = document.getElementById(`logoProgress-${packId}-${ci}`);
-  prog.textContent = '⏳ Subiendo...';
+  prog.textContent = '⏳ Subiendo logo...';
+
   const path = `pack-${packId}/comercio-${comercioId}-${Date.now()}.jpg`;
-  const url = await uploadImage('logos-comercios', path, file);
-  if (!url) { prog.textContent = '❌ Error al subir'; return; }
-  prog.textContent = '✅ Logo subido';
+  const url  = await uploadImage('logos-comercios', path, file);
+  if (!url) { prog.textContent = '❌ Error al subir logo'; return; }
+
   // actualizar preview
   const el = document.getElementById(`logoImg-${packId}-${ci}`);
   if (el.tagName === 'DIV') {
     el.outerHTML = `<img src="${url}" class="logo-preview" id="logoImg-${packId}-${ci}">`;
   } else { el.src = url; }
   input._uploadedUrl = url;
-  setSaveStatus('saved','✅ Logo listo');
+
+  // guardar URL en DB inmediatamente
+  prog.textContent = '⏳ Guardando en base de datos...';
+  const { data, error } = await supabase
+    .from('comercios')
+    .update({ logo_url: url })
+    .eq('id', comercioId)
+    .select();
+
+  if (error || !data?.length) {
+    prog.textContent = `⚠️ Logo subido pero no guardado: ${error?.message || 'sin permisos'}`;
+    console.error('Error guardando logo_url:', error);
+    return;
+  }
+
+  prog.textContent = '✅ Logo guardado';
+  setSaveStatus('saved','✅ Logo guardado');
+
+  // actualizar caché
+  const pack = packsCache[currentType]?.find(p => p.id == packId);
+  const c    = pack?.comercios[ci];
+  if (c) c.logo_url = url;
 };
 
 window.handleOfertaImg = async (input, packId, ci, comercioId, n) => {
@@ -696,50 +721,78 @@ window.calcDescFromPrecio = (packId, ci) => {
 };
 
 /* ══════════════════════════════════════════════════════════
-   GUARDAR PACK (nombre)
+   GUARDAR NOMBRE DEL PACK
 ══════════════════════════════════════════════════════════ */
-window.savePack = async (packId) => {
+window.savePackNombre = async (packId) => {
   const nombre = document.getElementById(`pnombre-${packId}`)?.value || '';
-  setSaveStatus('saving','⏳ Guardando pack...');
+  setSaveStatus('saving','⏳ Guardando...');
   const { error } = await supabase.from('packs').update({ nombre }).eq('id', packId);
-  if (error) { setSaveStatus('error','❌ Error'); showToast('❌ Error al guardar pack'); return; }
-
-  // Guardar cada comercio visible
-  const pack = packsCache[currentType]?.find(p => p.id === packId);
-  if (!pack) return;
-
-  for (let ci = 0; ci < pack.comercios.length; ci++) {
-    await saveComercioData(packId, ci);
-  }
-
-  setSaveStatus('saved','✅ Pack guardado');
-  showToast('✓ Pack guardado en Supabase');
-  delete packsCache[currentType]; // invalidar caché para próxima carga
+  if (error) { setSaveStatus('error','❌ ' + error.message); showToast('❌ ' + error.message); return; }
+  setSaveStatus('saved','✅ Nombre guardado');
+  showToast('✓ Nombre del pack guardado');
+  delete packsCache[currentType];
 };
 
-async function saveComercioData(packId, ci) {
-  const pack = packsCache[currentType]?.find(p => p.id === packId);
-  if (!pack || !pack.comercios[ci]) return;
-  const c = pack.comercios[ci];
+/* ══════════════════════════════════════════════════════════
+   GUARDAR COMERCIO INDIVIDUAL
+══════════════════════════════════════════════════════════ */
+window.saveComercio = async (packId, ci, comercioId) => {
+  const btn = document.querySelector(`#comform-${packId}-${ci} .btn-save`);
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Guardando...'; }
 
+  setSaveStatus('saving','⏳ Guardando comercio...');
+
+  // leer todos los campos del form
+  const val = id => document.getElementById(id)?.value?.trim() || '';
   const logoInput = document.getElementById(`logoFile-${packId}-${ci}`);
-  const logo_url  = logoInput?._uploadedUrl || c.logo_url || '';
+
+  // obtener logo_url: primero el recién subido, si no el que ya tenía en DB
+  const pack = packsCache[currentType]?.find(p => p.id == packId);
+  const c    = pack?.comercios[ci];
+  const logo_url = logoInput?._uploadedUrl || c?.logo_url || '';
 
   const payload = {
-    nombre:          document.getElementById(`f-nombre-${packId}-${ci}`)?.value || c.nombre,
-    rubro:           document.getElementById(`f-rubro-${packId}-${ci}`)?.value  || c.rubro,
-    whatsapp:        document.getElementById(`f-wa-${packId}-${ci}`)?.value     || c.whatsapp,
-    telefono:        document.getElementById(`f-tel-${packId}-${ci}`)?.value    || c.telefono,
-    mail:            document.getElementById(`f-mail-${packId}-${ci}`)?.value   || c.mail,
-    direccion:       document.getElementById(`f-dir-${packId}-${ci}`)?.value    || c.direccion,
-    ciudad:          document.getElementById(`f-ciudad-${packId}-${ci}`)?.value || c.ciudad,
-    provincia:       document.getElementById(`f-prov-${packId}-${ci}`)?.value   || c.provincia,
-    color:           document.getElementById(`f-color-${packId}-${ci}`)?.value  || c.color,
+    nombre:          val(`f-nombre-${packId}-${ci}`) || c?.nombre || '',
+    rubro:           val(`f-rubro-${packId}-${ci}`)  || c?.rubro  || '',
+    whatsapp:        val(`f-wa-${packId}-${ci}`)     || c?.whatsapp || '',
+    telefono:        val(`f-tel-${packId}-${ci}`)    || c?.telefono || '',
+    mail:            val(`f-mail-${packId}-${ci}`)   || c?.mail || '',
+    direccion:       val(`f-dir-${packId}-${ci}`)    || c?.direccion || '',
+    ciudad:          val(`f-ciudad-${packId}-${ci}`) || c?.ciudad || '',
+    provincia:       val(`f-prov-${packId}-${ci}`)   || c?.provincia || '',
+    color:           document.getElementById(`f-color-${packId}-${ci}`)?.value || c?.color || '#1d3557',
     logo_url,
   };
 
-  await supabase.from('comercios').update(payload).eq('id', c.id);
-}
+  console.log('Guardando comercio', comercioId, payload);
+
+  const { data, error } = await supabase
+    .from('comercios')
+    .update(payload)
+    .eq('id', comercioId)
+    .select();
+
+  if (btn) { btn.disabled = false; btn.textContent = '💾 Guardar datos de este comercio'; }
+
+  if (error) {
+    console.error('Error guardando comercio:', error);
+    setSaveStatus('error','❌ ' + error.message);
+    showToast('❌ Error: ' + error.message);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    setSaveStatus('error','❌ Sin permisos para guardar');
+    showToast('❌ Sin permisos — verificá que seas admin');
+    return;
+  }
+
+  setSaveStatus('saved','✅ Comercio guardado');
+  showToast(`✓ ${payload.nombre || 'Comercio'} guardado`);
+
+  // actualizar caché local
+  if (c) Object.assign(c, payload);
+};
 
 /* ══════════════════════════════════════════════════════════
    OFERTAS
