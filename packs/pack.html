@@ -407,13 +407,15 @@ function renderLogos() {
     }
 
     return `
-      <button class="logo-btn ${isActive ? 'active' : ''}" style="--cc:${col}"
+      <div class="logo-btn ${isActive ? 'active' : ''}" style="--cc:${col}"
         onclick="toggleComercio(${c.id}, '${rub}', '${col}')">
-        <div class="logo-circle" style="background:${col}33;border-color:${isActive ? col : 'rgba(255,255,255,.4)'}">
-          ${inner}
-        </div>
+        <a href="comercio.html#comercio-${c.id}" style="display:contents;text-decoration:none">
+          <div class="logo-circle" style="background:${col}33;border-color:${isActive ? col : 'rgba(255,255,255,.4)'}">
+            ${inner}
+          </div>
+        </a>
         <div class="logo-label">${rub}</div>
-      </button>`;
+      </div>`;
   }).join('');
 }
 
@@ -457,7 +459,9 @@ function renderGrid() {
         </div>
         <div class="card-footer">
           <div class="card-info">
-            <span class="card-comercio">${c.nombre || ''}</span>
+            <a href="comercio.html#comercio-${c.id}" style="text-decoration:none">
+              <span class="card-comercio" style="color:rgba(255,215,0,.65)">${c.nombre || ''} →</span>
+            </a>
             <span class="card-nombre">${o.nombre || ''}</span>
           </div>
           <div class="precio-wrap">

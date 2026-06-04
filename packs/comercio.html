@@ -264,22 +264,23 @@
 
 <div class="toast" id="toast">✓ ¡Enlace copiado!</div>
 
-<script>
-// Hash: #type-idx-cid  ej: #comunidad-0-1
-const hash  = location.hash.replace('#','');
-const parts = hash.split('-');
-const type  = parts[0];
-const idx   = parseInt(parts[1]??'0');
-const cid   = parseInt(parts[2]??'1');
-const packUrl = `pack.html#${type}-${idx}`;
+<script type="module">
+import { supabase } from '../src/supabase.js';
 
+// Hash: #comercio-{id}  ej: #comercio-3
+const cid = parseInt(location.hash.replace('#','').replace('comercio-','')) || 0;
+
+/* ── CARGAR DATOS ── */
+const { data: com, error } = await supabase
+  .from('comercios')
+  .select(`*, ofertas(*), packs(id, tipo)`)
+  .eq('id', cid)
+  .single();
+
+const packUrl = com?.packs ? `pack.html#${com.packs.tipo}-${com.packs.id}` : 'pack.html';
 document.getElementById('btnVolver').href = packUrl;
 
-const raw  = localStorage.getItem(`rca_pack_${type}_${idx}`);
-const pack = raw ? JSON.parse(raw) : null;
-const com  = pack?.comercios?.find(c => c.id === cid);
-
-if (!com) {
+if (!com || error) {
   document.getElementById('perfilSection').innerHTML =
     `<div style="text-align:center;padding:80px 20px;color:rgba(255,255,255,.4)">Comercio no encontrado. <a href="${packUrl}" style="color:#FFD700">← Volver</a></div>`;
   document.getElementById('ofertasGrid').innerHTML = '';
@@ -291,8 +292,8 @@ if (!com) {
 
   /* ── PERFIL ── */
   const ini = com.inicial || (com.nombre||'??').substring(0,2).toUpperCase();
-  const logoHtml = (com.logo && com.logo.length > 10)
-    ? `<img src="${com.logo}" alt="${com.nombre}" onerror="this.style.display='none'">`
+  const logoHtml = com.logo_url
+    ? `<img src="${com.logo_url}" alt="${com.nombre}" onerror="this.style.display='none'">`
     : `<span>${ini}</span>`;
 
   const waMsg = encodeURIComponent(`Hola ${com.nombre}! Los contacto desde ComercialWeb. ¿Me pueden brindar información?`);
@@ -304,13 +305,14 @@ if (!com) {
       <div class="perfil-grid">
         <div class="perfil-logo" style="background:${color};border-color:${color}">${logoHtml}</div>
         <div class="perfil-info">
-          <div class="perfil-rubro" style="background:${color}">${com.rubro||''}</div>
+          ${com.rubro ? `<div class="perfil-rubro" style="background:${color}">${com.rubro}</div>` : ''}
           <h1 class="perfil-nombre">${com.nombre}</h1>
           <div class="datos-grid">
             ${addr ? `<div class="dato"><span class="dato-ico">📍</span><div class="dato-txt"><span class="dato-lbl">Dirección</span>${addr}</div></div>` : ''}
             ${com.telefono ? `<div class="dato"><span class="dato-ico">📞</span><div class="dato-txt"><span class="dato-lbl">Teléfono</span>${com.telefono}</div></div>` : ''}
-            ${com.telefonoVentas ? `<div class="dato"><span class="dato-ico">🛒</span><div class="dato-txt"><span class="dato-lbl">Ventas</span>${com.telefonoVentas}</div></div>` : ''}
-            ${com.mail ? `<div class="dato"><span class="dato-ico">✉️</span><div class="dato-txt"><span class="dato-lbl">Email</span>${com.mail}</div></div>` : ''}
+            ${com.telefono_ventas ? `<div class="dato"><span class="dato-ico">🛒</span><div class="dato-txt"><span class="dato-lbl">Ventas</span>${com.telefono_ventas}</div></div>` : ''}
+            ${com.mail ? `<div class="dato"><span class="dato-ico">✉️</span><div class="dato-txt"><span class="dato-lbl">Email</span><a href="mailto:${com.mail}" style="color:inherit">${com.mail}</a></div></div>` : ''}
+            ${com.whatsapp ? `<div class="dato"><span class="dato-ico">💬</span><div class="dato-txt"><span class="dato-lbl">WhatsApp</span>${com.whatsapp}</div></div>` : ''}
           </div>
           <div class="acciones">
             ${com.whatsapp ? `<a href="${waUrl}" target="_blank" class="btn-wa-grande">💬 Escribinos por WhatsApp</a>` : ''}
@@ -322,7 +324,7 @@ if (!com) {
 
   /* ── MAPA ── */
   if (addr) {
-    const mapQ = encodeURIComponent(addr);
+    const mapQ   = encodeURIComponent(addr);
     const mapUrl = `https://www.google.com/maps/search/?api=1&query=${mapQ}`;
     document.getElementById('mapaSection').innerHTML = `
       <div class="mapa-section">
@@ -339,14 +341,14 @@ if (!com) {
   }
 
   /* ── OFERTAS ── */
-  const ofertas = Object.entries(com.ofertas||{})
-    .sort(([a],[b])=>parseInt(a)-parseInt(b))
-    .map(([,o])=>o);
+  const ofertas = (com.ofertas || [])
+    .filter(o => o.activo)
+    .sort((a,b) => a.orden - b.orden);
 
   document.getElementById('ofertasTitulo').textContent =
     `🏷️ ${ofertas.length} oferta${ofertas.length!==1?'s':''} de ${com.nombre}`;
 
-  const fmt = n => '$ ' + (n||0).toLocaleString('es-AR');
+  const fmt  = n => '$ ' + (n||0).toLocaleString('es-AR');
   const grid = document.getElementById('ofertasGrid');
 
   if (!ofertas.length) {
@@ -354,12 +356,12 @@ if (!com) {
   } else {
     const waBase = `https://wa.me/${com.whatsapp||''}`;
     grid.innerHTML = ofertas.map(o => {
-      const off = o.descuento || (o.precioReal&&o.precioOferta ? Math.round((1-o.precioOferta/o.precioReal)*100) : 0);
-      const ahorro = o.precioReal&&o.precioOferta ? o.precioReal-o.precioOferta : 0;
+      const off    = o.descuento || (o.precio_real && o.precio_oferta ? Math.round((1 - o.precio_oferta/o.precio_real)*100) : 0);
+      const ahorro = o.precio_real && o.precio_oferta ? o.precio_real - o.precio_oferta : 0;
       const waOfMsg = encodeURIComponent(`Hola! Vi la oferta *"${o.nombre}"* en ComercialWeb y me gustaría consultarles. ¿Me dan más información?`);
-      const waOf = `${waBase}?text=${waOfMsg}`;
-      const imgHtml = o.imagen ? `<img src="${o.imagen}" alt="${o.nombre}">` : `<span>🏷️</span>`;
-      const vence = o.vence
+      const waOf   = `${waBase}?text=${waOfMsg}`;
+      const imgHtml = o.imagen_url ? `<img src="${o.imagen_url}" alt="${o.nombre}">` : `<span>🏷️</span>`;
+      const vence  = o.vence
         ? `<div class="badge-vence">⏰ Hasta ${new Date(o.vence).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})}</div>`
         : '';
       return `
@@ -373,8 +375,8 @@ if (!com) {
             ${o.descripcion ? `<div class="card-desc">${o.descripcion}</div>` : ''}
           </div>
           <div class="card-precios">
-            ${o.precioReal ? `<span class="precio-antes">Antes: ${fmt(o.precioReal)}</span>` : ''}
-            <div class="precio-oferta"><small>$</small> ${(o.precioOferta||0).toLocaleString('es-AR')}</div>
+            ${o.precio_real ? `<span class="precio-antes">Antes: ${fmt(o.precio_real)}</span>` : ''}
+            <div class="precio-oferta"><small>$</small> ${(o.precio_oferta||0).toLocaleString('es-AR')}</div>
             ${ahorro > 0 ? `<span class="ahorro">✓ Ahorrás ${fmt(ahorro)}</span>` : ''}
           </div>
           <a href="${waOf}" target="_blank" rel="noopener" class="card-btn">🛒 ¡Compralo Ya!</a>
@@ -384,7 +386,7 @@ if (!com) {
 }
 
 /* ── COMPARTIR ── */
-function compartir() {
+window.compartir = () => {
   const url = location.href;
   if (navigator.share) {
     navigator.share({ title: document.title, url });
@@ -392,10 +394,10 @@ function compartir() {
     navigator.clipboard.writeText(url).then(() => {
       const t = document.getElementById('toast');
       t.classList.add('show');
-      setTimeout(()=>t.classList.remove('show'), 2500);
+      setTimeout(() => t.classList.remove('show'), 2500);
     });
   }
-}
+};
 </script>
 </body>
 </html>
