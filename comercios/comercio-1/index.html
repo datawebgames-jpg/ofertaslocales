@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cargando… — OfertasLocales</title>
+  <title>Cargando… — RedComprAr</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../../src/styles.css" />
@@ -14,7 +14,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="OfertasLocales" />
+  <meta name="apple-mobile-web-app-title" content="RedComprAr" />
 </head>
 <body>
 
@@ -86,7 +86,7 @@
   </div>
 
   <footer>
-    <p>&copy; 2025 OfertasLocales — Conectando comercios locales con su comunidad</p>
+    <p>&copy; 2025 RedComprAr — Conectando comercios locales con su comunidad</p>
   </footer>
 
   <script>
@@ -103,7 +103,7 @@
     const COMERCIO_ID = 1;
     const c = getComercio(COMERCIO_ID);
 
-    document.title = `${c.nombre} — OfertasLocales`;
+    document.title = `${c.nombre} — RedComprAr`;
 
     const rubros = [c.rubro]; // este comercio solo tiene un rubro
 
@@ -270,7 +270,7 @@
       const tel    = document.getElementById('cTelefono').value.trim();
       const msg    = document.getElementById('cMensaje').value.trim();
       const msgAdmin =
-        `🛒 *Nueva consulta — OfertasLocales*\n\n` +
+        `🛒 *Nueva consulta — RedComprAr*\n\n` +
         `👤 *Cliente:* ${nombre}\n` +
         `📱 *Teléfono:* ${tel}\n` +
         `🏷️ *Producto:* ${o.titulo}\n` +
@@ -300,7 +300,7 @@
     <div class="cm-bot-row">
       <div class="cm-bot-avatar">🤖</div>
       <div class="cm-bot-bubble">
-        <div class="cm-bot-name">Asistente OfertasLocales</div>
+        <div class="cm-bot-name">Asistente RedComprAr</div>
         <span id="cmBotMsg"></span>
       </div>
     </div>

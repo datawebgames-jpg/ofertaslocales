@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ComercialWeb — Tu compra a un click</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',system-ui,sans-serif;background:#06122a;color:#fff;min-height:100vh;overflow-x:hidden}
+
+    /* ── FONDO ESTADIO ── */
+    .bg{position:fixed;inset:0;z-index:0;background:url('../images/hero.jpg') center/cover no-repeat,#06122a;filter:brightness(.35) saturate(1.2)}
+    .bg-ov{position:fixed;inset:0;z-index:1;background:rgba(6,18,42,.75)}
+    .page{position:relative;z-index:2}
+
+    /* ── ADMIN LINK ── */
+    .admin-lnk{display:none;position:fixed;top:8px;right:12px;z-index:99;color:rgba(255,255,255,.35);font-size:.7rem;text-decoration:none;padding:3px 10px;border:1px solid rgba(255,255,255,.12);border-radius:50px}
+
+    /* ══════════════════════════════
+       HERO BANNER
+    ══════════════════════════════ */
+    .hero{padding:22px 16px 0;text-align:center}
+    .hero-box{
+      display:inline-block;border:3px solid #FFD700;border-radius:14px;
+      padding:12px 28px 10px;background:rgba(6,18,42,.55);backdrop-filter:blur(4px);
+    }
+    .hero-title{
+      font-size:clamp(2rem,9vw,4rem);font-weight:900;color:#fff;
+      text-transform:uppercase;letter-spacing:3px;line-height:1;
+      display:flex;align-items:center;justify-content:center;gap:14px;
+      text-shadow:0 2px 12px rgba(0,0,0,.8);
+    }
+    .hero-title .yw{color:#FFD700}
+    .hero-sub{margin-top:12px;display:flex;align-items:center;justify-content:center}
+    .hero-sub-pill{
+      background:linear-gradient(90deg,#e6a800,#FFD700,#e6a800);color:#06122a;
+      font-size:clamp(.9rem,3.5vw,1.25rem);font-weight:900;text-transform:uppercase;
+      letter-spacing:2.5px;padding:8px 28px;border-radius:50px;
+      display:flex;align-items:center;gap:10px;box-shadow:0 4px 22px rgba(255,215,0,.45);
+    }
+    .hero-sub-pill .cursor{animation:blink 1s step-end infinite;font-size:1rem}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+    /* ══════════════════════════════
+       LOGOS / RUBROS CIRCULARES
+    ══════════════════════════════ */
+    .logos-section{padding:24px 10px 20px;display:flex;justify-content:center}
+    .logos-row{
+      display:flex;justify-content:center;flex-wrap:nowrap;
+      gap:clamp(6px,1.5vw,18px);width:100%;max-width:1200px;
+    }
+
+    .logo-btn{
+      flex:1;min-width:0;max-width:200px;
+      display:flex;flex-direction:column;align-items:center;gap:0;
+      cursor:pointer;text-decoration:none;color:#fff;
+      background:none;border:none;padding:0;
+      transition:transform .25s cubic-bezier(.34,1.4,.64,1);
+    }
+    .logo-btn:hover{transform:translateY(-8px)}
+
+    /* círculo */
+    .logo-circle{
+      width:100%;padding-bottom:100%;height:0;
+      border-radius:50%;border:4px solid rgba(255,255,255,.4);
+      overflow:hidden;position:relative;
+      background:var(--cc,#1a3a7a);
+      box-shadow:0 8px 28px rgba(0,0,0,.6);
+      transition:all .25s;
+    }
+    .logo-btn.active .logo-circle,
+    .logo-btn:hover .logo-circle{
+      border-color:#FFD700;
+      box-shadow:0 0 0 4px #FFD700,0 12px 36px rgba(255,215,0,.45);
+    }
+    .logo-circle img,.logo-ini,.logo-icon{
+      position:absolute;inset:0;width:100%;height:100%;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .logo-circle img{object-fit:contain;padding:10%}
+    .logo-ini{
+      font-size:clamp(1.8rem,5vw,3rem);font-weight:900;color:#fff;
+      text-shadow:0 3px 12px rgba(0,0,0,.5);
+    }
+    .logo-icon{
+      font-size:clamp(2.2rem,6vw,3.8rem);
+      filter:drop-shadow(0 3px 8px rgba(0,0,0,.5));
+    }
+
+    /* etiqueta / label button */
+    .logo-label{
+      margin-top:9px;width:100%;padding:9px 6px;
+      border-radius:8px;border:2px solid rgba(255,255,255,.2);
+      background:rgba(255,255,255,.08);color:#fff;
+      font-size:clamp(.58rem,1.4vw,.78rem);font-weight:900;
+      text-transform:uppercase;letter-spacing:.5px;line-height:1.25;
+      text-align:center;min-height:40px;
+      display:flex;align-items:center;justify-content:center;
+      transition:all .2s;box-shadow:0 3px 10px rgba(0,0,0,.3);
+    }
+    .logo-btn.active .logo-label{
+      background:var(--cc,#1a3a7a);
+      border-color:var(--cc,#1a3a7a);
+      color:#fff;
+      box-shadow:0 4px 18px rgba(0,0,0,.5);
+    }
+    .logo-btn:hover .logo-label{
+      background:#FFD700;color:#06122a;border-color:#FFD700;
+    }
+    .logo-btn.active:hover .logo-label{
+      background:#FFD700;color:#06122a;border-color:#FFD700;
+    }
+
+    /* ══════════════════════════════
+       CTA STRIP
+    ══════════════════════════════ */
+    .cta-strip{
+      background:linear-gradient(90deg,#cc8800,#FFD700 25%,#FFD700 75%,#cc8800);
+      padding:15px 20px;display:flex;align-items:center;justify-content:center;
+      gap:14px;flex-wrap:wrap;box-shadow:0 4px 28px rgba(255,215,0,.35);
+    }
+    .cta-cart{font-size:clamp(1.4rem,4vw,2rem)}
+    .cta-text{
+      font-size:clamp(1rem,4.5vw,1.7rem);font-weight:900;
+      color:#06122a;text-transform:uppercase;letter-spacing:2px;
+    }
+    .cta-spark{font-size:1.4rem;animation:spark 1.3s infinite}
+    @keyframes spark{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.35) rotate(18deg)}}
+
+    /* ══════════════════════════════
+       FILTRO ACTIVO CHIP
+    ══════════════════════════════ */
+    .filter-bar{
+      display:none;align-items:center;justify-content:center;gap:10px;
+      padding:10px 16px 0;
+    }
+    .filter-bar.visible{display:flex}
+    .filter-label{
+      font-size:.78rem;color:rgba(255,255,255,.5);font-weight:700;
+    }
+    .filter-chip{
+      background:var(--fc,#1a3a7a);color:#fff;
+      font-size:.8rem;font-weight:900;padding:5px 16px;
+      border-radius:50px;border:none;cursor:pointer;
+      display:flex;align-items:center;gap:6px;
+      transition:opacity .2s;
+    }
+    .filter-chip:hover{opacity:.8}
+
+    /* ══════════════════════════════
+       GRID — 3 columnas
+    ══════════════════════════════ */
+    .ofertas-section{padding:8px 8px 50px}
+    .ofertas-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;max-width:1300px;margin:0 auto;
+    }
+    @media(max-width:700px){.ofertas-grid{grid-template-columns:repeat(2,1fr)}}
+
+    /* ══════════════════════════════
+       CARD
+    ══════════════════════════════ */
+    .card{
+      position:relative;background:#0a1f45;
+      border-radius:10px;overflow:hidden;
+      display:flex;flex-direction:column;cursor:pointer;
+      border:1px solid rgba(255,255,255,.07);
+      transition:transform .18s,box-shadow .18s,opacity .2s;
+      box-shadow:0 2px 12px rgba(0,0,0,.4);
+    }
+    .card:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(0,0,0,.6);border-color:rgba(255,215,0,.25)}
+    .card.hidden{display:none}
+
+    .badge-of{
+      position:absolute;top:0;left:0;z-index:3;
+      background:rgba(6,18,42,.82);
+      padding:5px 12px;border-bottom-right-radius:10px;
+      font-size:.68rem;font-weight:900;color:#fff;
+      text-transform:uppercase;letter-spacing:.3px;
+      display:flex;align-items:center;gap:4px;
+    }
+    .badge-pct{
+      position:absolute;top:0;right:0;z-index:3;
+      background:#e63946;color:#fff;
+      padding:5px 10px;border-bottom-left-radius:10px;
+      font-size:.72rem;font-weight:900;
+    }
+
+    .card-img{
+      width:100%;position:relative;padding-bottom:72%;
+      background:linear-gradient(135deg,#0d255a,#1a3a7a);
+      overflow:hidden;flex-shrink:0;
+    }
+    .card-img img,.card-img span{
+      position:absolute;inset:0;width:100%;height:100%;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .card-img img{object-fit:cover}
+    .card-img span{font-size:3.5rem;color:rgba(255,255,255,.25)}
+
+    .card-wa-hover{
+      position:absolute;inset:0;z-index:5;
+      background:rgba(22,163,74,.92);
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;font-size:.9rem;font-weight:900;
+      text-decoration:none;gap:8px;
+      opacity:0;transition:opacity .2s;
+    }
+    .card:hover .card-wa-hover{opacity:1}
+
+    .card-footer{
+      background:rgba(6,12,30,.92);
+      padding:10px 12px;
+      display:flex;align-items:center;justify-content:space-between;gap:6px;
+    }
+    .card-info{flex:1;min-width:0}
+    .card-comercio{font-size:.6rem;color:rgba(255,255,255,.4);text-transform:uppercase;font-weight:700;display:block;margin-bottom:1px}
+    .card-nombre{font-size:.72rem;font-weight:700;color:rgba(255,255,255,.7);line-height:1.2;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+    .precio-wrap{text-align:right;flex-shrink:0}
+    .precio-antes{font-size:.65rem;color:rgba(255,255,255,.35);text-decoration:line-through;display:block;text-align:right}
+    .precio-val{
+      font-size:clamp(1.2rem,3.5vw,1.6rem);font-weight:900;
+      color:#FFD700;line-height:1;letter-spacing:-0.5px;
+      white-space:nowrap;
+    }
+    .precio-val .sg{font-size:.8rem;font-weight:800;vertical-align:super}
+
+    .card-wa-mobile{
+      display:none;
+      background:#16a34a;color:#fff;font-size:.78rem;font-weight:900;
+      padding:9px;text-align:center;text-decoration:none;
+      align-items:center;justify-content:center;gap:6px;
+    }
+    @media(hover:none){
+      .card-wa-mobile{display:flex}
+      .card-wa-hover{display:none}
+    }
+
+    .empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:rgba(255,255,255,.3);font-size:1rem}
+    .empty span{display:block;font-size:3rem;margin-bottom:12px}
+
+    footer{text-align:center;padding:16px;font-size:.73rem;color:rgba(255,255,255,.2);border-top:1px solid rgba(255,255,255,.05)}
+    footer a{color:#FFD700;text-decoration:none;opacity:.6}
+  </style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="bg-ov"></div>
+<div class="page">
+
+  <a href="../admin/packs.html" class="admin-lnk" id="btnAdmin">⚙ Admin</a>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-box">
+      <div class="hero-title">COMERCIAL <span class="yw">WEB</span> 🛒</div>
+    </div>
+    <div class="hero-sub">
+      <div class="hero-sub-pill">TU COMPRA A UN CLICK <span class="cursor">✦</span></div>
+    </div>
+  </div>
+
+  <!-- LOGOS RUBROS -->
+  <div class="logos-section">
+    <div class="logos-row" id="logosRow"></div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-strip">
+    <span class="cta-cart">🛒</span>
+    <span class="cta-text">Elegí un rubro · Cliquea y Comprá</span>
+    <span class="cta-spark">✨</span>
+  </div>
+
+  <!-- FILTRO ACTIVO -->
+  <div class="filter-bar" id="filterBar">
+    <span class="filter-label">Mostrando:</span>
+    <button class="filter-chip" id="filterChip" onclick="clearFilter()"></button>
+    <span class="filter-label" style="font-size:.72rem;opacity:.6">— Tocá el chip para ver todo</span>
+  </div>
+
+  <!-- GRID OFERTAS -->
+  <div class="ofertas-section">
+    <div class="ofertas-grid" id="ofertasGrid">
+      <div class="empty"><span>⏳</span>Cargando...</div>
+    </div>
+  </div>
+
+  <footer>
+    <p><strong style="color:rgba(255,255,255,.4)">ComercialWeb</strong> · Tu compra a un click · 2026 · <a href="https://www.instagram.com/dataweb76/" target="_blank">@dataweb76</a></p>
+  </footer>
+</div>
+
+<script type="module">
+import { supabase } from '../src/supabase.js';
+import { packs as packsData } from '../src/data/packs.js'; // fallback local
+
+/* ── ICON POR RUBRO ── */
+const RUBRO_ICONS = {
+  ferret:    '🔧', herramienta: '🔨',
+  pintur:    '🎨', color: '🖌️',
+  electr:    '💻', tecnolog: '📱',
+  hogar:     '🏠', deco: '🛋️',
+  salud:     '💊', belleza: '💄',
+  aliment:   '🍔', gastro: '🍕',
+  ropa:      '👕', moda: '👗',
+  deport:    '⚽',
+  hierro:    '⚙️', chapa: '🔩',
+  'árido':   '🧱', construcc: '🏗️',
+  plomer:    '🚿', agua: '💧',
+  carnicer:  '🥩',
+  farmac:    '💉', optic: '👓',
+  mueble:    '🛒', bazar: '🏪',
+};
+
+function getIcon(rubro) {
+  const r = (rubro||'').toLowerCase();
+  for (const [key, icon] of Object.entries(RUBRO_ICONS)) {
+    if (r.includes(key)) return icon;
+  }
+  return '🏪';
+}
+
+/* ── LOAD PACK ── */
+const hash  = location.hash.replace('#','');
+const parts = hash.split('-');
+const type  = parts[0];
+// El idx puede ser el id real de Supabase o un índice local
+const idxOrId = parseInt(parts[1] ?? '0');
+
+document.getElementById('btnAdmin').style.display = 'none';
+const { data: { session } } = await supabase.auth.getSession();
+if (session) document.getElementById('btnAdmin').style.display = 'block';
+
+let pack = null;
+
+/* 1. intentar cargar desde Supabase */
+if (type && !isNaN(idxOrId) && idxOrId > 0) {
+  const { data } = await supabase
+    .from('packs')
+    .select(`*, comercios(*, ofertas(*))`)
+    .eq('id', idxOrId)
+    .eq('activo', true)
+    .single();
+  if (data) {
+    // normalizar estructura
+    data.comercios = (data.comercios || []).sort((a,b) => a.orden - b.orden);
+    data.comercios.forEach(c => {
+      c.ofertas = (c.ofertas || []).filter(o => o.activo).sort((a,b) => a.orden - b.orden);
+      // mapear campos para compatibilidad con renderGrid
+      c.whatsapp = c.whatsapp || '';
+      c.color    = c.color    || '#1d3557';
+      c.logo     = c.logo_url || '';
+      c.nombre   = c.nombre   || '';
+      c.rubro    = c.rubro    || '';
+      c.id       = c.id;
+      c.ofertas.forEach(o => {
+        o.nombre        = o.nombre        || '';
+        o.imagen        = o.imagen_url    || '';
+        o.precioReal    = o.precio_real   || 0;
+        o.precioOferta  = o.precio_oferta || 0;
+        o.descuento     = o.descuento     || 0;
+        o.vence         = o.vence         || '';
+      });
+    });
+    pack = data;
+  }
+}
+
+/* 2. fallback: packs.js local */
+if (!pack && packsData) {
+  const found = packsData.find((p, i) => {
+    const ptype = p.tipo >= 5 ? 'comunidad' : p.tipo >= 3 ? 'barrio' : 'exclusivo';
+    return ptype === type && i === idxOrId;
+  }) || packsData[idxOrId] || packsData[0];
+  if (found) pack = found;
+}
+
+let activeComercioId = null; // null = todos
+
+/* ── RENDER ── */
+if (!pack) {
+  document.getElementById('logosRow').innerHTML = '<p style="color:#aaa;padding:40px;text-align:center">Pack no encontrado.</p>';
+  document.getElementById('ofertasGrid').innerHTML = '';
+} else {
+  document.title = `${pack.nombre} — ComercialWeb`;
+  renderLogos();
+  renderGrid();
+}
+
+function renderLogos() {
+  document.getElementById('logosRow').innerHTML = pack.comercios.map(c => {
+    const col   = c.color || '#1a3a7a';
+    const rub   = c.rubro || c.nombre || `Comercio ${c.id}`;
+    const icon  = getIcon(rub);
+    const isActive = activeComercioId === c.id;
+
+    let inner;
+    if (c.logo && c.logo.length > 10) {
+      inner = `<img src="${c.logo}" alt="${c.nombre}" onerror="this.style.display='none'">`;
+    } else {
+      inner = `<span class="logo-icon">${icon}</span>`;
+    }
+
+    return `
+      <button class="logo-btn ${isActive ? 'active' : ''}" style="--cc:${col}"
+        onclick="toggleComercio(${c.id}, '${rub}', '${col}')">
+        <div class="logo-circle" style="background:${col}33;border-color:${isActive ? col : 'rgba(255,255,255,.4)'}">
+          ${inner}
+        </div>
+        <div class="logo-label">${rub}</div>
+      </button>`;
+  }).join('');
+}
+
+function renderGrid() {
+  const fmt = n => (n || 0).toLocaleString('es-AR');
+  const grid = document.getElementById('ofertasGrid');
+
+  let cards = [];
+  pack.comercios.forEach(c => {
+    if (activeComercioId !== null && c.id !== activeComercioId) return;
+    const ofertas = c.ofertas || {};
+    // soporta tanto array (packs.js) como objeto {1:{...}} (localStorage)
+    const items = Array.isArray(ofertas)
+      ? ofertas
+      : Object.values(ofertas).sort((a,b) => (a.orden||a.id||0) - (b.orden||b.id||0));
+    items.forEach(o => cards.push({...o, _c: c}));
+  });
+
+  if (!cards.length) {
+    grid.innerHTML = '<div class="empty"><span>🏷️</span>No hay ofertas cargadas aún.</div>';
+    return;
+  }
+
+  grid.innerHTML = cards.map(o => {
+    const c   = o._c;
+    const off = o.descuento || (o.precioReal && o.precioOferta ? Math.round((1 - o.precioOferta / o.precioReal) * 100) : 0);
+    const waMsg = encodeURIComponent(`Hola! Vi la oferta *"${o.nombre}"* en ComercialWeb y me gustaría consultar. ¿Me dan más información?`);
+    const waUrl = `https://wa.me/${c.whatsapp || ''}?text=${waMsg}`;
+    const img   = o.imagen ? `<img src="${o.imagen}" alt="${o.nombre}">` : `<span>🏷️</span>`;
+    const vence = o.vence
+      ? `<div style="position:absolute;bottom:8px;left:8px;z-index:3;background:rgba(6,12,30,.85);color:#FFD700;font-size:.6rem;font-weight:800;padding:2px 8px;border-radius:4px;border:1px solid #FFD700">⏰ Hasta ${new Date(o.vence).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})}</div>`
+      : '';
+
+    return `
+      <div class="card">
+        <div class="badge-of">🏷️ OFERTAS</div>
+        ${off ? `<div class="badge-pct">${off}% OFF</div>` : ''}
+        <div class="card-img">
+          ${img}${vence}
+          <a href="${waUrl}" target="_blank" rel="noopener" class="card-wa-hover">💬 ¡Compralo Ya!</a>
+        </div>
+        <div class="card-footer">
+          <div class="card-info">
+            <span class="card-comercio">${c.nombre || ''}</span>
+            <span class="card-nombre">${o.nombre || ''}</span>
+          </div>
+          <div class="precio-wrap">
+            ${o.precioReal ? `<span class="precio-antes">$${fmt(o.precioReal)}</span>` : ''}
+            <div class="precio-val"><span class="sg">$</span> ${fmt(o.precioOferta)}</div>
+          </div>
+        </div>
+        <a href="${waUrl}" target="_blank" rel="noopener" class="card-wa-mobile">💬 ¡Compralo Ya!</a>
+      </div>`;
+  }).join('');
+}
+
+function toggleComercio(id, rub, col) {
+  if (activeComercioId === id) {
+    clearFilter();
+    return;
+  }
+  activeComercioId = id;
+
+  // chip filtro
+  const bar  = document.getElementById('filterBar');
+  const chip = document.getElementById('filterChip');
+  chip.textContent = rub + '  ✕';
+  chip.style.setProperty('--fc', col);
+  bar.classList.add('visible');
+
+  renderLogos();
+  renderGrid();
+}
+
+function clearFilter() {
+  activeComercioId = null;
+  document.getElementById('filterBar').classList.remove('visible');
+  renderLogos();
+  renderGrid();
+}
+</script>
+</body>
+</html>

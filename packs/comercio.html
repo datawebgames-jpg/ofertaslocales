@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ComercialWeb — Comercio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --azul:#06122a;--azul2:#0b1e42;--azul3:#1a3a7a;
+      --amarillo:#FFD700;--verde:#16a34a;--rojo:#e63946;
+      --blanco:#fff;--muted:rgba(255,255,255,.5);
+      --color:#e63946;
+    }
+    body{font-family:'DM Sans',system-ui,sans-serif;background:var(--azul);color:var(--blanco);min-height:100vh}
+
+    /* ── FONDO ── */
+    .bg{position:fixed;inset:0;z-index:0;
+      background:url('../images/hero.jpg') center/cover no-repeat,#06122a;
+      filter:brightness(.3) saturate(1.1)}
+    .bg-ov{position:fixed;inset:0;z-index:1;background:rgba(6,18,42,.78)}
+    .page{position:relative;z-index:2}
+
+    /* ── HEADER ── */
+    .header{
+      background:rgba(6,18,42,.92);backdrop-filter:blur(12px);
+      padding:0 20px;height:58px;
+      display:flex;align-items:center;justify-content:space-between;
+      border-bottom:2px solid var(--amarillo);
+      position:sticky;top:0;z-index:50;
+    }
+    .marca{font-size:1.2rem;font-weight:900;color:#fff;text-decoration:none}
+    .marca span{color:var(--amarillo)}
+    .btn-volver{
+      display:flex;align-items:center;gap:6px;
+      color:var(--amarillo);font-size:.82rem;font-weight:800;
+      text-decoration:none;padding:7px 14px;border-radius:50px;
+      border:2px solid var(--amarillo);transition:all .2s;
+    }
+    .btn-volver:hover{background:var(--amarillo);color:#06122a}
+
+    /* ── PERFIL HEADER ── */
+    .perfil-section{
+      padding:32px 20px 28px;
+      max-width:1100px;margin:0 auto;
+    }
+    .perfil-grid{
+      display:grid;
+      grid-template-columns:auto 1fr;
+      gap:28px;align-items:start;
+    }
+    @media(max-width:640px){
+      .perfil-grid{grid-template-columns:1fr;justify-items:center;text-align:center}
+    }
+
+    /* LOGO GRANDE */
+    .perfil-logo{
+      width:clamp(120px,18vw,180px);
+      height:clamp(120px,18vw,180px);
+      border-radius:50%;
+      border:5px solid var(--color);
+      box-shadow:0 0 0 4px rgba(255,255,255,.1), 0 12px 40px rgba(0,0,0,.6);
+      overflow:hidden;
+      display:flex;align-items:center;justify-content:center;
+      font-size:clamp(2.5rem,6vw,3.5rem);font-weight:900;
+      background:var(--color);
+      flex-shrink:0;
+    }
+    .perfil-logo img{width:100%;height:100%;object-fit:cover}
+
+    /* INFO */
+    .perfil-info{padding-top:8px}
+    .perfil-rubro{
+      display:inline-block;
+      background:var(--color);color:#fff;
+      font-size:.72rem;font-weight:900;letter-spacing:1.5px;
+      text-transform:uppercase;padding:4px 14px;border-radius:50px;
+      margin-bottom:10px;
+    }
+    .perfil-nombre{
+      font-size:clamp(1.6rem,4vw,2.4rem);font-weight:900;
+      line-height:1.1;margin-bottom:12px;
+    }
+    .datos-grid{
+      display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+      gap:8px;margin-bottom:16px;
+    }
+    .dato{
+      display:flex;align-items:center;gap:8px;
+      background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
+      border-radius:10px;padding:9px 12px;
+      font-size:.83rem;color:var(--blanco);
+    }
+    .dato-ico{font-size:1.1rem;flex-shrink:0}
+    .dato-txt{line-height:1.35}
+    .dato-lbl{font-size:.68rem;color:var(--muted);display:block;text-transform:uppercase;letter-spacing:.5px}
+
+    /* BOTONES ACCIÓN */
+    .acciones{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+    .btn-wa-grande{
+      display:flex;align-items:center;gap:8px;
+      background:var(--verde);color:#fff;
+      font-size:.95rem;font-weight:900;
+      padding:12px 22px;border-radius:12px;text-decoration:none;
+      box-shadow:0 4px 16px rgba(22,163,74,.4);transition:all .2s;
+    }
+    .btn-wa-grande:hover{background:#15803d;transform:translateY(-2px)}
+    .btn-compartir{
+      display:flex;align-items:center;gap:7px;
+      background:rgba(255,255,255,.1);color:#fff;
+      font-size:.88rem;font-weight:700;
+      padding:11px 18px;border-radius:12px;border:2px solid rgba(255,255,255,.2);
+      cursor:pointer;font-family:inherit;transition:all .2s;
+    }
+    .btn-compartir:hover{background:rgba(255,255,255,.18);border-color:#fff}
+
+    /* TOAST COMPARTIR */
+    .toast{
+      position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);
+      background:#1d3557;color:#fff;padding:11px 24px;border-radius:50px;
+      font-size:.85rem;font-weight:700;z-index:999;
+      transition:transform .3s cubic-bezier(.34,1.3,.64,1);pointer-events:none;
+      box-shadow:0 4px 20px rgba(0,0,0,.3);
+    }
+    .toast.show{transform:translateX(-50%) translateY(0)}
+
+    /* ── MAPA ── */
+    .mapa-section{max-width:1100px;margin:0 auto;padding:0 20px 28px}
+    .mapa-link{text-decoration:none;display:block}
+    .mapa-preview{
+      display:flex;align-items:center;gap:16px;
+      background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.12);
+      border-radius:14px;padding:16px 20px;
+      transition:border-color .2s,background .2s;
+    }
+    .mapa-link:hover .mapa-preview{border-color:var(--amarillo);background:rgba(255,215,0,.06)}
+    .mapa-pin{font-size:2rem;flex-shrink:0}
+    .mapa-dir{font-size:.95rem;font-weight:700;color:#fff;margin-bottom:3px}
+    .mapa-sub{font-size:.78rem;color:var(--amarillo);font-weight:700}
+
+    /* ── SEPARADOR ── */
+    .sep{
+      display:flex;align-items:center;gap:14px;
+      padding:16px 20px 12px;max-width:1100px;margin:0 auto;
+    }
+    .sep-line{flex:1;height:1px;background:rgba(255,255,255,.1)}
+    .sep-txt{
+      font-size:1rem;font-weight:900;color:var(--amarillo);
+      text-transform:uppercase;letter-spacing:2px;white-space:nowrap;
+    }
+
+    /* ── GRID OFERTAS ── */
+    .ofertas-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      padding:4px 20px 40px;
+      max-width:1100px;margin:0 auto;
+    }
+    @media(max-width:700px){
+      .ofertas-grid{grid-template-columns:repeat(2,1fr);padding:4px 12px 40px;gap:10px}
+    }
+
+    /* CARD */
+    .card{
+      position:relative;background:#0b1e42;border-radius:14px;
+      overflow:hidden;display:flex;flex-direction:column;
+      border:1px solid rgba(255,255,255,.07);
+      box-shadow:0 4px 20px rgba(0,0,0,.4);
+      transition:transform .2s,box-shadow .2s;
+    }
+    .card:hover{transform:translateY(-5px);box-shadow:0 12px 36px rgba(0,0,0,.6);border-color:rgba(255,215,0,.3)}
+    .badge-of{
+      position:absolute;top:10px;left:10px;z-index:3;
+      background:rgba(6,18,42,.85);padding:4px 11px;border-radius:50px;
+      font-size:.68rem;font-weight:900;color:#fff;
+      display:flex;align-items:center;gap:4px;border:1px solid rgba(255,255,255,.15);
+    }
+    .badge-pct{
+      position:absolute;top:10px;right:10px;z-index:3;
+      background:var(--rojo);color:#fff;
+      padding:5px 11px;border-radius:50px;
+      font-size:.75rem;font-weight:900;
+    }
+    .badge-vence{
+      position:absolute;bottom:52px;left:10px;z-index:3;
+      background:rgba(6,18,42,.9);color:var(--amarillo);
+      font-size:.62rem;font-weight:800;padding:3px 9px;border-radius:50px;
+      border:1px solid var(--amarillo);
+    }
+    .card-img{
+      width:100%;aspect-ratio:4/3;
+      background:linear-gradient(135deg,#0d2555,#1a3a7a);
+      display:flex;align-items:center;justify-content:center;
+      font-size:3.5rem;overflow:hidden;flex-shrink:0;
+    }
+    .card-img img{width:100%;height:100%;object-fit:cover}
+    .card-body{padding:12px 14px 6px;flex:1;display:flex;flex-direction:column;gap:4px}
+    .card-nombre{font-size:.9rem;font-weight:800;color:#fff;line-height:1.25}
+    .card-desc{font-size:.75rem;color:var(--muted);line-height:1.4;flex:1}
+    .card-precios{
+      padding:10px 14px 0;border-top:1px solid rgba(255,255,255,.06);
+    }
+    .precio-antes{font-size:.78rem;color:rgba(255,255,255,.3);text-decoration:line-through;display:block}
+    .precio-oferta{
+      font-size:clamp(1.5rem,4vw,1.9rem);font-weight:900;
+      color:var(--amarillo);line-height:1;
+      text-shadow:0 2px 10px rgba(255,215,0,.3);
+    }
+    .precio-oferta small{font-size:.95rem;font-weight:700}
+    .ahorro{font-size:.67rem;font-weight:800;color:#4ade80;margin-top:3px;display:block}
+    .card-btn{
+      display:flex;align-items:center;justify-content:center;gap:7px;
+      background:var(--verde);color:#fff;
+      font-size:.82rem;font-weight:900;
+      padding:11px 14px;margin:10px 14px 14px;
+      border-radius:10px;text-decoration:none;
+      box-shadow:0 3px 12px rgba(22,163,74,.35);
+      transition:background .18s;
+    }
+    .card-btn:hover{background:#15803d}
+
+    /* empty */
+    .empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)}
+    .empty span{display:block;font-size:3rem;margin-bottom:12px}
+
+    footer{
+      text-align:center;padding:16px;font-size:.73rem;
+      color:rgba(255,255,255,.2);border-top:1px solid rgba(255,255,255,.05);
+    }
+    footer a{color:var(--amarillo);text-decoration:none;opacity:.6}
+  </style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="bg-ov"></div>
+<div class="page">
+
+  <header class="header">
+    <a href="../index.html" class="marca">Comercial<span>Web</span></a>
+    <a href="pack.html" class="btn-volver" id="btnVolver">← Ver todos los comercios</a>
+  </header>
+
+  <div id="perfilSection"></div>
+  <div id="mapaSection"></div>
+
+  <div class="sep">
+    <div class="sep-line"></div>
+    <div class="sep-txt" id="ofertasTitulo">🏷️ Sus ofertas</div>
+    <div class="sep-line"></div>
+  </div>
+
+  <div class="ofertas-grid" id="ofertasGrid">
+    <div class="empty"><span>⏳</span>Cargando...</div>
+  </div>
+
+  <footer>
+    <p><strong style="color:rgba(255,255,255,.45)">ComercialWeb</strong> · Tu compra a un click · 2026 · <a href="https://www.instagram.com/dataweb76/" target="_blank">@dataweb76</a></p>
+  </footer>
+</div>
+
+<div class="toast" id="toast">✓ ¡Enlace copiado!</div>
+
+<script>
+// Hash: #type-idx-cid  ej: #comunidad-0-1
+const hash  = location.hash.replace('#','');
+const parts = hash.split('-');
+const type  = parts[0];
+const idx   = parseInt(parts[1]??'0');
+const cid   = parseInt(parts[2]??'1');
+const packUrl = `pack.html#${type}-${idx}`;
+
+document.getElementById('btnVolver').href = packUrl;
+
+const raw  = localStorage.getItem(`rca_pack_${type}_${idx}`);
+const pack = raw ? JSON.parse(raw) : null;
+const com  = pack?.comercios?.find(c => c.id === cid);
+
+if (!com) {
+  document.getElementById('perfilSection').innerHTML =
+    `<div style="text-align:center;padding:80px 20px;color:rgba(255,255,255,.4)">Comercio no encontrado. <a href="${packUrl}" style="color:#FFD700">← Volver</a></div>`;
+  document.getElementById('ofertasGrid').innerHTML = '';
+  document.getElementById('ofertasTitulo').textContent = '';
+} else {
+  document.title = `${com.nombre} — ComercialWeb`;
+  const color = com.color || '#e63946';
+  document.documentElement.style.setProperty('--color', color);
+
+  /* ── PERFIL ── */
+  const ini = com.inicial || (com.nombre||'??').substring(0,2).toUpperCase();
+  const logoHtml = (com.logo && com.logo.length > 10)
+    ? `<img src="${com.logo}" alt="${com.nombre}" onerror="this.style.display='none'">`
+    : `<span>${ini}</span>`;
+
+  const waMsg = encodeURIComponent(`Hola ${com.nombre}! Los contacto desde ComercialWeb. ¿Me pueden brindar información?`);
+  const waUrl = `https://wa.me/${com.whatsapp||''}?text=${waMsg}`;
+  const addr  = [com.direccion, com.ciudad, com.provincia].filter(Boolean).join(', ');
+
+  document.getElementById('perfilSection').innerHTML = `
+    <div class="perfil-section">
+      <div class="perfil-grid">
+        <div class="perfil-logo" style="background:${color};border-color:${color}">${logoHtml}</div>
+        <div class="perfil-info">
+          <div class="perfil-rubro" style="background:${color}">${com.rubro||''}</div>
+          <h1 class="perfil-nombre">${com.nombre}</h1>
+          <div class="datos-grid">
+            ${addr ? `<div class="dato"><span class="dato-ico">📍</span><div class="dato-txt"><span class="dato-lbl">Dirección</span>${addr}</div></div>` : ''}
+            ${com.telefono ? `<div class="dato"><span class="dato-ico">📞</span><div class="dato-txt"><span class="dato-lbl">Teléfono</span>${com.telefono}</div></div>` : ''}
+            ${com.telefonoVentas ? `<div class="dato"><span class="dato-ico">🛒</span><div class="dato-txt"><span class="dato-lbl">Ventas</span>${com.telefonoVentas}</div></div>` : ''}
+            ${com.mail ? `<div class="dato"><span class="dato-ico">✉️</span><div class="dato-txt"><span class="dato-lbl">Email</span>${com.mail}</div></div>` : ''}
+          </div>
+          <div class="acciones">
+            ${com.whatsapp ? `<a href="${waUrl}" target="_blank" class="btn-wa-grande">💬 Escribinos por WhatsApp</a>` : ''}
+            <button class="btn-compartir" onclick="compartir()">📤 Compartir</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  /* ── MAPA ── */
+  if (addr) {
+    const mapQ = encodeURIComponent(addr);
+    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${mapQ}`;
+    document.getElementById('mapaSection').innerHTML = `
+      <div class="mapa-section">
+        <a href="${mapUrl}" target="_blank" rel="noopener" class="mapa-link">
+          <div class="mapa-preview">
+            <span class="mapa-pin">📍</span>
+            <div>
+              <div class="mapa-dir">${addr}</div>
+              <div class="mapa-sub">Tocá para ver en Google Maps →</div>
+            </div>
+          </div>
+        </a>
+      </div>`;
+  }
+
+  /* ── OFERTAS ── */
+  const ofertas = Object.entries(com.ofertas||{})
+    .sort(([a],[b])=>parseInt(a)-parseInt(b))
+    .map(([,o])=>o);
+
+  document.getElementById('ofertasTitulo').textContent =
+    `🏷️ ${ofertas.length} oferta${ofertas.length!==1?'s':''} de ${com.nombre}`;
+
+  const fmt = n => '$ ' + (n||0).toLocaleString('es-AR');
+  const grid = document.getElementById('ofertasGrid');
+
+  if (!ofertas.length) {
+    grid.innerHTML = '<div class="empty"><span>🏷️</span>No hay ofertas cargadas aún.</div>';
+  } else {
+    const waBase = `https://wa.me/${com.whatsapp||''}`;
+    grid.innerHTML = ofertas.map(o => {
+      const off = o.descuento || (o.precioReal&&o.precioOferta ? Math.round((1-o.precioOferta/o.precioReal)*100) : 0);
+      const ahorro = o.precioReal&&o.precioOferta ? o.precioReal-o.precioOferta : 0;
+      const waOfMsg = encodeURIComponent(`Hola! Vi la oferta *"${o.nombre}"* en ComercialWeb y me gustaría consultarles. ¿Me dan más información?`);
+      const waOf = `${waBase}?text=${waOfMsg}`;
+      const imgHtml = o.imagen ? `<img src="${o.imagen}" alt="${o.nombre}">` : `<span>🏷️</span>`;
+      const vence = o.vence
+        ? `<div class="badge-vence">⏰ Hasta ${new Date(o.vence).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})}</div>`
+        : '';
+      return `
+        <div class="card">
+          <div class="badge-of">🏷️ OFERTA</div>
+          ${off ? `<div class="badge-pct">${off}% OFF</div>` : ''}
+          <div class="card-img">${imgHtml}</div>
+          ${vence}
+          <div class="card-body">
+            <div class="card-nombre">${o.nombre||''}</div>
+            ${o.descripcion ? `<div class="card-desc">${o.descripcion}</div>` : ''}
+          </div>
+          <div class="card-precios">
+            ${o.precioReal ? `<span class="precio-antes">Antes: ${fmt(o.precioReal)}</span>` : ''}
+            <div class="precio-oferta"><small>$</small> ${(o.precioOferta||0).toLocaleString('es-AR')}</div>
+            ${ahorro > 0 ? `<span class="ahorro">✓ Ahorrás ${fmt(ahorro)}</span>` : ''}
+          </div>
+          <a href="${waOf}" target="_blank" rel="noopener" class="card-btn">🛒 ¡Compralo Ya!</a>
+        </div>`;
+    }).join('');
+  }
+}
+
+/* ── COMPARTIR ── */
+function compartir() {
+  const url = location.href;
+  if (navigator.share) {
+    navigator.share({ title: document.title, url });
+  } else {
+    navigator.clipboard.writeText(url).then(() => {
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'), 2500);
+    });
+  }
+}
+</script>
+</body>
+</html>

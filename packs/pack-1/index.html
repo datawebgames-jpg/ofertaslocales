@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ComercialWeb — Pack Comunidad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --rojo: #e63946; --azul: #1d3557; --amarillo: #FFE600;
+      --gris: #f0f4f8; --texto: #1a1a2e; --muted: #6c757d;
+    }
+    body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--gris); color: var(--texto); }
+
+    /* HEADER */
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(29,53,87,.97); backdrop-filter: blur(10px);
+      padding: 0 24px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
+    .logo { font-size: 1.35rem; font-weight: 900; color: #fff; text-decoration: none; }
+    .logo span { color: var(--amarillo); }
+    .btn-volver {
+      display: flex; align-items: center; gap: 6px;
+      color: rgba(255,255,255,.8); text-decoration: none;
+      font-size: .85rem; font-weight: 600;
+      padding: 7px 16px; border-radius: 50px;
+      border: 1px solid rgba(255,255,255,.2);
+      transition: all .2s;
+    }
+    .btn-volver:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+    /* HERO PACK */
+    .hero-pack {
+      background: linear-gradient(135deg, var(--azul) 0%, #c1121f 100%);
+      padding: 56px 24px 48px;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .hero-pack::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: url('../../images/hero.jpg');
+      background-size: cover; background-position: center;
+      opacity: .18;
+    }
+    .hero-pack-inner { position: relative; z-index: 1; }
+    .hero-pack .badge {
+      display: inline-block;
+      background: var(--amarillo); color: var(--texto);
+      font-size: .72rem; font-weight: 800; letter-spacing: 1.5px;
+      text-transform: uppercase; padding: 4px 14px; border-radius: 50px;
+      margin-bottom: 14px;
+    }
+    .hero-pack h1 {
+      font-size: clamp(1.8rem, 5vw, 3rem); font-weight: 900;
+      color: #fff; line-height: 1.15; margin-bottom: 10px;
+    }
+    .hero-pack p { font-size: 1rem; color: rgba(255,255,255,.8); max-width: 480px; margin: 0 auto; }
+
+    /* LOGOS SECTION */
+    .logos-section {
+      background: #fff;
+      padding: 56px 24px;
+      text-align: center;
+    }
+    .logos-slogan {
+      font-size: clamp(1.3rem, 3.5vw, 2rem); font-weight: 900;
+      margin-bottom: 8px; color: var(--texto);
+    }
+    .logos-sub {
+      font-size: .95rem; color: var(--muted); margin-bottom: 48px;
+    }
+    .logos-grid {
+      display: flex; flex-wrap: wrap;
+      justify-content: center; gap: 28px;
+      max-width: 800px; margin: 0 auto 48px;
+    }
+    .logo-item {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      text-decoration: none; color: var(--texto);
+      transition: transform .2s;
+    }
+    .logo-item:hover { transform: translateY(-6px); }
+    .logo-item:hover .logo-circle { box-shadow: 0 12px 32px rgba(0,0,0,.22); }
+    .logo-circle {
+      width: 110px; height: 110px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; font-weight: 900; color: #fff;
+      box-shadow: 0 6px 20px rgba(0,0,0,.15);
+      transition: box-shadow .2s;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .logo-circle img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .logo-nombre {
+      font-size: .85rem; font-weight: 700; text-align: center;
+      max-width: 110px; line-height: 1.3;
+    }
+    .logo-rubro {
+      font-size: .75rem; color: var(--muted); text-align: center;
+      max-width: 110px;
+    }
+
+    /* CTA BANNER */
+    .cta-banner {
+      margin: 0 auto 48px;
+      max-width: 680px;
+      background: linear-gradient(135deg, var(--rojo), #c1121f);
+      border-radius: 20px; padding: 32px 28px;
+      text-align: center; color: #fff;
+      box-shadow: 0 8px 32px rgba(230,57,70,.35);
+    }
+    .cta-banner .emoji { font-size: 2.4rem; margin-bottom: 10px; display: block; }
+    .cta-banner h2 {
+      font-size: clamp(1.2rem, 3vw, 1.7rem); font-weight: 900;
+      margin-bottom: 8px; line-height: 1.2;
+    }
+    .cta-banner p { font-size: .92rem; opacity: .88; line-height: 1.5; }
+    .flecha-abajo {
+      font-size: 2rem; color: var(--rojo); margin-top: 8px;
+      animation: bounce 1.4s infinite;
+      display: block;
+    }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+
+    /* FOOTER */
+    footer {
+      background: var(--azul); color: rgba(255,255,255,.65);
+      text-align: center; padding: 24px;
+      font-size: .82rem;
+    }
+    footer strong { color: #fff; }
+    footer a { color: var(--amarillo); }
+
+    @media (max-width: 600px) {
+      .logo-circle { width: 82px; height: 82px; font-size: 1.3rem; }
+      .logos-grid { gap: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="../../index.html" class="logo">RedCompr<span>Ar</span></a>
+  <a href="../../index.html" class="btn-volver" id="btnAdmin" style="display:none">⚙ Admin</a>
+</header>
+<script>
+  if (localStorage.getItem('rca_admin')) document.getElementById('btnAdmin').style.display = 'flex';
+</script>
+
+<div class="hero-pack">
+  <div class="hero-pack-inner">
+    <div class="badge">Pack Comunidad · 5 comercios</div>
+    <h1 id="packNombre">Cargando...</h1>
+    <p>Ofertas exclusivas de los mejores comercios de tu ciudad</p>
+  </div>
+</div>
+
+<section class="logos-section">
+  <h2 class="logos-slogan">🛒 ¡Las mejores ofertas te esperan!</h2>
+  <p class="logos-sub">Elegí el comercio y descubrí sus promociones exclusivas</p>
+
+  <div class="logos-grid" id="logosGrid">
+    <!-- se llena con JS -->
+  </div>
+
+  <div class="cta-banner">
+    <span class="emoji">🏪</span>
+    <h2>¿Querés ahorrar hoy?<br>¡Tocá el comercio que más te interesa!</h2>
+    <p>Cada negocio tiene hasta 20 ofertas con descuentos reales. Sin vueltas, sin letras chicas.</p>
+  </div>
+
+  <span class="flecha-abajo">↑</span>
+</section>
+
+<footer>
+  <p><strong>ComercialWeb</strong> · Conectando comercios con su comunidad · 2026</p>
+  <p style="margin-top:6px">Instagram: <a href="https://www.instagram.com/dataweb76/" target="_blank">@dataweb76</a></p>
+</footer>
+
+<script type="module">
+  const { packs } = await import(`../../src/data/packs.js?v=${Date.now()}`);
+
+  const pack = packs.find(p => p.slug === 'pack-1');
+  if (!pack) {
+    document.getElementById('packNombre').textContent = 'Pack no encontrado';
+  } else {
+    document.getElementById('packNombre').textContent = pack.nombre;
+
+    const grid = document.getElementById('logosGrid');
+    grid.innerHTML = pack.comercios.map(c => {
+      const ini = c.inicial || c.nombre.substring(0,2).toUpperCase();
+      const rub = c.rubro || '';
+      return `
+        <a href="comercio.html#${c.id}" class="logo-item">
+          <div class="logo-circle" style="background:${c.color}">
+            ${c.logo ? `<img src="${c.logo}" alt="${c.nombre}">` : `<span>${ini}</span>`}
+          </div>
+          <div class="logo-nombre">${c.nombre}</div>
+          <div class="logo-rubro">${rub}</div>
+        </a>`;
+    }).join('');
+  }
+</script>
+</body>
+</html>

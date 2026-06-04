@@ -1,0 +1,2 @@
+[functions.reporte-semanal]
+verify_jwt = false

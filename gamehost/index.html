@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InfernoHost — Servidores de Juegos Online</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #080c18; color: #e2e8f0; overflow-x: hidden; }
+    h1, h2, h3, .font-gaming { font-family: 'Rajdhani', sans-serif; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #080c18; }
+    ::-webkit-scrollbar-thumb { background: #1e2a45; border-radius: 3px; }
+
+    /* Navbar */
+    .navbar {
+      background: rgba(8, 12, 24, 0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(30, 42, 69, 0.6);
+    }
+
+    /* Hero */
+    .hero-bg {
+      background:
+        linear-gradient(to bottom, rgba(6,10,20,0.72) 0%, rgba(6,10,20,0.88) 65%, #080c18 100%),
+        url('./hero-bg.jpg') center top / cover no-repeat;
+    }
+    .grid-overlay {
+      background-image:
+        linear-gradient(rgba(0, 212, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.018) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* Gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: linear-gradient(135deg, #00d4ff, #0ea5e9);
+      color: #080c18;
+      font-weight: 700;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.35);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 0 35px rgba(0, 212, 255, 0.6);
+      transform: translateY(-2px);
+    }
+    .btn-outline {
+      border: 1px solid #1e2a45;
+      color: #94a3b8;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+    .btn-outline:hover { border-color: #00d4ff; color: #00d4ff; }
+
+    /* Game card */
+    .game-card {
+      background: #0f1629;
+      border: 1px solid #1e2a45;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .game-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px var(--gc);
+      border-color: var(--gc);
+    }
+    .game-card .top-bar { height: 3px; background: var(--gc); }
+    .game-card .game-icon-bg {
+      height: 140px;
+      background: linear-gradient(135deg, var(--gc-dark) 0%, #0f1629 100%);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .game-card .game-icon-bg::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.04) 0%, transparent 70%);
+    }
+
+    /* Stats bar */
+    .stats-bar {
+      background: #0f1629;
+      border-top: 1px solid #1e2a45;
+      border-bottom: 1px solid #1e2a45;
+    }
+
+    /* Feature card */
+    .feature-card {
+      background: #0f1629;
+      border: 1px solid #1e2a45;
+      border-radius: 16px;
+      transition: all 0.3s ease;
+    }
+    .feature-card:hover { border-color: #00d4ff33; transform: translateY(-3px); }
+
+    /* How it works steps */
+    .step-number {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, #00d4ff22, #7c3aed22);
+      border: 1px solid #00d4ff44;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 22px; font-weight: 700;
+      color: #00d4ff;
+      flex-shrink: 0;
+    }
+    .step-line {
+      flex: 1; height: 1px;
+      background: linear-gradient(90deg, #1e2a45, transparent);
+    }
+
+    /* Pricing */
+    .pricing-card {
+      background: #0f1629;
+      border: 1px solid #1e2a45;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+    }
+    .pricing-card.featured {
+      border-color: #7c3aed;
+      background: linear-gradient(135deg, #0f1629 0%, #1a1040 100%);
+      box-shadow: 0 0 50px rgba(124, 58, 237, 0.15);
+    }
+    .pricing-card:hover:not(.featured) { border-color: #00d4ff44; transform: translateY(-4px); }
+    .pricing-card.featured:hover { transform: translateY(-4px); }
+
+    /* Badge */
+    .badge { border-radius: 6px; font-size: 11px; font-weight: 700; padding: 3px 9px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge-green { background: rgba(16,185,129,0.15); color: #10b981; }
+    .badge-blue { background: rgba(0,212,255,0.12); color: #00d4ff; }
+    .badge-purple { background: rgba(124,58,237,0.15); color: #a78bfa; }
+    .badge-orange { background: rgba(249,115,22,0.15); color: #fb923c; }
+
+    /* Pulse dot */
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+    .pulse { animation: pulse 2s ease-in-out infinite; }
+
+    /* Search input */
+    .search-input {
+      background: rgba(15,22,41,0.9);
+      border: 1px solid #1e2a45;
+      border-radius: 12px;
+      color: #e2e8f0;
+      transition: all 0.3s;
+    }
+    .search-input:focus { outline: none; border-color: #00d4ff; box-shadow: 0 0 0 3px rgba(0,212,255,0.1); }
+
+    /* Footer */
+    footer { border-top: 1px solid #1e2a45; }
+
+    /* Section heading underline */
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 60px; height: 3px;
+      background: linear-gradient(90deg, #00d4ff, #7c3aed);
+      border-radius: 2px;
+      margin: 12px auto 0;
+    }
+
+    /* Testimonial card */
+    .testimonial-card {
+      background: #0f1629;
+      border: 1px solid #1e2a45;
+      border-radius: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .hero-title { font-size: 42px !important; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ NAVBAR ═══════════════════════════════ -->
+<nav class="navbar fixed top-0 left-0 right-0 z-50 px-6" style="padding-top:16px;padding-bottom:16px;">
+  <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;">
+    <!-- Logo -->
+    <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      <div style="width:36px;height:36px;background:linear-gradient(135deg,#ff6b35,#dc2626);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+        <i class="fas fa-fire" style="color:white;font-size:15px;"></i>
+      </div>
+      <span class="font-gaming" style="font-size:22px;font-weight:700;color:white;letter-spacing:1px;">INFERNO<span style="color:#ff6b35;">HOST</span></span>
+    </a>
+
+    <!-- Links -->
+    <div class="nav-links" style="display:flex;align-items:center;gap:32px;">
+      <a href="#games" style="color:#94a3b8;text-decoration:none;font-size:14px;font-weight:500;transition:color 0.2s;" onmouseover="this.style.color='#e2e8f0'" onmouseout="this.style.color='#94a3b8'">Juegos</a>
+      <a href="#precios" style="color:#94a3b8;text-decoration:none;font-size:14px;font-weight:500;" onmouseover="this.style.color='#e2e8f0'" onmouseout="this.style.color='#94a3b8'">Precios</a>
+      <a href="#como-funciona" style="color:#94a3b8;text-decoration:none;font-size:14px;font-weight:500;" onmouseover="this.style.color='#e2e8f0'" onmouseout="this.style.color='#94a3b8'">¿Cómo funciona?</a>
+      <a href="#" style="color:#94a3b8;text-decoration:none;font-size:14px;font-weight:500;" onmouseover="this.style.color='#e2e8f0'" onmouseout="this.style.color='#94a3b8'">Soporte</a>
+    </div>
+
+    <!-- CTA -->
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a href="dashboard.html" class="btn-outline" style="padding:9px 18px;text-decoration:none;font-size:14px;font-weight:500;display:inline-block;">Iniciar sesión</a>
+      <a href="#games" class="btn-primary" style="padding:10px 22px;text-decoration:none;font-size:14px;display:inline-block;">Empezar ahora</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
+<section class="hero-bg grid-overlay" style="min-height:100vh;display:flex;align-items:center;padding-top:100px;padding-bottom:80px;">
+  <div style="max-width:1200px;margin:0 auto;padding:0 24px;text-align:center;width:100%;">
+
+    <!-- Badge -->
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:100px;padding:6px 16px;margin-bottom:32px;">
+      <span class="pulse" style="width:7px;height:7px;background:#00d4ff;border-radius:50%;display:inline-block;"></span>
+      <span style="font-size:13px;color:#00d4ff;font-weight:500;">+1,200 servidores activos ahora mismo</span>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="hero-title" style="font-size:72px;font-weight:700;line-height:1.05;color:white;margin-bottom:24px;">
+      Tu servidor de juegos<br>
+      <span class="gradient-text">listo en 60 segundos</span>
+    </h1>
+
+    <p style="font-size:19px;color:#94a3b8;max-width:560px;margin:0 auto 48px;line-height:1.7;">
+      Servidores dedicados para los juegos más populares. Sin configuraciones complicadas, sin contratos. Encendé y jugá.
+    </p>
+
+    <!-- Search -->
+    <div style="max-width:540px;margin:0 auto 48px;position:relative;">
+      <input
+        type="text"
+        id="searchInput"
+        class="search-input"
+        placeholder="Buscá tu juego favorito..."
+        oninput="filterGames(this.value)"
+        style="width:100%;padding:18px 56px 18px 22px;font-size:16px;"
+      >
+      <i class="fas fa-search" style="position:absolute;right:20px;top:50%;transform:translateY(-50%);color:#475569;pointer-events:none;"></i>
+    </div>
+
+    <!-- Quick game buttons -->
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:64px;">
+      <button onclick="scrollToGame('minecraft')" style="background:#0f1629;border:1px solid #1e2a45;color:#94a3b8;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.2s;" onmouseover="this.style.borderColor='#65a30d';this.style.color='#84cc16'" onmouseout="this.style.borderColor='#1e2a45';this.style.color='#94a3b8'">⛏ Minecraft</button>
+      <button onclick="scrollToGame('valheim')" style="background:#0f1629;border:1px solid #1e2a45;color:#94a3b8;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.2s;" onmouseover="this.style.borderColor='#3b82f6';this.style.color='#60a5fa'" onmouseout="this.style.borderColor='#1e2a45';this.style.color='#94a3b8'">⚔ Valheim</button>
+      <button onclick="scrollToGame('conan')" style="background:#0f1629;border:1px solid #1e2a45;color:#94a3b8;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.2s;" onmouseover="this.style.borderColor='#dc2626';this.style.color='#f87171'" onmouseout="this.style.borderColor='#1e2a45';this.style.color='#94a3b8'">🗡 Conan Exiles</button>
+      <button onclick="scrollToGame('cs2')" style="background:#0f1629;border:1px solid #1e2a45;color:#94a3b8;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.2s;" onmouseover="this.style.borderColor='#f59e0b';this.style.color='#fbbf24'" onmouseout="this.style.borderColor='#1e2a45';this.style.color='#94a3b8'">🎯 CS2</button>
+      <button onclick="scrollToGame('palworld')" style="background:#0f1629;border:1px solid #1e2a45;color:#94a3b8;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.2s;" onmouseover="this.style.borderColor='#14b8a6';this.style.color='#2dd4bf'" onmouseout="this.style.borderColor='#1e2a45';this.style.color='#94a3b8'">🐾 Palworld</button>
+      <button onclick="scrollToGame('rust')" style="background:#0f1629;border:1px solid #1e2a45;color:#94a3b8;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.2s;" onmouseover="this.style.borderColor='#ea580c';this.style.color='#fb923c'" onmouseout="this.style.borderColor='#1e2a45';this.style.color='#94a3b8'">🔥 Rust</button>
+    </div>
+
+    <!-- Arrow down -->
+    <a href="#stats" style="color:#334155;text-decoration:none;display:inline-block;animation:bounce 2s infinite;">
+      <i class="fas fa-chevron-down" style="font-size:20px;"></i>
+    </a>
+  </div>
+</section>
+
+<style>
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+</style>
+
+<!-- ═══════════════════════════════ STATS ═══════════════════════════════ -->
+<div class="stats-bar" id="stats" style="padding:24px 0;">
+  <div style="max-width:1200px;margin:0 auto;padding:0 24px;display:flex;flex-wrap:wrap;justify-content:center;gap:48px;">
+    <div style="text-align:center;">
+      <div class="font-gaming" style="font-size:36px;font-weight:700;color:#00d4ff;">1,247</div>
+      <div style="font-size:13px;color:#64748b;margin-top:2px;">Servidores activos</div>
+    </div>
+    <div style="text-align:center;">
+      <div class="font-gaming" style="font-size:36px;font-weight:700;color:#00d4ff;">8</div>
+      <div style="font-size:13px;color:#64748b;margin-top:2px;">Juegos disponibles</div>
+    </div>
+    <div style="text-align:center;">
+      <div class="font-gaming" style="font-size:36px;font-weight:700;color:#00d4ff;">99.9%</div>
+      <div style="font-size:13px;color:#64748b;margin-top:2px;">Uptime garantizado</div>
+    </div>
+    <div style="text-align:center;">
+      <div class="font-gaming" style="font-size:36px;font-weight:700;color:#00d4ff;">24/7</div>
+      <div style="font-size:13px;color:#64748b;margin-top:2px;">Soporte técnico</div>
+    </div>
+    <div style="text-align:center;">
+      <div class="font-gaming" style="font-size:36px;font-weight:700;color:#00d4ff;">60s</div>
+      <div style="font-size:13px;color:#64748b;margin-top:2px;">Activación instantánea</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ GAMES ═══════════════════════════════ -->
+<section id="games" style="padding:100px 24px;">
+  <div style="max-width:1200px;margin:0 auto;">
+
+    <div style="text-align:center;margin-bottom:60px;">
+      <div style="display:inline-block;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:6px;padding:4px 14px;font-size:12px;color:#00d4ff;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Catálogo de juegos</div>
+      <h2 class="section-title font-gaming" style="font-size:48px;font-weight:700;color:white;">Elegí tu juego</h2>
+      <p style="color:#64748b;font-size:16px;margin-top:16px;">Servidores configurados y listos para cada juego. Sin complicaciones.</p>
+    </div>
+
+    <!-- Game Grid -->
+    <div id="gamesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:24px;">
+    </div>
+
+    <div id="noResults" style="display:none;text-align:center;padding:60px;color:#475569;">
+      <i class="fas fa-search" style="font-size:40px;margin-bottom:16px;display:block;"></i>
+      <p>No encontramos ese juego. ¡Pronto habrá más!</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ FEATURES ═══════════════════════════════ -->
+<section id="features" style="padding:80px 24px;background:#0a0f1e;">
+  <div style="max-width:1200px;margin:0 auto;">
+
+    <div style="text-align:center;margin-bottom:60px;">
+      <div style="display:inline-block;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);border-radius:6px;padding:4px 14px;font-size:12px;color:#a78bfa;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">¿Por qué InfernoHost?</div>
+      <h2 class="section-title font-gaming" style="font-size:48px;font-weight:700;color:white;">Hosting sin complicaciones</h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px;">
+      <div class="feature-card" style="padding:32px;">
+        <div style="width:48px;height:48px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+          <i class="fas fa-bolt" style="color:#00d4ff;font-size:20px;"></i>
+        </div>
+        <h3 class="font-gaming" style="font-size:20px;font-weight:700;color:white;margin-bottom:10px;">Activación en 60 segundos</h3>
+        <p style="color:#64748b;font-size:14px;line-height:1.7;">Pagás y tu servidor se levanta automáticamente. Sin esperar, sin tickets de soporte.</p>
+      </div>
+      <div class="feature-card" style="padding:32px;">
+        <div style="width:48px;height:48px;background:rgba(124,58,237,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+          <i class="fas fa-sliders" style="color:#a78bfa;font-size:20px;"></i>
+        </div>
+        <h3 class="font-gaming" style="font-size:20px;font-weight:700;color:white;margin-bottom:10px;">Panel de control completo</h3>
+        <p style="color:#64748b;font-size:14px;line-height:1.7;">Arrancá, pausá o reiniciá tu server con un clic. Consola en tiempo real incluida.</p>
+      </div>
+      <div class="feature-card" style="padding:32px;">
+        <div style="width:48px;height:48px;background:rgba(16,185,129,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+          <i class="fas fa-shield-halved" style="color:#10b981;font-size:20px;"></i>
+        </div>
+        <h3 class="font-gaming" style="font-size:20px;font-weight:700;color:white;margin-bottom:10px;">Backups automáticos</h3>
+        <p style="color:#64748b;font-size:14px;line-height:1.7;">Tu mundo guardado a salvo. Backups diarios automáticos con restauración con un clic.</p>
+      </div>
+      <div class="feature-card" style="padding:32px;">
+        <div style="width:48px;height:48px;background:rgba(249,115,22,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+          <i class="fas fa-puzzle-piece" style="color:#fb923c;font-size:20px;"></i>
+        </div>
+        <h3 class="font-gaming" style="font-size:20px;font-weight:700;color:white;margin-bottom:10px;">Mods y plugins</h3>
+        <p style="color:#64748b;font-size:14px;line-height:1.7;">Instalá mods y plugins desde el panel con un clic. Sin SSH ni conocimientos técnicos.</p>
+      </div>
+      <div class="feature-card" style="padding:32px;">
+        <div style="width:48px;height:48px;background:rgba(239,68,68,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+          <i class="fas fa-headset" style="color:#f87171;font-size:20px;"></i>
+        </div>
+        <h3 class="font-gaming" style="font-size:20px;font-weight:700;color:white;margin-bottom:10px;">Soporte 24/7</h3>
+        <p style="color:#64748b;font-size:14px;line-height:1.7;">¿Problemas? Nuestro equipo responde en minutos por WhatsApp, Discord o email.</p>
+      </div>
+      <div class="feature-card" style="padding:32px;">
+        <div style="width:48px;height:48px;background:rgba(234,179,8,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+          <i class="fas fa-gauge-high" style="color:#facc15;font-size:20px;"></i>
+        </div>
+        <h3 class="font-gaming" style="font-size:20px;font-weight:700;color:white;margin-bottom:10px;">Sin lag garantizado</h3>
+        <p style="color:#64748b;font-size:14px;line-height:1.7;">Hardware dedicado y conexión de fibra óptica. Ping bajo para todos los jugadores.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ HOW IT WORKS ═══════════════════════════════ -->
+<section id="como-funciona" style="padding:100px 24px;">
+  <div style="max-width:900px;margin:0 auto;">
+
+    <div style="text-align:center;margin-bottom:70px;">
+      <div style="display:inline-block;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:6px;padding:4px 14px;font-size:12px;color:#00d4ff;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Proceso simple</div>
+      <h2 class="section-title font-gaming" style="font-size:48px;font-weight:700;color:white;">¿Cómo funciona?</h2>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:40px;">
+
+      <div style="display:flex;align-items:flex-start;gap:24px;">
+        <div class="step-number">1</div>
+        <div style="background:#0f1629;border:1px solid #1e2a45;border-radius:16px;padding:28px;flex:1;">
+          <h3 class="font-gaming" style="font-size:22px;font-weight:700;color:white;margin-bottom:8px;">Elegí tu juego y plan</h3>
+          <p style="color:#64748b;font-size:15px;line-height:1.7;">Seleccioná el juego, la cantidad de jugadores y el tiempo de contratación. El precio se calcula al instante.</p>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:24px;">
+        <div class="step-number">2</div>
+        <div style="background:#0f1629;border:1px solid #1e2a45;border-radius:16px;padding:28px;flex:1;">
+          <h3 class="font-gaming" style="font-size:22px;font-weight:700;color:white;margin-bottom:8px;">Pagá con MercadoPago</h3>
+          <p style="color:#64748b;font-size:15px;line-height:1.7;">Aceptamos tarjetas, débito, transferencia y cuotas sin interés. Pago 100% seguro.</p>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:24px;">
+        <div class="step-number">3</div>
+        <div style="background:#0f1629;border:1px solid #1e2a45;border-radius:16px;padding:28px;flex:1;">
+          <h3 class="font-gaming" style="font-size:22px;font-weight:700;color:white;margin-bottom:8px;">¡Tu servidor está listo!</h3>
+          <p style="color:#64748b;font-size:15px;line-height:1.7;">En menos de 60 segundos recibís la IP y el puerto para conectarte. Accedé al panel para personalizar todo.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ PRICING ═══════════════════════════════ -->
+<section id="precios" style="padding:100px 24px;background:#0a0f1e;">
+  <div style="max-width:1100px;margin:0 auto;">
+
+    <div style="text-align:center;margin-bottom:60px;">
+      <div style="display:inline-block;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);border-radius:6px;padding:4px 14px;font-size:12px;color:#a78bfa;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Planes</div>
+      <h2 class="section-title font-gaming" style="font-size:48px;font-weight:700;color:white;">Precios claros, sin sorpresas</h2>
+      <p style="color:#64748b;font-size:16px;margin-top:16px;">Todos los planes incluyen panel de control, soporte y backups automáticos.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;align-items:start;">
+
+      <!-- Basic -->
+      <div class="pricing-card" style="padding:36px;">
+        <div style="font-size:13px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Básico</div>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:8px;">
+          <span style="font-size:14px;color:#64748b;">USD</span>
+          <span class="font-gaming" style="font-size:52px;font-weight:700;color:white;line-height:1;">3</span>
+          <span style="color:#64748b;font-size:14px;">/mes</span>
+        </div>
+        <p style="color:#475569;font-size:13px;margin-bottom:32px;">Perfecto para jugar con amigos</p>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:14px;margin-bottom:36px;">
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#94a3b8;"><i class="fas fa-check" style="color:#10b981;font-size:13px;"></i> Hasta 10 jugadores</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#94a3b8;"><i class="fas fa-check" style="color:#10b981;font-size:13px;"></i> 2 GB RAM</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#94a3b8;"><i class="fas fa-check" style="color:#10b981;font-size:13px;"></i> 10 GB almacenamiento</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#94a3b8;"><i class="fas fa-check" style="color:#10b981;font-size:13px;"></i> Backups diarios</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#475569;"><i class="fas fa-times" style="color:#374151;font-size:13px;"></i> Mods ilimitados</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#475569;"><i class="fas fa-times" style="color:#374151;font-size:13px;"></i> IP dedicada</li>
+        </ul>
+        <a href="#games" class="btn-outline" style="display:block;text-align:center;padding:13px;text-decoration:none;font-size:14px;font-weight:600;">Empezar con Básico</a>
+      </div>
+
+      <!-- Pro (featured) -->
+      <div class="pricing-card featured" style="padding:36px;position:relative;">
+        <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7c3aed,#9333ea);color:white;font-size:12px;font-weight:700;padding:4px 18px;border-radius:100px;text-transform:uppercase;letter-spacing:0.5px;">Más popular</div>
+        <div style="font-size:13px;color:#a78bfa;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Pro</div>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:8px;">
+          <span style="font-size:14px;color:#64748b;">USD</span>
+          <span class="font-gaming" style="font-size:52px;font-weight:700;color:white;line-height:1;">8</span>
+          <span style="color:#64748b;font-size:14px;">/mes</span>
+        </div>
+        <p style="color:#475569;font-size:13px;margin-bottom:32px;">Para comunidades activas</p>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:14px;margin-bottom:36px;">
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#94a3b8;"><i class="fas fa-check" style="color:#10b981;font-size:13px;"></i> Hasta 40 jugadores</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#94a3b8;"><i class="fas fa-check" style="color:#10b981;font-size:13px;"></i> 8 GB RAM</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#94a3b8;"><i class="fas fa-check" style="color:#10b981;font-size:13px;"></i> 50 GB almacenamiento</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#94a3b8;"><i class="fas fa-check" style="color:#10b981;font-size:13px;"></i> Backups diarios</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#94a3b8;"><i class="fas fa-check" style="color:#10b981;font-size:13px;"></i> Mods ilimitados</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#475569;"><i class="fas fa-times" style="color:#374151;font-size:13px;"></i> IP dedicada</li>
+        </ul>
+        <a href="#games" style="display:block;text-align:center;padding:13px;text-decoration:none;font-size:14px;font-weight:700;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#9333ea);color:white;box-shadow:0 0 25px rgba(124,58,237,0.4);transition:all 0.3s;" onmouseover="this.style.boxShadow='0 0 40px rgba(124,58,237,0.7)'" onmouseout="this.style.boxShadow='0 0 25px rgba(124,58,237,0.4)'">Empezar con Pro</a>
+      </div>
+
+      <!-- Premium -->
+      <div class="pricing-card" style="padding:36px;">
+        <div style="font-size:13px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Premium</div>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:8px;">
+          <span style="font-size:14px;color:#64748b;">USD</span>
+          <span class="font-gaming" style="font-size:52px;font-weight:700;color:white;line-height:1;">18</span>
+          <span style="color:#64748b;font-size:14px;">/mes</span>
+        </div>
+        <p style="color:#475569;font-size:13px;margin-bottom:32px;">Para servidores públicos grandes</p>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:14px;margin-bottom:36px;">
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#94a3b8;"><i class="fas fa-check" style="color:#10b981;font-size:13px;"></i> Jugadores ilimitados</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#94a3b8;"><i class="fas fa-check" style="color:#10b981;font-size:13px;"></i> 16 GB RAM</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#94a3b8;"><i class="fas fa-check" style="color:#10b981;font-size:13px;"></i> 200 GB almacenamiento</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#94a3b8;"><i class="fas fa-check" style="color:#10b981;font-size:13px;"></i> Backups cada 6hs</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#94a3b8;"><i class="fas fa-check" style="color:#10b981;font-size:13px;"></i> Mods ilimitados</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#94a3b8;"><i class="fas fa-check" style="color:#10b981;font-size:13px;"></i> IP dedicada</li>
+        </ul>
+        <a href="#games" class="btn-outline" style="display:block;text-align:center;padding:13px;text-decoration:none;font-size:14px;font-weight:600;">Empezar con Premium</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ TESTIMONIALS ═══════════════════════════════ -->
+<section style="padding:100px 24px;">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:60px;">
+      <h2 class="section-title font-gaming" style="font-size:48px;font-weight:700;color:white;">Lo que dicen nuestros jugadores</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;">
+      <div class="testimonial-card" style="padding:28px;">
+        <div style="display:flex;gap:4px;margin-bottom:16px;">
+          <i class="fas fa-star" style="color:#facc15;font-size:13px;"></i>
+          <i class="fas fa-star" style="color:#facc15;font-size:13px;"></i>
+          <i class="fas fa-star" style="color:#facc15;font-size:13px;"></i>
+          <i class="fas fa-star" style="color:#facc15;font-size:13px;"></i>
+          <i class="fas fa-star" style="color:#facc15;font-size:13px;"></i>
+        </div>
+        <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin-bottom:20px;">"Lo mejor es que el servidor se levanta solo al instante. Con los amigos nos conectamos al Valheim sin lag ninguno."</p>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:38px;height:38px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:white;">M</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:white;">Matías R.</div>
+            <div style="font-size:12px;color:#475569;">Valheim — Plan Pro</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card" style="padding:28px;">
+        <div style="display:flex;gap:4px;margin-bottom:16px;">
+          <i class="fas fa-star" style="color:#facc15;font-size:13px;"></i>
+          <i class="fas fa-star" style="color:#facc15;font-size:13px;"></i>
+          <i class="fas fa-star" style="color:#facc15;font-size:13px;"></i>
+          <i class="fas fa-star" style="color:#facc15;font-size:13px;"></i>
+          <i class="fas fa-star" style="color:#facc15;font-size:13px;"></i>
+        </div>
+        <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin-bottom:20px;">"Teníamos un server de Conan Exiles en otro hosting y lo pasamos acá. La diferencia en ping es tremenda para la Argentina."</p>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:38px;height:38px;background:linear-gradient(135deg,#dc2626,#991b1b);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:white;">L</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:white;">Lucas P.</div>
+            <div style="font-size:12px;color:#475569;">Conan Exiles — Plan Premium</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card" style="padding:28px;">
+        <div style="display:flex;gap:4px;margin-bottom:16px;">
+          <i class="fas fa-star" style="color:#facc15;font-size:13px;"></i>
+          <i class="fas fa-star" style="color:#facc15;font-size:13px;"></i>
+          <i class="fas fa-star" style="color:#facc15;font-size:13px;"></i>
+          <i class="fas fa-star" style="color:#facc15;font-size:13px;"></i>
+          <i class="fas fa-star-half-stroke" style="color:#facc15;font-size:13px;"></i>
+        </div>
+        <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin-bottom:20px;">"Súper fácil de usar. Configuré mi server de Minecraft con mods en 10 minutos sin saber nada. El soporte responde rapidísimo."</p>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:38px;height:38px;background:linear-gradient(135deg,#65a30d,#166534);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:white;">S</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:white;">Sofía G.</div>
+            <div style="font-size:12px;color:#475569;">Minecraft — Plan Básico</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ CTA ═══════════════════════════════ -->
+<section style="padding:100px 24px;background:#0a0f1e;">
+  <div style="max-width:700px;margin:0 auto;text-align:center;">
+    <div style="background:linear-gradient(135deg,rgba(0,212,255,0.06),rgba(124,58,237,0.06));border:1px solid rgba(0,212,255,0.15);border-radius:24px;padding:64px 48px;">
+      <h2 class="font-gaming" style="font-size:48px;font-weight:700;color:white;margin-bottom:16px;">¿Listo para jugar?</h2>
+      <p style="color:#64748b;font-size:16px;margin-bottom:40px;line-height:1.7;">Armá tu servidor ahora. Sin contratos, cancelá cuando quieras.</p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+        <a href="#games" class="btn-primary" style="padding:16px 36px;text-decoration:none;font-size:16px;display:inline-block;">Crear mi servidor</a>
+        <a href="dashboard.html" class="btn-outline" style="padding:16px 36px;text-decoration:none;font-size:14px;display:inline-block;">Ver demo del panel</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ FOOTER ═══════════════════════════════ -->
+<footer style="padding:60px 24px 32px;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px;">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+          <div style="width:32px;height:32px;background:linear-gradient(135deg,#ff6b35,#dc2626);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+            <i class="fas fa-fire" style="color:white;font-size:13px;"></i>
+          </div>
+          <span class="font-gaming" style="font-size:18px;font-weight:700;color:white;">INFERNO<span style="color:#ff6b35;">HOST</span></span>
+        </div>
+        <p style="color:#475569;font-size:14px;line-height:1.7;max-width:260px;">Servidores de juegos para Argentina y Latinoamérica. Rápidos, seguros y sin complicaciones.</p>
+        <div style="display:flex;gap:12px;margin-top:24px;">
+          <a href="#" style="width:36px;height:36px;background:#0f1629;border:1px solid #1e2a45;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#64748b;text-decoration:none;" onmouseover="this.style.borderColor='#00d4ff';this.style.color='#00d4ff'" onmouseout="this.style.borderColor='#1e2a45';this.style.color='#64748b'"><i class="fab fa-discord"></i></a>
+          <a href="#" style="width:36px;height:36px;background:#0f1629;border:1px solid #1e2a45;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#64748b;text-decoration:none;" onmouseover="this.style.borderColor='#00d4ff';this.style.color='#00d4ff'" onmouseout="this.style.borderColor='#1e2a45';this.style.color='#64748b'"><i class="fab fa-instagram"></i></a>
+          <a href="#" style="width:36px;height:36px;background:#0f1629;border:1px solid #1e2a45;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#64748b;text-decoration:none;" onmouseover="this.style.borderColor='#00d4ff';this.style.color='#00d4ff'" onmouseout="this.style.borderColor='#1e2a45';this.style.color='#64748b'"><i class="fab fa-whatsapp"></i></a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:white;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:20px;">Juegos</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <a href="configurar.html?game=minecraft" style="color:#475569;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'">Minecraft</a>
+          <a href="configurar.html?game=valheim" style="color:#475569;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'">Valheim</a>
+          <a href="configurar.html?game=conan" style="color:#475569;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'">Conan Exiles</a>
+          <a href="configurar.html?game=cs2" style="color:#475569;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'">CS2</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:white;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:20px;">Empresa</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <a href="#" style="color:#475569;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'">Nosotros</a>
+          <a href="#" style="color:#475569;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'">Blog</a>
+          <a href="#" style="color:#475569;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'">Términos</a>
+          <a href="#" style="color:#475569;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'">Privacidad</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:white;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:20px;">Soporte</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <a href="#" style="color:#475569;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'">Centro de ayuda</a>
+          <a href="#" style="color:#475569;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'">Discord</a>
+          <a href="#" style="color:#475569;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'">WhatsApp</a>
+          <a href="#" style="color:#475569;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'">Estado del sistema</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid #1e2a45;padding-top:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+      <p style="color:#334155;font-size:13px;">© 2025 InfernoHost. Todos los derechos reservados.</p>
+      <p style="color:#334155;font-size:13px;">Hecho con <span style="color:#ef4444;">♥</span> en Argentina</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════ JAVASCRIPT ═══════════════════════════════ -->
+<script>
+  const GAMES = [
+    { id: 'minecraft',  name: 'Minecraft',        icon: 'fa-cube',         color: '#65a30d', colorDark: '#14320400', price: 3,  players: 20,  tag: 'Popular',   tags: ['popular'], desc: 'Java & Bedrock Edition. Vanilla, Forge, Paper, Spigot.' },
+    { id: 'valheim',    name: 'Valheim',           icon: 'fa-dragon',       color: '#3b82f6', colorDark: '#172554',   price: 5,  players: 10,  tag: 'Trending',  tags: ['trending'], desc: 'Exploración vikinga. Hasta 10 jugadores por mundo.' },
+    { id: 'conan',      name: 'Conan Exiles',      icon: 'fa-skull',        color: '#dc2626', colorDark: '#450a0a',   price: 8,  players: 40,  tag: '',          tags: [], desc: 'Sobrevivencia brutal. Mods del Steam Workshop incluidos.' },
+    { id: 'cs2',        name: 'CS2',               icon: 'fa-crosshairs',   color: '#f59e0b', colorDark: '#451a03',   price: 6,  players: 32,  tag: 'Popular',   tags: ['popular'], desc: 'Counter-Strike 2 competitivo. Servidores dedicados de 128 tick.' },
+    { id: 'terraria',   name: 'Terraria',          icon: 'fa-mountain',     color: '#84cc16', colorDark: '#1a2e05',   price: 3,  players: 8,   tag: '',          tags: [], desc: 'Aventura 2D infinita. Configuración rápida, bajo consumo.' },
+    { id: 'palworld',   name: 'Palworld',          icon: 'fa-paw',          color: '#14b8a6', colorDark: '#042f2e',   price: 7,  players: 32,  tag: 'Nuevo',     tags: ['nuevo'], desc: 'Pals y supervivencia. Servidor para hasta 32 jugadores.' },
+    { id: 'ark',        name: 'ARK: Survival',     icon: 'fa-dna',          color: '#d97706', colorDark: '#431407',   price: 10, players: 70,  tag: '',          tags: [], desc: 'Dinosaurios y sobrevivencia. Mapas oficiales y personalizados.' },
+    { id: 'rust',       name: 'Rust',              icon: 'fa-fire',         color: '#ea580c', colorDark: '#431407',   price: 12, players: 200, tag: '',          tags: [], desc: 'PvP hardcore. Servidores de hasta 200 jugadores simultáneos.' },
+  ];
+
+  function buildGameCards(games) {
+    const grid = document.getElementById('gamesGrid');
+    const noResults = document.getElementById('noResults');
+
+    if (games.length === 0) {
+      grid.innerHTML = '';
+      noResults.style.display = 'block';
+      return;
+    }
+    noResults.style.display = 'none';
+
+    grid.innerHTML = games.map(g => `
+      <div class="game-card" id="game-${g.id}" style="--gc:${g.color};--gc-dark:${g.colorDark};" onclick="window.location='configurar.html?game=${g.id}'">
+        <div class="top-bar"></div>
+        <div class="game-icon-bg">
+          <i class="fas ${g.icon}" style="font-size:52px;color:${g.color};opacity:0.9;position:relative;z-index:1;filter:drop-shadow(0 0 20px ${g.color}55);"></i>
+          ${g.tag ? `<div class="badge ${g.tag === 'Popular' ? 'badge-blue' : g.tag === 'Nuevo' ? 'badge-green' : 'badge-orange'}" style="position:absolute;top:12px;right:12px;">${g.tag}</div>` : ''}
+        </div>
+        <div style="padding:20px 22px 22px;">
+          <h3 class="font-gaming" style="font-size:20px;font-weight:700;color:white;margin-bottom:6px;">${g.name}</h3>
+          <p style="font-size:12px;color:#475569;margin-bottom:16px;line-height:1.5;">${g.desc}</p>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <span style="font-size:11px;color:#475569;display:flex;align-items:center;gap:5px;"><i class="fas fa-users" style="font-size:10px;"></i> hasta ${g.players} jugadores</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <span style="font-size:11px;color:#64748b;">desde </span>
+              <span class="font-gaming" style="font-size:26px;font-weight:700;color:${g.color};">$${g.price}</span>
+              <span style="font-size:12px;color:#64748b;">/mes</span>
+            </div>
+            <div style="background:${g.color}22;color:${g.color};padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid ${g.color}44;">Configurar →</div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function filterGames(query) {
+    const q = query.toLowerCase().trim();
+    const filtered = q ? GAMES.filter(g => g.name.toLowerCase().includes(q)) : GAMES;
+    buildGameCards(filtered);
+    if (q) document.getElementById('games').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function scrollToGame(id) {
+    document.getElementById('games').scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+      const el = document.getElementById('game-' + id);
+      if (el) el.style.boxShadow = `0 0 0 2px ${GAMES.find(g=>g.id===id)?.color}, 0 20px 40px rgba(0,0,0,0.5)`;
+      setTimeout(() => { if (el) el.style.boxShadow = ''; }, 1500);
+    }, 500);
+  }
+
+  // Init
+  buildGameCards(GAMES);
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+</script>
+
+</body>
+</html>

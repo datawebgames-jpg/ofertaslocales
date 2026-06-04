@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurar servidor — InfernoHost</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #080c18; color: #e2e8f0; }
+    h1, h2, h3, .font-gaming { font-family: 'Rajdhani', sans-serif; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #080c18; }
+    ::-webkit-scrollbar-thumb { background: #1e2a45; border-radius: 3px; }
+
+    .navbar {
+      background: rgba(8,12,24,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(30,42,69,0.6);
+    }
+
+    /* Range slider */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%; height: 6px;
+      background: #1e2a45;
+      border-radius: 3px; outline: none;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--game-color, #00d4ff);
+      border: 3px solid #080c18;
+      box-shadow: 0 0 10px var(--game-color, #00d4ff);
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 20px var(--game-color, #00d4ff);
+    }
+
+    /* Option buttons (duration/extras) */
+    .opt-btn {
+      background: #0f1629;
+      border: 1px solid #1e2a45;
+      border-radius: 10px;
+      padding: 12px 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      color: #64748b;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .opt-btn.active {
+      border-color: var(--game-color, #00d4ff);
+      color: var(--game-color, #00d4ff);
+      background: color-mix(in srgb, var(--game-color, #00d4ff) 8%, #0f1629);
+    }
+    .opt-btn:hover:not(.active) { border-color: #334155; color: #94a3b8; }
+
+    /* Extra toggle */
+    .extra-card {
+      background: #0f1629;
+      border: 1px solid #1e2a45;
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .extra-card.active {
+      border-color: var(--game-color, #00d4ff);
+      background: color-mix(in srgb, var(--game-color, #00d4ff) 5%, #0f1629);
+    }
+    .extra-check {
+      width: 22px; height: 22px;
+      border: 2px solid #1e2a45;
+      border-radius: 6px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .extra-card.active .extra-check {
+      background: var(--game-color, #00d4ff);
+      border-color: var(--game-color, #00d4ff);
+    }
+
+    /* Summary card */
+    .summary-card {
+      background: #0f1629;
+      border: 1px solid #1e2a45;
+      border-radius: 20px;
+      position: sticky;
+      top: 90px;
+    }
+
+    /* Config section */
+    .config-section {
+      background: #0f1629;
+      border: 1px solid #1e2a45;
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* Gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Game banner */
+    .game-banner {
+      height: 200px;
+      position: relative;
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .game-banner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 30%, #080c18 100%);
+      z-index: 1;
+    }
+
+    /* Step */
+    .step-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #1e2a45;
+      transition: background 0.3s;
+    }
+    .step-dot.active { background: var(--game-color, #00d4ff); }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar fixed top-0 left-0 right-0 z-50 px-6" style="padding-top:16px;padding-bottom:16px;">
+  <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;">
+    <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      <div style="width:34px;height:34px;background:linear-gradient(135deg,#ff6b35,#dc2626);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+        <i class="fas fa-fire" style="color:white;font-size:14px;"></i>
+      </div>
+      <span class="font-gaming" style="font-size:20px;font-weight:700;color:white;letter-spacing:1px;">INFERNO<span style="color:#ff6b35;">HOST</span></span>
+    </a>
+    <!-- Breadcrumb -->
+    <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#475569;">
+      <a href="index.html" style="color:#475569;text-decoration:none;" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'">Inicio</a>
+      <i class="fas fa-chevron-right" style="font-size:10px;"></i>
+      <a href="index.html#games" style="color:#475569;text-decoration:none;" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'">Juegos</a>
+      <i class="fas fa-chevron-right" style="font-size:10px;"></i>
+      <span id="navGameName" style="color:#94a3b8;">Configurar</span>
+    </div>
+    <a href="dashboard.html" style="background:#0f1629;border:1px solid #1e2a45;color:#94a3b8;padding:9px 18px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:500;" onmouseover="this.style.borderColor='#00d4ff';this.style.color='#00d4ff'" onmouseout="this.style.borderColor='#1e2a45';this.style.color='#94a3b8'">
+      <i class="fas fa-gauge" style="margin-right:6px;font-size:12px;"></i>Mi panel
+    </a>
+  </div>
+</nav>
+
+<!-- GAME BANNER -->
+<div id="gameBanner" class="game-banner" style="margin-top:64px;background:#0a0f1e;">
+  <i id="bannerIcon" class="fas fa-server" style="font-size:80px;opacity:0.15;position:absolute;z-index:0;"></i>
+  <div style="position:relative;z-index:2;text-align:center;">
+    <div id="bannerGameName" class="font-gaming" style="font-size:52px;font-weight:700;color:white;line-height:1;"></div>
+    <div id="bannerTagline" style="font-size:15px;color:#64748b;margin-top:8px;"></div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div style="max-width:1100px;margin:0 auto;padding:40px 24px 80px;display:grid;grid-template-columns:1fr 360px;gap:32px;align-items:start;">
+
+  <!-- LEFT: Config panels -->
+  <div>
+
+    <!-- 1. Jugadores -->
+    <div class="config-section">
+      <div class="section-label">
+        <i class="fas fa-users" style="font-size:11px;"></i>
+        Cantidad de jugadores
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <span style="color:#94a3b8;font-size:15px;">¿Cuántos jugadores en tu servidor?</span>
+        <div style="display:flex;align-items:baseline;gap:4px;">
+          <span id="playerCount" class="font-gaming" style="font-size:32px;font-weight:700;"></span>
+          <span style="color:#64748b;font-size:14px;">jugadores</span>
+        </div>
+      </div>
+      <input type="range" id="playersSlider" min="2" max="100" value="10" oninput="updatePlayers(this.value)">
+      <div style="display:flex;justify-content:space-between;margin-top:8px;">
+        <span style="font-size:12px;color:#334155;">2</span>
+        <span style="font-size:12px;color:#334155;" id="maxPlayersLabel">100</span>
+      </div>
+      <!-- RAM indicator -->
+      <div style="margin-top:20px;background:#080c18;border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:16px;">
+        <i class="fas fa-memory" style="color:#64748b;font-size:14px;"></i>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-size:13px;color:#64748b;">RAM asignada</span>
+            <span id="ramLabel" style="font-size:13px;font-weight:600;color:#94a3b8;"></span>
+          </div>
+          <div style="height:4px;background:#1e2a45;border-radius:2px;overflow:hidden;">
+            <div id="ramBar" style="height:100%;border-radius:2px;transition:width 0.3s,background 0.3s;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Duración -->
+    <div class="config-section">
+      <div class="section-label">
+        <i class="fas fa-calendar" style="font-size:11px;"></i>
+        Duración del plan
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;" id="durationGrid">
+        <button class="opt-btn active" onclick="setDuration(1, this)" data-months="1">
+          <div style="font-size:20px;font-weight:700;font-family:'Rajdhani',sans-serif;">1</div>
+          <div style="font-size:11px;margin-top:2px;">mes</div>
+        </button>
+        <button class="opt-btn" onclick="setDuration(3, this)" data-months="3">
+          <div style="font-size:20px;font-weight:700;font-family:'Rajdhani',sans-serif;">3</div>
+          <div style="font-size:11px;margin-top:2px;">meses</div>
+          <div style="font-size:10px;margin-top:4px;color:#10b981;font-weight:600;">-5%</div>
+        </button>
+        <button class="opt-btn" onclick="setDuration(6, this)" data-months="6">
+          <div style="font-size:20px;font-weight:700;font-family:'Rajdhani',sans-serif;">6</div>
+          <div style="font-size:11px;margin-top:2px;">meses</div>
+          <div style="font-size:10px;margin-top:4px;color:#10b981;font-weight:600;">-10%</div>
+        </button>
+        <button class="opt-btn" onclick="setDuration(12, this)" data-months="12">
+          <div style="font-size:20px;font-weight:700;font-family:'Rajdhani',sans-serif;">12</div>
+          <div style="font-size:11px;margin-top:2px;">meses</div>
+          <div style="font-size:10px;margin-top:4px;color:#10b981;font-weight:600;">-20%</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. Nombre del servidor -->
+    <div class="config-section">
+      <div class="section-label">
+        <i class="fas fa-tag" style="font-size:11px;"></i>
+        Nombre del servidor
+      </div>
+      <input
+        type="text"
+        id="serverName"
+        placeholder="Ej: El server de los pibes"
+        maxlength="32"
+        oninput="updateSummary()"
+        style="width:100%;background:#080c18;border:1px solid #1e2a45;border-radius:10px;padding:14px 16px;color:#e2e8f0;font-size:15px;outline:none;transition:border-color 0.2s;"
+        onfocus="this.style.borderColor=gameColor;this.style.boxShadow='0 0 0 3px '+gameColor+'22'"
+        onblur="this.style.borderColor='#1e2a45';this.style.boxShadow='none'"
+      >
+      <div style="text-align:right;font-size:12px;color:#334155;margin-top:6px;">máx 32 caracteres</div>
+    </div>
+
+    <!-- 4. Extras -->
+    <div class="config-section">
+      <div class="section-label">
+        <i class="fas fa-plus-circle" style="font-size:11px;"></i>
+        Extras opcionales
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="extra-card" id="extra-backups" onclick="toggleExtra('backups', 2)">
+          <div class="extra-check" id="check-backups"><i class="fas fa-check" style="font-size:11px;color:white;display:none;" id="checkIcon-backups"></i></div>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:600;color:#e2e8f0;margin-bottom:2px;">Backups cada 6 horas</div>
+            <div style="font-size:12px;color:#475569;">Guardado automático cada 6hs. Restauración con un clic.</div>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:#64748b;white-space:nowrap;">+ $2/mes</div>
+        </div>
+        <div class="extra-card" id="extra-mods" onclick="toggleExtra('mods', 3)">
+          <div class="extra-check" id="check-mods"><i class="fas fa-check" style="font-size:11px;color:white;display:none;" id="checkIcon-mods"></i></div>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:600;color:#e2e8f0;margin-bottom:2px;">Gestor de mods avanzado</div>
+            <div style="font-size:12px;color:#475569;">Instalá mods con un clic desde Steam Workshop y CurseForge.</div>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:#64748b;white-space:nowrap;">+ $3/mes</div>
+        </div>
+        <div class="extra-card" id="extra-ddos" onclick="toggleExtra('ddos', 4)">
+          <div class="extra-check" id="check-ddos"><i class="fas fa-check" style="font-size:11px;color:white;display:none;" id="checkIcon-ddos"></i></div>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:600;color:#e2e8f0;margin-bottom:2px;">Protección DDoS Premium</div>
+            <div style="font-size:12px;color:#475569;">Mitigación avanzada. Tu servidor siempre disponible.</div>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:#64748b;white-space:nowrap;">+ $4/mes</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: Summary (sticky) -->
+  <div>
+    <div class="summary-card" style="padding:28px;">
+
+      <!-- Game header in summary -->
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid #1e2a45;">
+        <div id="summaryIcon" style="width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;"></div>
+        <div>
+          <div id="summaryGame" class="font-gaming" style="font-size:20px;font-weight:700;color:white;"></div>
+          <div style="font-size:12px;color:#475569;margin-top:2px;">Servidor privado</div>
+        </div>
+      </div>
+
+      <!-- Summary details -->
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:#64748b;display:flex;align-items:center;gap:6px;"><i class="fas fa-users" style="font-size:11px;"></i> Jugadores</span>
+          <span id="sumPlayers" style="font-size:13px;color:#94a3b8;font-weight:500;"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:#64748b;display:flex;align-items:center;gap:6px;"><i class="fas fa-memory" style="font-size:11px;"></i> RAM</span>
+          <span id="sumRAM" style="font-size:13px;color:#94a3b8;font-weight:500;"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:#64748b;display:flex;align-items:center;gap:6px;"><i class="fas fa-calendar" style="font-size:11px;"></i> Duración</span>
+          <span id="sumDuration" style="font-size:13px;color:#94a3b8;font-weight:500;"></span>
+        </div>
+        <div id="sumExtrasRow" style="display:none;justify-content:space-between;align-items:flex-start;">
+          <span style="font-size:13px;color:#64748b;display:flex;align-items:center;gap:6px;"><i class="fas fa-plus" style="font-size:11px;"></i> Extras</span>
+          <div id="sumExtrasList" style="text-align:right;font-size:13px;color:#94a3b8;"></div>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div style="border-top:1px solid #1e2a45;margin-bottom:20px;"></div>
+
+      <!-- Price -->
+      <div style="margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:13px;color:#64748b;">Precio mensual</span>
+          <span id="sumMonthly" style="font-size:16px;font-weight:700;color:#94a3b8;"></span>
+        </div>
+        <div id="sumDiscountRow" style="display:none;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:13px;color:#10b981;">Descuento</span>
+          <span id="sumDiscount" style="font-size:13px;font-weight:600;color:#10b981;"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid #1e2a45;">
+          <span style="font-size:14px;font-weight:600;color:#e2e8f0;">Total a pagar</span>
+          <div>
+            <span style="font-size:11px;color:#64748b;margin-right:2px;">USD</span>
+            <span id="sumTotal" class="font-gaming" style="font-size:36px;font-weight:700;color:white;"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Discount badge if any -->
+      <div id="discountBadge" style="display:none;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:8px 12px;margin-bottom:20px;font-size:12px;color:#10b981;text-align:center;"></div>
+
+      <!-- CTA -->
+      <button id="buyBtn" onclick="goToDashboard()" style="width:100%;padding:16px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:12px;font-family:'Rajdhani',sans-serif;letter-spacing:0.5px;transition:all 0.3s;">
+        <i class="fas fa-bolt" style="margin-right:8px;"></i>Contratar ahora
+      </button>
+
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;">
+        <i class="fas fa-lock" style="font-size:11px;color:#334155;"></i>
+        <span style="font-size:12px;color:#334155;">Pago seguro con MercadoPago</span>
+      </div>
+
+      <!-- Trust icons -->
+      <div style="display:flex;justify-content:center;gap:20px;padding-top:16px;border-top:1px solid #1e2a45;">
+        <div style="text-align:center;">
+          <i class="fas fa-bolt" style="color:#334155;font-size:14px;margin-bottom:4px;display:block;"></i>
+          <div style="font-size:11px;color:#334155;">60 seg</div>
+        </div>
+        <div style="text-align:center;">
+          <i class="fas fa-rotate-left" style="color:#334155;font-size:14px;margin-bottom:4px;display:block;"></i>
+          <div style="font-size:11px;color:#334155;">Cancelá ya</div>
+        </div>
+        <div style="text-align:center;">
+          <i class="fas fa-headset" style="color:#334155;font-size:14px;margin-bottom:4px;display:block;"></i>
+          <div style="font-size:11px;color:#334155;">24/7</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const GAMES_DATA = {
+    minecraft:  { name: 'Minecraft',       icon: 'fa-cube',       color: '#65a30d', basePrice: 3,  maxPlayers: 100, tagline: 'Java & Bedrock Edition · Vanilla, Forge, Paper, Spigot' },
+    valheim:    { name: 'Valheim',          icon: 'fa-dragon',     color: '#3b82f6', basePrice: 5,  maxPlayers: 10,  tagline: 'Exploración vikinga · Hasta 10 jugadores por mundo' },
+    conan:      { name: 'Conan Exiles',     icon: 'fa-skull',      color: '#dc2626', basePrice: 8,  maxPlayers: 40,  tagline: 'Sobrevivencia brutal · Mods del Steam Workshop incluidos' },
+    cs2:        { name: 'CS2',              icon: 'fa-crosshairs', color: '#f59e0b', basePrice: 6,  maxPlayers: 32,  tagline: 'Counter-Strike 2 · Servidores dedicados de 128 tick' },
+    terraria:   { name: 'Terraria',         icon: 'fa-mountain',   color: '#84cc16', basePrice: 3,  maxPlayers: 8,   tagline: 'Aventura 2D infinita · Bajo consumo, activación rápida' },
+    palworld:   { name: 'Palworld',         icon: 'fa-paw',        color: '#14b8a6', basePrice: 7,  maxPlayers: 32,  tagline: 'Pals y supervivencia · Hasta 32 jugadores' },
+    ark:        { name: 'ARK: Survival',    icon: 'fa-dna',        color: '#d97706', basePrice: 10, maxPlayers: 70,  tagline: 'Dinosaurios · Mapas oficiales y personalizados' },
+    rust:       { name: 'Rust',             icon: 'fa-fire',       color: '#ea580c', basePrice: 12, maxPlayers: 200, tagline: 'PvP hardcore · Hasta 200 jugadores simultáneos' },
+  };
+
+  const DISCOUNTS = { 1: 0, 3: 0.05, 6: 0.10, 12: 0.20 };
+  const DISCOUNT_LABELS = { 3: '5% de descuento por 3 meses', 6: '10% de descuento por 6 meses', 12: '20% de descuento por 12 meses' };
+
+  let currentGame = null;
+  let players = 10;
+  let duration = 1;
+  let extras = { backups: false, mods: false, ddos: false };
+  let extraPrices = { backups: 2, mods: 3, ddos: 4 };
+  let gameColor = '#00d4ff';
+
+  function getRAM(p) {
+    if (p <= 5)  return { gb: 2,  pct: 20 };
+    if (p <= 15) return { gb: 4,  pct: 35 };
+    if (p <= 30) return { gb: 6,  pct: 50 };
+    if (p <= 50) return { gb: 8,  pct: 65 };
+    if (p <= 80) return { gb: 12, pct: 80 };
+    return              { gb: 16, pct: 100 };
+  }
+
+  function getRAMColor(pct) {
+    if (pct < 50) return '#10b981';
+    if (pct < 75) return '#f59e0b';
+    return '#ef4444';
+  }
+
+  function getPricePerPlayer(g, p) {
+    const base = g.basePrice;
+    const extra = Math.max(0, p - 10) * 0.15;
+    return base + extra;
+  }
+
+  function updatePlayers(val) {
+    players = parseInt(val);
+    document.getElementById('playerCount').textContent = players;
+    const ram = getRAM(players);
+    document.getElementById('ramLabel').textContent = ram.gb + ' GB';
+    const bar = document.getElementById('ramBar');
+    bar.style.width = ram.pct + '%';
+    bar.style.background = getRAMColor(ram.pct);
+    updateSummary();
+  }
+
+  function setDuration(months, btn) {
+    duration = months;
+    document.querySelectorAll('#durationGrid .opt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    updateSummary();
+  }
+
+  function toggleExtra(key, price) {
+    extras[key] = !extras[key];
+    const card = document.getElementById('extra-' + key);
+    const check = document.getElementById('check-' + key);
+    const icon = document.getElementById('checkIcon-' + key);
+    card.classList.toggle('active', extras[key]);
+    icon.style.display = extras[key] ? 'block' : 'none';
+    updateSummary();
+  }
+
+  function updateSummary() {
+    if (!currentGame) return;
+    const g = GAMES_DATA[currentGame];
+    const ram = getRAM(players);
+    const monthlyBase = getPricePerPlayer(g, players);
+    const extrasTotal = Object.entries(extras).reduce((sum, [k, v]) => sum + (v ? extraPrices[k] : 0), 0);
+    const monthlyTotal = monthlyBase + extrasTotal;
+    const discount = DISCOUNTS[duration];
+    const total = monthlyTotal * duration * (1 - discount);
+
+    document.getElementById('sumPlayers').textContent = players + ' jugadores';
+    document.getElementById('sumRAM').textContent = ram.gb + ' GB';
+    document.getElementById('sumDuration').textContent = duration + (duration === 1 ? ' mes' : ' meses');
+    document.getElementById('sumMonthly').textContent = `$${monthlyTotal.toFixed(2)}/mes`;
+    document.getElementById('sumTotal').textContent = total.toFixed(2);
+
+    const activeExtras = Object.entries(extras).filter(([,v])=>v).map(([k])=>({backups:'Backups 6hs',mods:'Gestor mods',ddos:'DDoS'}[k]));
+    if (activeExtras.length > 0) {
+      document.getElementById('sumExtrasRow').style.display = 'flex';
+      document.getElementById('sumExtrasList').innerHTML = activeExtras.map(e=>`<div>${e}</div>`).join('');
+    } else {
+      document.getElementById('sumExtrasRow').style.display = 'none';
+    }
+
+    if (discount > 0) {
+      const saved = (monthlyTotal * duration * discount).toFixed(2);
+      document.getElementById('sumDiscountRow').style.display = 'flex';
+      document.getElementById('sumDiscount').textContent = `-$${saved}`;
+      document.getElementById('discountBadge').style.display = 'block';
+      document.getElementById('discountBadge').textContent = DISCOUNT_LABELS[duration] + ` (ahorrás $${saved})`;
+    } else {
+      document.getElementById('sumDiscountRow').style.display = 'none';
+      document.getElementById('discountBadge').style.display = 'none';
+    }
+  }
+
+  function initPage() {
+    const params = new URLSearchParams(window.location.search);
+    const gameId = params.get('game') || 'minecraft';
+    currentGame = GAMES_DATA[gameId] ? gameId : 'minecraft';
+    const g = GAMES_DATA[currentGame];
+    gameColor = g.color;
+
+    // Set CSS var for slider
+    document.documentElement.style.setProperty('--game-color', gameColor);
+    document.querySelectorAll('.opt-btn, .extra-card, .step-dot').forEach(el => el.style.setProperty('--game-color', gameColor));
+
+    // Banner
+    document.getElementById('bannerGameName').textContent = g.name;
+    document.getElementById('bannerTagline').textContent = g.tagline;
+    const bannerIcon = document.getElementById('bannerIcon');
+    bannerIcon.className = 'fas ' + g.icon;
+    bannerIcon.style.color = g.color;
+    document.getElementById('gameBanner').style.background = `radial-gradient(ellipse at center, ${g.color}15 0%, #0a0f1e 70%)`;
+
+    // Nav
+    document.getElementById('navGameName').textContent = g.name;
+
+    // Summary icon
+    const si = document.getElementById('summaryIcon');
+    si.style.background = `${g.color}22`;
+    si.innerHTML = `<i class="fas ${g.icon}" style="color:${g.color};font-size:20px;"></i>`;
+    document.getElementById('summaryGame').textContent = g.name;
+
+    // Buy button
+    const btn = document.getElementById('buyBtn');
+    btn.style.background = `linear-gradient(135deg, ${g.color}, ${g.color}cc)`;
+    btn.style.color = '#080c18';
+    btn.style.boxShadow = `0 0 25px ${g.color}44`;
+
+    // Slider
+    const slider = document.getElementById('playersSlider');
+    slider.max = g.maxPlayers;
+    document.getElementById('maxPlayersLabel').textContent = g.maxPlayers;
+    slider.value = Math.min(10, g.maxPlayers);
+    players = parseInt(slider.value);
+
+    updatePlayers(players);
+  }
+
+  function goToDashboard() {
+    const g = GAMES_DATA[currentGame];
+    const name = document.getElementById('serverName').value || `Mi server de ${g.name}`;
+    sessionStorage.setItem('newServer', JSON.stringify({ game: currentGame, name, players, duration }));
+    window.location.href = 'dashboard.html?nuevo=1';
+  }
+
+  initPage();
+</script>
+
+</body>
+</html>

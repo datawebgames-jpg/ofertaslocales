@@ -3,399 +3,532 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OfertasLocales — Las mejores ofertas de tu ciudad</title>
+  <title>ComercialWeb — Las mejores ofertas de tu ciudad</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="src/styles.css" />
-  <!-- PWA -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon.svg" />
-  <meta name="theme-color" content="#FFE600" />
+  <meta name="theme-color" content="#e63946" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="OfertasLocales" />
+  <meta name="apple-mobile-web-app-title" content="ComercialWeb" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rojo:    #e63946;
+      --rojo2:   #c1121f;
+      --azul:    #1d3557;
+      --azul2:   #457b9d;
+      --amarillo:#FFE600;
+      --gris:    #f8f9fa;
+      --texto:   #1a1a2e;
+      --muted:   #6c757d;
+      --border:  #dee2e6;
+      --white:   #ffffff;
+      --sombra:  0 4px 24px rgba(0,0,0,.10);
+      --sombra2: 0 8px 40px rgba(0,0,0,.18);
+    }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      color: var(--texto);
+      background: var(--white);
+    }
+
+    /* ── HEADER ── */
+    .header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: rgba(29,53,87,.97);
+      backdrop-filter: blur(10px);
+      padding: 0 24px;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
+    .logo {
+      font-size: 1.5rem; font-weight: 900; color: var(--white);
+      text-decoration: none; letter-spacing: -.5px;
+    }
+    .logo span { color: var(--amarillo); }
+    .header-nav { display: flex; gap: 8px; }
+    .header-nav a {
+      color: rgba(255,255,255,.8); text-decoration: none;
+      font-size: .85rem; font-weight: 600;
+      padding: 7px 16px; border-radius: 50px;
+      transition: all .2s;
+    }
+    .header-nav a:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .header-nav a.btn-admin {
+      background: var(--rojo); color: #fff;
+    }
+    .header-nav a.btn-admin:hover { background: var(--rojo2); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      padding-top: 64px;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background-image: url('images/hero.jpg');
+      background-size: cover; background-position: center;
+      /* fallback si no hay imagen */
+      background-color: #1d3557;
+    }
+    /* gradiente oscuro encima de la imagen */
+    .hero-bg::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(29,53,87,.88) 0%,
+        rgba(198,12,48,.70) 100%
+      );
+    }
+    .hero-content {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 60px 24px;
+      max-width: 780px;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: var(--amarillo); color: #1a1a2e;
+      font-size: .75rem; font-weight: 800; letter-spacing: 1.5px;
+      text-transform: uppercase; padding: 5px 16px; border-radius: 50px;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 900; color: #fff; line-height: 1.1;
+      margin-bottom: 18px;
+    }
+    .hero h1 em { font-style: normal; color: var(--amarillo); }
+    .hero p {
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      color: rgba(255,255,255,.88); line-height: 1.7;
+      max-width: 560px; margin: 0 auto 32px;
+    }
+    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-hero-main {
+      background: var(--amarillo); color: var(--texto);
+      font-weight: 800; font-size: 1rem;
+      padding: 16px 36px; border-radius: 50px;
+      text-decoration: none; transition: all .2s;
+      box-shadow: 0 4px 20px rgba(255,230,0,.4);
+    }
+    .btn-hero-main:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,230,0,.5); }
+    .btn-hero-sec {
+      background: rgba(255,255,255,.12); color: #fff;
+      border: 2px solid rgba(255,255,255,.4);
+      font-weight: 700; font-size: 1rem;
+      padding: 14px 32px; border-radius: 50px;
+      text-decoration: none; transition: all .2s;
+    }
+    .btn-hero-sec:hover { background: rgba(255,255,255,.22); }
+
+    /* ── SCROLL INDICATOR ── */
+    .hero-scroll {
+      position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+      z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+      color: rgba(255,255,255,.6); font-size: .7rem; letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .hero-scroll .arrow {
+      width: 28px; height: 28px; border-right: 2.5px solid rgba(255,255,255,.5);
+      border-bottom: 2.5px solid rgba(255,255,255,.5);
+      transform: rotate(45deg);
+      animation: bounce 1.6s infinite;
+    }
+    @keyframes bounce { 0%,100%{transform:rotate(45deg) translateY(0)} 50%{transform:rotate(45deg) translateY(6px)} }
+
+    /* ── SECCIÓN GENERAL ── */
+    section { padding: 80px 24px; }
+    .section-title {
+      text-align: center; margin-bottom: 12px;
+      font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 900;
+    }
+    .section-sub {
+      text-align: center; color: var(--muted);
+      font-size: 1rem; max-width: 560px; margin: 0 auto 52px;
+      line-height: 1.7;
+    }
+
+    /* ── PRICING ── */
+    .pricing { background: var(--gris); }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px; max-width: 1100px; margin: 0 auto;
+    }
+    .pack-card {
+      background: var(--white); border-radius: 20px;
+      padding: 36px 28px; position: relative;
+      border: 2px solid transparent;
+      box-shadow: var(--sombra);
+      transition: transform .25s, box-shadow .25s;
+    }
+    .pack-card:hover { transform: translateY(-6px); box-shadow: var(--sombra2); }
+    .pack-card.destacado {
+      border-color: var(--rojo);
+      background: linear-gradient(160deg, #fff 60%, #fff5f5 100%);
+    }
+    .pack-mejor {
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+      background: var(--rojo); color: #fff;
+      font-size: .72rem; font-weight: 800; letter-spacing: 1px;
+      padding: 4px 18px; border-radius: 50px; text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .pack-icon {
+      width: 64px; height: 64px; border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; margin-bottom: 20px;
+    }
+    .pack-icon.c5 { background: linear-gradient(135deg,#1d3557,#457b9d); }
+    .pack-icon.c3 { background: linear-gradient(135deg,#e63946,#c1121f); }
+    .pack-icon.c1 { background: linear-gradient(135deg,#f4a261,#e76f51); }
+    .pack-nombre {
+      font-size: 1.3rem; font-weight: 900; margin-bottom: 4px;
+    }
+    .pack-tagline {
+      font-size: .85rem; color: var(--muted); margin-bottom: 24px;
+    }
+    .pack-precio {
+      font-size: 2.8rem; font-weight: 900; line-height: 1; margin-bottom: 4px;
+      color: var(--texto);
+    }
+    .pack-precio .signo { font-size: 1.4rem; vertical-align: top; margin-top: 8px; display: inline-block; }
+    .pack-precio .por-mes { font-size: .85rem; font-weight: 400; color: var(--muted); display: block; margin-top: 4px; }
+    .pack-por-comercio {
+      font-size: .8rem; color: var(--rojo); font-weight: 700;
+      margin-bottom: 24px; padding: 4px 0;
+    }
+    .pack-features {
+      list-style: none; display: flex; flex-direction: column; gap: 10px;
+      margin-bottom: 28px;
+    }
+    .pack-features li {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: .9rem; color: #444; line-height: 1.4;
+    }
+    .pack-features li::before {
+      content: '✓'; color: #16a34a; font-weight: 800;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .btn-pack {
+      display: block; text-align: center; width: 100%;
+      padding: 15px; border-radius: 12px; border: none;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
+      text-decoration: none; transition: all .2s;
+    }
+    .btn-pack.azul {
+      background: var(--azul); color: #fff;
+    }
+    .btn-pack.azul:hover { background: #16304a; }
+    .btn-pack.rojo {
+      background: var(--rojo); color: #fff;
+      box-shadow: 0 4px 16px rgba(230,57,70,.35);
+    }
+    .btn-pack.rojo:hover { background: var(--rojo2); }
+    .btn-pack.naranja {
+      background: #f4a261; color: #fff;
+    }
+    .btn-pack.naranja:hover { background: #e76f51; }
+
+    /* ── COMO FUNCIONA ── */
+    .como-funciona { background: var(--white); }
+    .steps {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 32px; max-width: 1000px; margin: 0 auto;
+    }
+    .step {
+      text-align: center; padding: 24px 16px;
+    }
+    .step-num {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--rojo); color: #fff;
+      font-size: 1.4rem; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .step h3 { font-size: 1rem; font-weight: 800; margin-bottom: 8px; }
+    .step p { font-size: .88rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── PACKS ACTIVOS ── */
+    .packs-activos { background: #f0f4f8; }
+    .packs-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 28px; max-width: 1100px; margin: 0 auto;
+    }
+    .pack-activo-card {
+      background: var(--white); border-radius: 18px;
+      padding: 28px; box-shadow: var(--sombra);
+      text-decoration: none; color: inherit;
+      transition: transform .2s, box-shadow .2s;
+      display: block; border: 2px solid transparent;
+    }
+    .pack-activo-card:hover {
+      transform: translateY(-4px); box-shadow: var(--sombra2);
+      border-color: var(--rojo);
+    }
+    .pac-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+    }
+    .pac-badge {
+      background: var(--rojo); color: #fff;
+      font-size: .7rem; font-weight: 800; padding: 3px 10px;
+      border-radius: 50px; text-transform: uppercase; letter-spacing: .5px;
+    }
+    .pac-title { font-size: 1.1rem; font-weight: 800; }
+    .pac-logos {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .pac-logo {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 800; color: #fff;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .pac-logo img { width: 100%; height: 100%; object-fit: cover; }
+    .pac-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: .82rem; color: var(--muted);
+    }
+    .pac-cta {
+      background: var(--rojo); color: #fff;
+      font-size: .78rem; font-weight: 700; padding: 6px 14px;
+      border-radius: 50px;
+    }
+    .empty-packs {
+      text-align: center; padding: 48px; color: var(--muted);
+      font-size: 1rem; grid-column: 1/-1;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--azul); color: rgba(255,255,255,.7);
+      text-align: center; padding: 32px 24px;
+      font-size: .85rem;
+    }
+    footer strong { color: #fff; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 640px) {
+      .header-nav a:not(.btn-admin) { display: none; }
+      .hero h1 { font-size: 2rem; }
+      section { padding: 56px 16px; }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- BANNER INSTALAR APP -->
-  <div id="installBanner" class="install-banner" aria-hidden="true">
-    <div class="ib-card">
-      <div class="ib-icon">OL</div>
-      <div class="ib-text">
-        <strong>OfertasLocales</strong>
-        <span>Instalá la app y accedé a las mejores ofertas desde tu inicio</span>
-      </div>
-      <div class="ib-btns">
-        <button class="ib-btn-yes" id="installBtn">Instalar gratis</button>
-        <button class="ib-btn-no"  id="installNo">Ahora no</button>
-      </div>
-    </div>
-    <!-- instrucciones iOS (se muestra solo en Safari iPhone/iPad) -->
-    <div class="ib-ios" id="iosHint" style="display:none">
-      <span>Tocá</span>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-      <span>y elegí <strong>Agregar a inicio</strong></span>
-    </div>
-    <button class="ib-close" id="installClose" aria-label="Cerrar">✕</button>
-  </div>
+<!-- HEADER -->
+<header class="header">
+  <a href="index.html" class="logo">Comercial<span>Web</span></a>
+  <nav class="header-nav">
+    <a href="#pricing">Precios</a>
+    <a href="#packs">Comercios activos</a>
+    <a href="admin/packs.html" class="btn-admin">⚙ Admin</a>
+  </nav>
+</header>
 
-  <!-- POPUP DE BIENVENIDA -->
-  <div id="welcome-overlay">
-    <div class="welcome-box">
-      <h1 class="welcome-title">Ofertas<span>Locales</span></h1>
-      <div class="welcome-logos" id="welcomeLogos"></div>
-      <p class="welcome-slogan">
-        Descubrí las <strong>mejores ofertas</strong> de tu ciudad.<br>
-        Comprá local, ahorrá más y apoyá a los comercios de tu barrio.<br>
-        <strong>¡Las promociones te esperan!</strong>
-      </p>
-      <button class="welcome-btn" id="welcomeBtn">Ver ofertas →</button>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge">🛒 La red de ofertas de tu ciudad</div>
+    <h1>Más clientes para tu<br><em>comercio local</em></h1>
+    <p>
+      Publicá tus ofertas en la plataforma que conecta a los comercios
+      de tu barrio con miles de compradores. Fácil, rápido y accesible.
+    </p>
+    <div class="hero-btns">
+      <a href="#pricing" class="btn-hero-main">Ver planes y precios</a>
+      <a href="#packs" class="btn-hero-sec">Ver comercios activos</a>
     </div>
   </div>
+  <div class="hero-scroll">
+    <div class="arrow"></div>
+  </div>
+</section>
 
-  <!-- HEADER -->
-  <header>
-    <a href="index.html" class="logo">Ofertas<span>Locales</span></a>
-    <div class="header-location">📍 <strong>Tu ciudad</strong></div>
-    <form class="search-form" onsubmit="buscar(event)">
-      <input class="search-input" type="text" id="searchInput" placeholder="Buscar ofertas, comercios, productos…" />
-      <button class="search-btn" type="submit">🔍</button>
-    </form>
-  </header>
-
-  <!-- NAV CATEGORÍAS -->
-  <nav class="nav-cats" id="navCats"></nav>
-
-  <!-- LAYOUT -->
-  <div class="main-layout">
-
-    <!-- SIDEBAR (desktop) -->
-    <aside class="sidebar">
-      <p class="sidebar-title">Filtrar por</p>
-
-      <div class="filter-group" id="sidebarComercios"></div>
-
-      <div class="filter-group">
-        <p class="filter-group-title">Precio</p>
-        <div class="price-range">
-          <input class="price-input" type="number" id="precioMin" placeholder="Mínimo $" />
-          <input class="price-input" type="number" id="precioMax" placeholder="Máximo $" />
-          <button class="price-btn" onclick="filtrarPrecio()">Aplicar</button>
-        </div>
-      </div>
-
-      <div class="filter-group">
-        <p class="filter-group-title">Descuento</p>
-        <button class="filter-option" id="dsc20" onclick="toggleDescuento(20)">Más del 20% OFF</button>
-        <button class="filter-option" id="dsc30" onclick="toggleDescuento(30)">Más del 30% OFF</button>
-        <button class="filter-option" id="dsc40" onclick="toggleDescuento(40)">Más del 40% OFF</button>
-      </div>
-
-      <!-- BLOQUE CREADORES -->
-      <div class="sidebar-creadores">
-        <p class="creadores-slogan">Conectamos tu barrio<br>con las mejores ofertas</p>
-        <a class="creadores-ig" href="https://www.instagram.com/dataweb76/" target="_blank" rel="noopener" title="Seguinos en Instagram">
-          <svg class="ig-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-            <circle cx="12" cy="12" r="4"/>
-            <circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/>
-          </svg>
-          <span>@dataweb76</span>
-        </a>
-        <p class="creadores-label">Creadores de la plataforma</p>
-      </div>
-    </aside>
-
-    <!-- CONTENIDO -->
-    <div class="content">
-
-      <!-- CHIPS DE COMERCIOS -->
-      <div class="comercios-strip">
-        <p class="strip-title">Comercios adheridos</p>
-        <div class="chips-row" id="chipsRow"></div>
-      </div>
-
-      <!-- FILTROS MOBILE -->
-      <div class="mobile-filter-bar" id="mobileFilterBar"></div>
-
-      <div class="results-header">
-        <p class="results-count"><strong id="resultsCount">0</strong> ofertas encontradas</p>
-        <select class="sort-select" id="sortSelect" onchange="renderOfertas()">
-          <option value="relevancia">Más relevantes</option>
-          <option value="precio-asc">Menor precio</option>
-          <option value="precio-desc">Mayor precio</option>
-          <option value="descuento">Mayor descuento</option>
-        </select>
-      </div>
-
-      <div class="ofertas-grid" id="ofertasGrid"></div>
+<!-- COMO FUNCIONA -->
+<section class="como-funciona" id="como">
+  <h2 class="section-title">¿Cómo funciona?</h2>
+  <p class="section-sub">En 3 pasos tu comercio está visible para toda la ciudad.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Elegís tu plan</h3>
+      <p>Seleccionás el pack que mejor se adapta a tu presupuesto. Solo o compartido con otros comercios.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Cargás tus ofertas</h3>
+      <p>Subís hasta 20 productos con foto, precio real y descuento. Lo administrás vos desde el panel.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Llegás a más clientes</h3>
+      <p>Tu página queda publicada en ComercialWeb y la difundimos en redes sociales mensualmente.</p>
     </div>
   </div>
+</section>
 
-  <footer>
-    <p>&copy; 2025 OfertasLocales — Conectando comercios locales con su comunidad</p>
-  </footer>
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <h2 class="section-title">Planes y precios</h2>
+  <p class="section-sub">Todos los planes incluyen hasta 20 ofertas por comercio, página propia y promoción en redes sociales.</p>
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      const manifest = document.querySelector('link[rel="manifest"]');
-      const base = manifest ? new URL(manifest.href).href.replace('manifest.json', '') : '/';
-      navigator.serviceWorker.register(base + 'sw.js', { scope: base }).catch(() => {});
+  <div class="pricing-grid">
+
+    <!-- PACK 5 COMERCIOS -->
+    <div class="pack-card">
+      <div class="pack-icon c5">🏘️</div>
+      <div class="pack-nombre">Pack Comunidad</div>
+      <div class="pack-tagline">5 comercios comparten una página</div>
+      <div class="pack-precio">
+        <span class="signo">$</span>300.000
+        <span class="por-mes">por mes · por comercio</span>
+      </div>
+      <div class="pack-por-comercio">→ Compartís la página con 4 comercios más</div>
+      <ul class="pack-features">
+        <li>5 comercios en una página compartida</li>
+        <li>20 ofertas por comercio (100 en total)</li>
+        <li>Logo y perfil de cada comercio</li>
+        <li>Promoción mensual en redes sociales</li>
+        <li>Panel admin para cargar y editar ofertas</li>
+        <li>Página propia de cada comercio</li>
+      </ul>
+      <a href="#contacto" class="btn-pack azul">Quiero este pack →</a>
+    </div>
+
+    <!-- PACK 3 COMERCIOS (DESTACADO) -->
+    <div class="pack-card destacado">
+      <div class="pack-mejor">⭐ Más elegido</div>
+      <div class="pack-icon c3">🏪</div>
+      <div class="pack-nombre">Pack Barrio</div>
+      <div class="pack-tagline">3 comercios, mayor visibilidad</div>
+      <div class="pack-precio">
+        <span class="signo">$</span>400.000
+        <span class="por-mes">por mes · por comercio</span>
+      </div>
+      <div class="pack-por-comercio">→ Compartís la página con 2 comercios más</div>
+      <ul class="pack-features">
+        <li>3 comercios en una página compartida</li>
+        <li>20 ofertas por comercio (60 en total)</li>
+        <li>Logo y perfil de cada comercio</li>
+        <li>Promoción mensual en redes sociales</li>
+        <li>Panel admin para cargar y editar ofertas</li>
+        <li>Página propia de cada comercio</li>
+        <li>Mayor destaque en la plataforma</li>
+      </ul>
+      <a href="#contacto" class="btn-pack rojo">Quiero este pack →</a>
+    </div>
+
+    <!-- PACK 1 COMERCIO -->
+    <div class="pack-card">
+      <div class="pack-icon c1">⭐</div>
+      <div class="pack-nombre">Pack Exclusivo</div>
+      <div class="pack-tagline">Solo tu comercio, máxima atención</div>
+      <div class="pack-precio">
+        <span class="signo">$</span>700.000
+        <span class="por-mes">por mes · por comercio</span>
+      </div>
+      <div class="pack-por-comercio">→ Toda la página es tuya</div>
+      <ul class="pack-features">
+        <li>Página 100% dedicada a tu comercio</li>
+        <li>20 ofertas destacadas</li>
+        <li>Logo y perfil completo</li>
+        <li>Promoción mensual en redes sociales</li>
+        <li>Panel admin exclusivo</li>
+        <li>Prioridad en la página principal</li>
+        <li>Diseño personalizado</li>
+      </ul>
+      <a href="#contacto" class="btn-pack naranja">Quiero este pack →</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- PACKS ACTIVOS -->
+<section class="packs-activos" id="packs">
+  <h2 class="section-title">Comercios activos</h2>
+  <p class="section-sub">Explorá las páginas de ofertas de los comercios que ya son parte de ComercialWeb.</p>
+  <div class="packs-grid" id="packsGrid">
+    <div class="empty-packs">Cargando comercios...</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="contacto">
+  <p><strong>ComercialWeb</strong> · Conectando comercios locales con su comunidad · 2026</p>
+  <p style="margin-top:8px">Contacto: <strong>dataweb76@gmail.com</strong> · Instagram: <a href="https://www.instagram.com/dataweb76/" target="_blank" style="color:var(--amarillo)">@dataweb76</a></p>
+</footer>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+</script>
+
+<script>
+  // Lee los packs activos de localStorage (cargados desde el admin)
+  const TIPOS = {
+    comunidad: { label:'Pack Comunidad', max:10 },
+    barrio:    { label:'Pack Barrio',    max:10 },
+    exclusivo: { label:'Pack Exclusivo', max:10 },
+  };
+
+  const grid = document.getElementById('packsGrid');
+  const activos = [];
+
+  Object.entries(TIPOS).forEach(([type, cfg]) => {
+    for (let i = 0; i < cfg.max; i++) {
+      const raw = localStorage.getItem(`rca_pack_${type}_${i}`);
+      if (!raw) continue;
+      try {
+        const pack = JSON.parse(raw);
+        if (pack.activo) activos.push({ type, idx: i, pack, label: cfg.label });
+      } catch(e) {}
     }
+  });
 
-    /* ── BANNER INSTALAR APP ── */
-    (function () {
-      // No mostrar si ya está instalada como app
-      if (window.matchMedia('(display-mode: standalone)').matches) return;
-      if (window.navigator.standalone) return; // iOS ya instalada
-
-      // No mostrar en desktop
-      const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      if (!isMobile) return;
-
-      // No mostrar si el usuario ya cerró el banner esta sesión
-      if (sessionStorage.getItem('ol_install_dismissed')) return;
-
-      const banner  = document.getElementById('installBanner');
-      const btnYes  = document.getElementById('installBtn');
-      const btnNo   = document.getElementById('installNo');
-      const btnX    = document.getElementById('installClose');
-      const iosHint = document.getElementById('iosHint');
-      let deferred  = null;
-
-      function show() {
-        banner.classList.add('show');
-        banner.setAttribute('aria-hidden', 'false');
-      }
-      function hide() {
-        banner.classList.remove('show');
-        sessionStorage.setItem('ol_install_dismissed', '1');
-      }
-
-      // Android / Chrome — capturamos el prompt antes de que desaparezca
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferred = e;
-        setTimeout(show, 4000); // mostramos 4s después de cargar
-      });
-
-      // Una vez instalada, ocultamos
-      window.addEventListener('appinstalled', hide);
-
-      // iOS Safari — no tiene beforeinstallprompt, mostramos instrucciones
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-      if (isIOS && isSafari) {
-        iosHint.style.display = 'flex';
-        // Ocultamos el botón "Instalar" (no funciona en iOS)
-        btnYes.style.display = 'none';
-        setTimeout(show, 4000);
-      }
-
-      btnYes.addEventListener('click', async () => {
-        if (!deferred) return;
-        deferred.prompt();
-        const { outcome } = await deferred.userChoice;
-        deferred = null;
-        hide();
-      });
-
-      btnNo.addEventListener('click', hide);
-      btnX.addEventListener('click',  hide);
-    })();
-  </script>
-  <script type="module">
-    import { getAll } from './src/store.js';
-    import { buildNav, buildMobileComercioChips, RUBROS_ICONO, pct, fmt } from './src/layout.js';
-
-    const comercios = getAll();
-    const rubros = [...new Set(comercios.map(c => c.rubro))];
-
-    // ── POPUP DE BIENVENIDA ──
-    if (!sessionStorage.getItem('ol_welcome_shown')) {
-      const logosEl = document.getElementById('welcomeLogos');
-      comercios.forEach(c => {
-        const item = document.createElement('div');
-        item.className = 'welcome-logo-item';
-        const circle = document.createElement('div');
-        circle.className = 'welcome-logo-circle';
-        circle.style.background = c.logo ? '#f0f0f0' : c.color;
-        circle.innerHTML = c.logo
-          ? `<img src="${c.logo}" alt="${c.nombre}" />`
-          : (c.inicial || c.nombre[0]);
-        const name = document.createElement('span');
-        name.className = 'welcome-logo-name';
-        name.textContent = c.nombre;
-        item.appendChild(circle);
-        item.appendChild(name);
-        logosEl.appendChild(item);
-      });
-
-      function cerrarPopup() {
-        const ov = document.getElementById('welcome-overlay');
-        ov.classList.add('fade-out');
-        sessionStorage.setItem('ol_welcome_shown', '1');
-        setTimeout(() => ov.remove(), 450);
-      }
-
-      document.getElementById('welcomeBtn').addEventListener('click', cerrarPopup);
-      document.getElementById('welcome-overlay').addEventListener('click', (e) => {
-        if (e.target === e.currentTarget) cerrarPopup();
-      });
-    } else {
-      document.getElementById('welcome-overlay').remove();
-    }
-
-    let filtroComercio  = null;
-    let filtroCategoria = null;
-    let filtroMinPrecio = null;
-    let filtroMaxPrecio = null;
-    let filtroDescuento = null;
-
-    // Leer ?rubro= de la URL al cargar
-    const params = new URLSearchParams(location.search);
-    if (params.get('rubro')) filtroCategoria = params.get('rubro');
-
-    // ── NAV ──
-    buildNav(document.getElementById('navCats'), rubros, {
-      mode: 'filter',
-      activeRubro: filtroCategoria,
-      onFilter: (r) => {
-        filtroCategoria = r;
-        filtroComercio  = null;
-        document.getElementById('mobileFilterBar').querySelector('.mob-chip')?.click();
-        buildMobileComercioChips(document.getElementById('mobileFilterBar'), comercios, null, onMobileComercio);
-        renderOfertas();
-      }
-    });
-
-    // ── CHIPS DE COMERCIOS ──
-    const chipsRow = document.getElementById('chipsRow');
-    comercios.forEach(c => {
-      const a = document.createElement('a');
-      a.className = 'chip';
-      a.href = `comercios/comercio-${c.id}/`;
-      const logoInner = c.logo
-        ? `<img src="${c.logo}" alt="${c.nombre}" style="width:100%;height:100%;object-fit:contain;border-radius:50%" />`
-        : c.inicial;
-      a.innerHTML = `<span class="chip-circle" style="background:${c.logo ? '#f0f0f0' : c.color}">${logoInner}</span>${c.nombre}`;
-      chipsRow.appendChild(a);
-    });
-
-    // ── FILTROS MOBILE ──
-    function onMobileComercio(id) {
-      filtroComercio = id;
-      buildMobileComercioChips(document.getElementById('mobileFilterBar'), comercios, id, onMobileComercio);
-      renderOfertas();
-    }
-    buildMobileComercioChips(document.getElementById('mobileFilterBar'), comercios, null, onMobileComercio);
-
-    // ── SIDEBAR COMERCIOS ──
-    const sbCom = document.getElementById('sidebarComercios');
-    const sbTitle = document.createElement('p');
-    sbTitle.className = 'filter-group-title';
-    sbTitle.textContent = 'Comercio';
-    sbCom.appendChild(sbTitle);
-
-    comercios.forEach(c => {
-      const btn = document.createElement('button');
-      btn.className = 'filter-option';
-      btn.innerHTML = `${c.nombre} <span class="filter-count">(${c.ofertas.length})</span>`;
-      btn.onclick = () => {
-        filtroComercio = filtroComercio === c.id ? null : c.id;
-        document.querySelectorAll('#sidebarComercios .filter-option').forEach(b => b.classList.remove('active'));
-        if (filtroComercio) btn.classList.add('active');
-        renderOfertas();
-      };
-      sbCom.appendChild(btn);
-    });
-
-    // ── BÚSQUEDA ──
-    window.buscar = (e) => { e.preventDefault(); renderOfertas(); };
-
-    // ── PRECIO ──
-    window.filtrarPrecio = () => {
-      filtroMinPrecio = parseFloat(document.getElementById('precioMin').value) || null;
-      filtroMaxPrecio = parseFloat(document.getElementById('precioMax').value) || null;
-      renderOfertas();
-    };
-
-    // ── DESCUENTO ──
-    window.toggleDescuento = (min) => {
-      filtroDescuento = filtroDescuento === min ? null : min;
-      [20, 30, 40].forEach(n => {
-        document.getElementById(`dsc${n}`)?.classList.toggle('active', filtroDescuento === n);
-      });
-      renderOfertas();
-    };
-
-    // ── RENDER ──
-    function getOfertas() {
-      const q = document.getElementById('searchInput').value.trim().toLowerCase();
-      let lista = comercios.flatMap(c => c.ofertas.map(o => ({ ...o, comercio: c })));
-
-      if (filtroCategoria) lista = lista.filter(o => o.comercio.rubro === filtroCategoria);
-      if (filtroComercio)  lista = lista.filter(o => o.comercio.id === filtroComercio);
-      if (filtroMinPrecio) lista = lista.filter(o => o.precio >= filtroMinPrecio);
-      if (filtroMaxPrecio) lista = lista.filter(o => o.precio <= filtroMaxPrecio);
-      if (filtroDescuento) lista = lista.filter(o => pct(o.precioOriginal, o.precio) >= filtroDescuento);
-      if (q) lista = lista.filter(o =>
-        o.titulo.toLowerCase().includes(q) ||
-        o.descripcion.toLowerCase().includes(q) ||
-        o.comercio.nombre.toLowerCase().includes(q) ||
-        o.comercio.rubro.toLowerCase().includes(q)
-      );
-
-      const sort = document.getElementById('sortSelect').value;
-      if (sort === 'precio-asc')  lista.sort((a, b) => a.precio - b.precio);
-      if (sort === 'precio-desc') lista.sort((a, b) => b.precio - a.precio);
-      if (sort === 'descuento')   lista.sort((a, b) => pct(b.precioOriginal, b.precio) - pct(a.precioOriginal, a.precio));
-      if (sort === 'relevancia')  lista.sort((a, b) => (b.destacada ? 1 : 0) - (a.destacada ? 1 : 0));
-
-      return lista;
-    }
-
-    window.renderOfertas = function() {
-      const lista = getOfertas();
-      const grid  = document.getElementById('ofertasGrid');
-      document.getElementById('resultsCount').textContent = lista.length;
-
-      if (!lista.length) {
-        grid.innerHTML = `<div class="empty-state">
-          <div class="icon">🔍</div>
-          <p>No encontramos ofertas con esos filtros.</p>
+  if (activos.length === 0) {
+    grid.innerHTML = '<div class="empty-packs">Aún no hay comercios activos. ¡Sé el primero en sumarte!</div>';
+  } else {
+    grid.innerHTML = activos.map(({ type, idx, pack, label }) => {
+      const logosHtml = (pack.comercios || []).map(c => {
+        const ini = (c.nombre||'??').substring(0,2).toUpperCase();
+        return `<div class="pac-logo" style="background:${c.color||'#1a3a7a'}">
+          ${(c.logo && c.logo.length > 10) ? `<img src="${c.logo}" alt="${c.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : ini}
         </div>`;
-        return;
-      }
-
-      grid.innerHTML = lista.map(o => {
-        const off   = pct(o.precioOriginal, o.precio);
-        const icono = RUBROS_ICONO[o.comercio.rubro] || '🏷️';
-        return `
-          <a class="oferta-card" href="comercios/comercio-${o.comercio.id}/">
-            <div class="card-imagen">
-              ${o.imagen
-                ? `<img src="${o.imagen}" alt="${o.titulo}" />`
-                : `<span class="card-imagen-placeholder">${icono}</span>`}
-              ${o.destacada ? '<span class="badge-oferta">Destacada</span>' : ''}
-            </div>
-            <div class="card-body">
-              <p class="card-comercio">${o.comercio.nombre} · ${o.comercio.rubro}</p>
-              <p class="card-titulo">${o.titulo}</p>
-              <p class="card-desc">${o.descripcion}</p>
-              <p class="card-precio-original">${fmt(o.precioOriginal)}</p>
-              <div class="card-precio-row">
-                <span class="card-precio">${fmt(o.precio)}</span>
-                <span class="card-descuento">${off}% OFF</span>
-              </div>
-              <p class="card-envio">✓ Disponible en local</p>
-            </div>
-          </a>`;
       }).join('');
-    };
 
-    renderOfertas();
-  </script>
+      const ciudad = pack.comercios?.[0]?.ciudad || '';
+      const url    = `packs/pack.html#${type}-${idx}`;
+
+      return `
+        <a href="${url}" class="pack-activo-card">
+          <div class="pac-header">
+            <span class="pac-badge">${label}</span>
+          </div>
+          <div class="pac-title">${pack.nombre}</div>
+          <div class="pac-logos" style="margin-top:12px">${logosHtml}</div>
+          <div class="pac-footer">
+            <span>${(pack.comercios||[]).length} comercio${(pack.comercios||[]).length !== 1 ? 's' : ''}${ciudad ? ' · ' + ciudad : ''}</span>
+            <span class="pac-cta">Ver ofertas →</span>
+          </div>
+        </a>`;
+    }).join('');
+  }
+</script>
+
 </body>
 </html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ComercialWeb — Ofertas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --rojo: #e63946; --azul: #1d3557; --amarillo: #FFE600;
+      --verde: #16a34a; --gris: #f0f4f8; --texto: #1a1a2e; --muted: #6c757d;
+      --color: #e63946; /* se sobreescribe por JS con el color del comercio */
+    }
+    body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--gris); color: var(--texto); }
+
+    /* HEADER */
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(29,53,87,.97); backdrop-filter: blur(10px);
+      padding: 0 20px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
+    .logo-marca { font-size: 1.3rem; font-weight: 900; color: #fff; text-decoration: none; }
+    .logo-marca span { color: var(--amarillo); }
+    .btn-volver {
+      display: flex; align-items: center; gap: 6px;
+      color: rgba(255,255,255,.8); text-decoration: none;
+      font-size: .82rem; font-weight: 700;
+      padding: 7px 14px; border-radius: 50px;
+      border: 1px solid rgba(255,255,255,.25);
+      transition: all .2s; white-space: nowrap;
+    }
+    .btn-volver:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+    /* PERFIL COMERCIO */
+    .perfil {
+      background: #fff;
+      padding: 36px 20px 28px;
+      text-align: center;
+      border-bottom: 3px solid var(--color, #e63946);
+    }
+    .perfil-logo-wrap {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: var(--color, #e63946);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: 900; color: #fff;
+      margin: 0 auto 16px;
+      box-shadow: 0 6px 24px rgba(0,0,0,.18);
+      overflow: hidden;
+    }
+    .perfil-logo-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .perfil-nombre { font-size: 1.6rem; font-weight: 900; margin-bottom: 4px; }
+    .perfil-rubro {
+      display: inline-block;
+      font-size: .78rem; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; padding: 3px 12px; border-radius: 50px;
+      background: var(--color, #e63946); color: #fff; margin-bottom: 20px;
+    }
+    .perfil-datos {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+      max-width: 600px; margin: 0 auto;
+    }
+    .dato {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--gris); border-radius: 50px;
+      padding: 7px 14px; font-size: .82rem; color: #444;
+    }
+    .dato .ico { font-size: 1rem; }
+
+    /* SECCIÓN OFERTAS */
+    .ofertas-section { padding: 36px 16px 48px; max-width: 1200px; margin: 0 auto; }
+    .ofertas-title {
+      text-align: center; margin-bottom: 8px;
+      font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 900;
+    }
+    .ofertas-sub { text-align: center; color: var(--muted); font-size: .9rem; margin-bottom: 32px; }
+
+    .ofertas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    /* CARD OFERTA */
+    .oferta-card {
+      background: #fff; border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 3px 16px rgba(0,0,0,.09);
+      display: flex; flex-direction: column;
+      transition: transform .2s, box-shadow .2s;
+      position: relative;
+    }
+    .oferta-card:hover { transform: translateY(-4px); box-shadow: 0 10px 32px rgba(0,0,0,.14); }
+
+    .oferta-imagen {
+      width: 100%; aspect-ratio: 4/3;
+      background: linear-gradient(135deg, #e9ecef, #dee2e6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.5rem; color: #adb5bd;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .oferta-imagen img { width: 100%; height: 100%; object-fit: cover; }
+
+    .badge-descuento {
+      position: absolute; top: 10px; right: 10px;
+      background: var(--rojo); color: #fff;
+      font-size: .75rem; font-weight: 900; padding: 4px 10px;
+      border-radius: 50px; letter-spacing: .5px;
+    }
+    .badge-vence {
+      position: absolute; top: 10px; left: 10px;
+      background: #1d3557; color: #fff;
+      font-size: .65rem; font-weight: 700; padding: 3px 9px;
+      border-radius: 50px;
+    }
+
+    .oferta-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .oferta-nombre { font-size: 1rem; font-weight: 800; line-height: 1.3; }
+    .oferta-desc { font-size: .82rem; color: var(--muted); line-height: 1.5; flex: 1; }
+
+    .precios { margin: 4px 0; }
+    .precio-real {
+      font-size: .88rem; color: #aaa;
+      text-decoration: line-through; font-weight: 500;
+    }
+    .precio-oferta {
+      font-size: 1.9rem; font-weight: 900; color: var(--rojo);
+      line-height: 1.1;
+    }
+    .precio-oferta small { font-size: 1rem; font-weight: 700; }
+
+    .oferta-footer {
+      display: flex; gap: 8px; padding: 0 16px 16px;
+    }
+    .btn-wa {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      background: #16a34a; color: #fff;
+      font-size: .82rem; font-weight: 800;
+      padding: 11px 14px; border-radius: 12px;
+      text-decoration: none; transition: background .2s;
+    }
+    .btn-wa:hover { background: #15803d; }
+    .btn-wa .wa-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+    /* BOTON VOLVER PACK */
+    .btn-volver-pack {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      background: var(--azul); color: #fff;
+      font-size: .78rem; font-weight: 700;
+      padding: 11px 14px; border-radius: 12px;
+      text-decoration: none; transition: background .2s;
+      flex-shrink: 0;
+    }
+    .btn-volver-pack:hover { background: #16304a; }
+
+    /* VOLVER FLOTANTE MOBILE */
+    .fab-volver {
+      position: fixed; bottom: 20px; right: 20px; z-index: 200;
+      background: var(--azul); color: #fff;
+      width: 54px; height: 54px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; text-decoration: none;
+      box-shadow: 0 4px 20px rgba(29,53,87,.45);
+      transition: transform .2s;
+    }
+    .fab-volver:hover { transform: scale(1.1); }
+
+    /* FOOTER */
+    footer {
+      background: var(--azul); color: rgba(255,255,255,.65);
+      text-align: center; padding: 24px;
+      font-size: .82rem;
+    }
+    footer strong { color: #fff; }
+
+    .no-comercio {
+      text-align: center; padding: 80px 24px;
+      font-size: 1.1rem; color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="../../index.html" class="logo-marca">RedCompr<span>Ar</span></a>
+  <a href="index.html" class="btn-volver" id="btnVolverPack">← Ver todos los comercios</a>
+</header>
+
+<div id="perfilSection"></div>
+
+<section class="ofertas-section">
+  <h2 class="ofertas-title" id="ofertasTitle">Cargando ofertas...</h2>
+  <p class="ofertas-sub" id="ofertasSub"></p>
+  <div class="ofertas-grid" id="ofertasGrid"></div>
+</section>
+
+<a href="index.html" class="fab-volver" title="Volver al pack">🏪</a>
+
+<footer>
+  <p><strong>ComercialWeb</strong> · Conectando comercios con su comunidad · 2026</p>
+</footer>
+
+<script type="module">
+(async () => {
+  const { packs } = await import(`../../src/data/packs.js?v=${Date.now()}`);
+
+  const cid      = parseInt(location.hash.replace('#',''));
+  const pack     = packs.find(p => p.slug === 'pack-1');
+  const comercio = pack?.comercios.find(c => c.id === cid);
+
+  if (!comercio) {
+    document.getElementById('perfilSection').innerHTML = `<div class="no-comercio">Comercio no encontrado. <a href="index.html">← Volver</a></div>`;
+    document.getElementById('ofertasTitle').textContent = '';
+    return;
+  }
+
+  // Color dinámico
+  document.documentElement.style.setProperty('--color', comercio.color);
+  document.title = `${comercio.nombre} — ComercialWeb`;
+
+  // PERFIL
+  const logoHtml = comercio.logo
+    ? `<img src="${comercio.logo}" alt="${comercio.nombre}">`
+    : comercio.inicial;
+
+  document.getElementById('perfilSection').innerHTML = `
+    <div class="perfil">
+      <div class="perfil-logo-wrap" style="background:${comercio.color}">${logoHtml}</div>
+      <h1 class="perfil-nombre">${comercio.nombre}</h1>
+      <span class="perfil-rubro" style="background:${comercio.color}">${comercio.rubro}</span>
+      <div class="perfil-datos">
+        ${comercio.direccion   ? `<div class="dato"><span class="ico">📍</span>${comercio.direccion}, ${comercio.ciudad}, ${comercio.provincia}</div>` : ''}
+        ${comercio.telefono    ? `<div class="dato"><span class="ico">📞</span>${comercio.telefono}</div>` : ''}
+        ${comercio.telefonoVentas ? `<div class="dato"><span class="ico">🛒</span>Ventas: ${comercio.telefonoVentas}</div>` : ''}
+        ${comercio.mail        ? `<div class="dato"><span class="ico">✉️</span>${comercio.mail}</div>` : ''}
+      </div>
+    </div>`;
+
+  // TÍTULO OFERTAS
+  document.getElementById('ofertasTitle').textContent = `🏷️ Ofertas de ${comercio.nombre}`;
+  document.getElementById('ofertasSub').textContent   = `${comercio.ofertas.length} productos con descuento — ¡Consultá por WhatsApp!`;
+
+  // BOTÓN VOLVER EN HEADER
+  document.getElementById('btnVolverPack').textContent = '← Ver los 5 comercios';
+
+  // FUNCIÓN PRECIO
+  const fmt = n => '$' + n.toLocaleString('es-AR');
+
+  // GRID OFERTAS
+  const grid = document.getElementById('ofertasGrid');
+  if (!comercio.ofertas || comercio.ofertas.length === 0) {
+    grid.innerHTML = '<p style="text-align:center;color:#aaa;grid-column:1/-1">No hay ofertas cargadas aún.</p>';
+  } else {
+    grid.innerHTML = comercio.ofertas.map(o => {
+      const waMsg = encodeURIComponent(
+        `Hola, vi la oferta *"${o.nombre}"* en ComercialWeb y me gustaría consultar. ¿Me pueden dar más información?`
+      );
+      const waUrl = `https://wa.me/${comercio.whatsapp}?text=${waMsg}`;
+
+      const badgeVence = o.vence
+        ? `<div class="badge-vence">⏰ Hasta ${new Date(o.vence).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})}</div>`
+        : '';
+
+      const imgHtml = o.imagen
+        ? `<img src="${o.imagen}" alt="${o.nombre}">`
+        : `<span>🏷️</span>`;
+
+      return `
+        <div class="oferta-card">
+          <div class="oferta-imagen">${imgHtml}</div>
+          <div class="badge-descuento">${o.descuento}% OFF</div>
+          ${badgeVence}
+          <div class="oferta-body">
+            <div class="oferta-nombre">${o.nombre}</div>
+            <div class="oferta-desc">${o.descripcion}</div>
+            <div class="precios">
+              <div class="precio-real">${fmt(o.precioReal)}</div>
+              <div class="precio-oferta"><small>$</small>${o.precioOferta.toLocaleString('es-AR')}</div>
+            </div>
+          </div>
+          <div class="oferta-footer">
+            <a href="${waUrl}" target="_blank" rel="noopener" class="btn-wa">
+              <span class="wa-icon">💬</span> Consultar por WhatsApp
+            </a>
+            <a href="index.html" class="btn-volver-pack">🏪</a>
+          </div>
+        </div>`;
+    }).join('');
+  }
+})();
+</script>
+</body>
+</html>

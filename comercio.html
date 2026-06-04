@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Comercio — OfertasLocales</title>
+  <title>Comercio — RedComprAr</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
@@ -245,7 +245,7 @@
   <div id="app"></div>
 
   <footer>
-    <p>&copy; 2025 OfertasLocales — Hecho con ❤️ para nuestra ciudad</p>
+    <p>&copy; 2025 RedComprAr — Hecho con ❤️ para nuestra ciudad</p>
   </footer>
 
   <script type="module">
@@ -259,7 +259,7 @@
     if (!comercio) {
       app.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><p>Comercio no encontrado.</p></div>`;
     } else {
-      document.title = `${comercio.nombre} — OfertasLocales`;
+      document.title = `${comercio.nombre} — RedComprAr`;
 
       function descuento(precio, original) {
         return Math.round(((original - precio) / original) * 100);

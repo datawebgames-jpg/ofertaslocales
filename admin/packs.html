@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Packs — ComercialWeb</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --rojo:#e63946;--azul:#1d3557;--verde:#16a34a;
+      --amarillo:#FFE600;--gris:#f0f4f8;--border:#dee2e6;
+      --texto:#1a1a2e;--muted:#6c757d;--white:#fff;
+    }
+    body{font-family:'DM Sans',system-ui,sans-serif;background:var(--gris);color:var(--texto)}
+
+    /* HEADER */
+    .adm-header{
+      background:var(--azul);padding:0 24px;height:60px;
+      display:flex;align-items:center;justify-content:space-between;
+      box-shadow:0 2px 12px rgba(0,0,0,.25);position:sticky;top:0;z-index:100;
+    }
+    .adm-logo{font-size:1.2rem;font-weight:900;color:#fff;text-decoration:none}
+    .adm-logo span{color:var(--amarillo)}
+    .adm-nav{display:flex;gap:8px;align-items:center}
+    .adm-nav a{color:rgba(255,255,255,.75);text-decoration:none;font-size:.82rem;
+      font-weight:600;padding:6px 14px;border-radius:50px;transition:all .2s}
+    .adm-nav a:hover{background:rgba(255,255,255,.12);color:#fff}
+    .adm-nav a.active{background:var(--rojo);color:#fff}
+    .adm-user{font-size:.75rem;color:rgba(255,255,255,.45);font-weight:600}
+    .btn-logout{
+      padding:5px 14px;border-radius:50px;border:1px solid rgba(255,255,255,.2);
+      background:none;color:rgba(255,255,255,.6);font-size:.75rem;font-weight:700;
+      cursor:pointer;font-family:inherit;transition:all .2s;
+    }
+    .btn-logout:hover{background:rgba(255,255,255,.1);color:#fff}
+
+    /* LAYOUT */
+    .adm-wrap{max-width:1100px;margin:0 auto;padding:32px 20px 60px}
+    .adm-title{font-size:1.6rem;font-weight:900;margin-bottom:4px}
+    .adm-sub{color:var(--muted);font-size:.9rem;margin-bottom:28px}
+
+    /* SAVE STATUS */
+    .save-status{
+      display:inline-flex;align-items:center;gap:8px;
+      font-size:.78rem;font-weight:700;padding:5px 14px;
+      border-radius:50px;margin-left:12px;
+      background:rgba(255,255,255,.8);
+      transition:all .3s;
+    }
+    .save-status.saving{color:#cc8800}
+    .save-status.saved{color:#16a34a}
+    .save-status.error{color:#e63946}
+    .save-status.hidden{display:none}
+
+    /* TYPE TABS */
+    .type-tabs{display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap}
+    .type-tab{
+      padding:10px 22px;border-radius:50px;border:2px solid var(--border);
+      background:var(--white);font-size:.9rem;font-weight:700;cursor:pointer;
+      transition:all .2s;color:var(--muted);
+    }
+    .type-tab.active{border-color:var(--rojo);background:var(--rojo);color:#fff}
+    .type-tab .tab-count{
+      display:inline-block;background:rgba(0,0,0,.12);border-radius:50px;
+      font-size:.72rem;font-weight:800;padding:1px 8px;margin-left:6px;
+    }
+
+    /* PACK LIST */
+    .packs-list{display:flex;flex-direction:column;gap:12px}
+    .pack-row{background:var(--white);border-radius:14px;border:2px solid var(--border);overflow:hidden;transition:border-color .2s}
+    .pack-row.activo{border-color:#16a34a}
+    .pack-row-header{display:flex;align-items:center;gap:14px;padding:16px 20px;cursor:pointer}
+    .pack-num{width:36px;height:36px;border-radius:10px;background:var(--gris);
+      display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:800;color:var(--muted);flex-shrink:0}
+    .pack-row.activo .pack-num{background:var(--verde);color:#fff}
+    .pack-row-info{flex:1}
+    .pack-row-nombre{font-size:1rem;font-weight:800}
+    .pack-row-meta{font-size:.78rem;color:var(--muted);margin-top:2px}
+    .pack-toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+    .pack-toggle input{opacity:0;width:0;height:0}
+    .toggle-slider{position:absolute;inset:0;border-radius:50px;background:#ccc;cursor:pointer;transition:.2s}
+    .toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+    input:checked + .toggle-slider{background:var(--verde)}
+    input:checked + .toggle-slider::before{transform:translateX(20px)}
+    .pack-chevron{font-size:.9rem;color:var(--muted);transition:transform .25s;flex-shrink:0}
+    .pack-row.open .pack-chevron{transform:rotate(180deg)}
+
+    /* PACK BODY */
+    .pack-body{display:none;padding:0 20px 20px;border-top:1px solid var(--border)}
+    .pack-row.open .pack-body{display:block}
+
+    /* PACK NOMBRE */
+    .pack-nombre-row{display:flex;gap:10px;align-items:center;padding:16px 0 20px}
+    .pack-nombre-row label{font-size:.82rem;font-weight:700;white-space:nowrap;color:var(--muted)}
+    .input-text{
+      flex:1;padding:9px 14px;border:2px solid var(--border);border-radius:10px;
+      font-family:inherit;font-size:.9rem;font-weight:600;transition:border-color .2s;background:var(--white);
+    }
+    .input-text:focus{outline:none;border-color:var(--rojo)}
+    .btn-ver{
+      display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:10px;border:none;
+      background:var(--azul);color:#fff;font-size:.82rem;font-weight:700;cursor:pointer;
+      text-decoration:none;white-space:nowrap;
+    }
+
+    /* COMERCIOS TABS */
+    .com-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+    .com-tab{
+      padding:7px 16px;border-radius:50px;border:2px solid var(--border);
+      background:var(--gris);font-size:.8rem;font-weight:700;cursor:pointer;
+      transition:all .2s;color:var(--muted);
+    }
+    .com-tab.active{border-color:var(--azul);background:var(--azul);color:#fff}
+
+    /* FORM COMERCIO */
+    .com-form{display:none;background:var(--gris);border-radius:12px;padding:20px}
+    .com-form.active{display:block}
+    .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px}
+    .form-field label{display:block;font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+    .form-field input,.form-field select{
+      width:100%;padding:9px 12px;border:2px solid var(--border);border-radius:8px;
+      font-family:inherit;font-size:.88rem;background:var(--white);transition:border-color .2s;
+    }
+    .form-field input:focus,.form-field select:focus{outline:none;border-color:var(--rojo)}
+
+    /* LOGO UPLOAD */
+    .logo-upload-area{
+      border:2px dashed var(--border);border-radius:10px;padding:16px;
+      text-align:center;cursor:pointer;transition:all .2s;background:var(--white);margin-bottom:16px;
+    }
+    .logo-upload-area:hover{border-color:var(--rojo);background:#fff8f8}
+    .logo-preview{width:72px;height:72px;border-radius:50%;object-fit:cover;margin:0 auto 8px;display:block}
+    .logo-placeholder{width:72px;height:72px;border-radius:50%;background:var(--border);margin:0 auto 8px;
+      display:flex;align-items:center;justify-content:center;font-size:1.8rem;color:#aaa}
+    .logo-upload-area p{font-size:.78rem;color:var(--muted)}
+    .logo-upload-area strong{font-size:.82rem;color:var(--rojo)}
+    .upload-progress{font-size:.75rem;color:#cc8800;font-weight:700;margin-top:4px;min-height:16px}
+
+    /* OFERTAS */
+    .ofertas-admin{margin-top:16px}
+    .ofertas-admin-title{font-size:.9rem;font-weight:800;margin-bottom:10px;
+      display:flex;align-items:center;justify-content:space-between}
+    .oferta-select-row{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+    .oferta-select-row label{font-size:.82rem;font-weight:700;color:var(--muted);white-space:nowrap}
+    .oferta-select-row select{
+      padding:8px 12px;border:2px solid var(--border);border-radius:8px;
+      font-family:inherit;font-size:.88rem;background:var(--white);
+    }
+    .oferta-select-row select:focus{outline:none;border-color:var(--rojo)}
+    .oferta-form{background:var(--white);border-radius:10px;border:2px solid var(--border);padding:16px;margin-bottom:10px}
+    .oferta-form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px}
+    .oferta-imagen-wrap{
+      border:2px dashed var(--border);border-radius:8px;padding:10px;
+      text-align:center;cursor:pointer;background:var(--gris);transition:border-color .2s;
+    }
+    .oferta-imagen-wrap:hover{border-color:var(--rojo)}
+    .oferta-img-preview{width:100%;max-height:100px;object-fit:cover;border-radius:6px;display:block;margin-bottom:4px}
+    .oferta-img-ph{font-size:2rem;color:#ccc;display:block;margin-bottom:4px}
+    .precio-auto{font-size:.78rem;color:var(--verde);font-weight:700;margin-top:4px;min-height:18px}
+
+    /* BOTONES */
+    .btn-save{
+      padding:12px 28px;border-radius:10px;border:none;
+      background:var(--rojo);color:#fff;font-size:.9rem;font-weight:800;
+      cursor:pointer;transition:all .2s;font-family:inherit;
+    }
+    .btn-save:hover{background:#c1121f}
+    .btn-save:disabled{opacity:.5;cursor:not-allowed}
+    .btn-save-oferta{
+      padding:9px 20px;border-radius:8px;border:none;
+      background:var(--verde);color:#fff;font-size:.82rem;font-weight:800;
+      cursor:pointer;font-family:inherit;transition:all .2s;
+    }
+    .btn-save-oferta:hover{background:#15803d}
+    .btn-save-oferta:disabled{opacity:.5;cursor:not-allowed}
+    .btn-secondary{
+      padding:9px 18px;border-radius:8px;border:2px solid var(--border);
+      background:var(--white);color:var(--texto);font-size:.82rem;font-weight:700;
+      cursor:pointer;font-family:inherit;transition:all .2s;
+    }
+    .btn-del{
+      padding:6px 12px;border-radius:6px;border:1.5px solid #fca5a5;
+      background:#fff5f5;color:#e63946;font-size:.72rem;font-weight:700;
+      cursor:pointer;font-family:inherit;transition:all .2s;
+    }
+    .btn-del:hover{background:#fee2e2}
+
+    /* OFERTA LIST */
+    .ofertas-saved{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+    .oferta-saved-item{
+      display:flex;align-items:center;gap:10px;background:var(--white);
+      border:1px solid var(--border);border-radius:8px;padding:8px 12px;
+    }
+    .osi-num{width:26px;height:26px;border-radius:6px;background:var(--rojo);color:#fff;
+      font-size:.72rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .osi-thumb{width:36px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--border)}
+    .osi-nombre{flex:1;font-size:.85rem;font-weight:700}
+    .osi-precio{font-size:.82rem;font-weight:800;color:var(--rojo)}
+    .osi-edit{padding:4px 10px;border-radius:6px;border:1px solid var(--border);
+      background:var(--gris);font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit}
+
+    /* TOAST */
+    .toast{
+      position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+      background:#1d3557;color:#fff;padding:12px 24px;border-radius:50px;
+      font-size:.88rem;font-weight:700;z-index:9999;
+      transition:transform .3s cubic-bezier(.34,1.3,.64,1);
+      pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.2);
+    }
+    .toast.show{transform:translateX(-50%) translateY(0)}
+
+    /* LOADING */
+    .loading-overlay{
+      position:fixed;inset:0;background:rgba(6,18,42,.7);
+      display:flex;align-items:center;justify-content:center;
+      z-index:999;backdrop-filter:blur(4px);
+    }
+    .loading-overlay.hidden{display:none}
+    .spinner-big{
+      width:48px;height:48px;border:4px solid rgba(255,255,255,.2);
+      border-top-color:#FFD700;border-radius:50%;animation:spin .7s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .sep{height:1px;background:var(--border);margin:16px 0}
+    .badge-activo{background:#dcfce7;color:#166534;font-size:.72rem;font-weight:800;padding:2px 10px;border-radius:50px;margin-left:8px}
+    .badge-inactivo{background:#f1f5f9;color:#94a3b8;font-size:.72rem;font-weight:800;padding:2px 10px;border-radius:50px;margin-left:8px}
+
+    @media(max-width:600px){
+      .form-grid{grid-template-columns:1fr}
+      .oferta-form-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner-big"></div>
+</div>
+
+<header class="adm-header">
+  <a href="../packs/pack.html" class="adm-logo">Comercial<span>Web</span></a>
+  <nav class="adm-nav">
+    <a href="packs.html" class="active">Packs</a>
+    <span class="adm-user" id="userEmail"></span>
+    <button class="btn-logout" onclick="logout()">Salir</button>
+  </nav>
+</header>
+
+<div class="adm-wrap">
+  <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:4px">
+    <div class="adm-title">Gestión de Packs</div>
+    <span class="save-status hidden" id="saveStatus"></span>
+  </div>
+  <div class="adm-sub">Los cambios se guardan automáticamente en Supabase.</div>
+
+  <div class="type-tabs" id="typeTabs">
+    <button class="type-tab active" data-type="comunidad" onclick="switchType('comunidad',this)">
+      🏘️ Pack Comunidad <span class="tab-count" id="cnt-comunidad">0</span>
+    </button>
+    <button class="type-tab" data-type="barrio" onclick="switchType('barrio',this)">
+      🏪 Pack Barrio <span class="tab-count" id="cnt-barrio">0</span>
+    </button>
+    <button class="type-tab" data-type="exclusivo" onclick="switchType('exclusivo',this)">
+      ⭐ Pack Exclusivo <span class="tab-count" id="cnt-exclusivo">0</span>
+    </button>
+  </div>
+
+  <div class="packs-list" id="packsList"></div>
+</div>
+
+<div class="toast" id="toast">✓ Guardado</div>
+
+<script type="module">
+import { supabase } from '../src/supabase.js';
+
+/* ══════════════════════════════════════════════════════════
+   AUTH GUARD
+══════════════════════════════════════════════════════════ */
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) { location.href = 'login-cw.html'; }
+else {
+  const { data: adm } = await supabase.from('admins').select('id').eq('id', session.user.id).single();
+  if (!adm) { await supabase.auth.signOut(); location.href = 'login-cw.html'; }
+  document.getElementById('userEmail').textContent = session.user.email;
+}
+
+window.logout = async () => {
+  await supabase.auth.signOut();
+  location.href = 'login-cw.html';
+};
+
+/* ══════════════════════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════════════════════ */
+const TIPOS = {
+  comunidad: { label:'Pack Comunidad', numComercios:5, precio:'$300.000', slug:'pack-c' },
+  barrio:    { label:'Pack Barrio',    numComercios:3, precio:'$400.000', slug:'pack-b' },
+  exclusivo: { label:'Pack Exclusivo', numComercios:1, precio:'$700.000', slug:'pack-e' },
+};
+const MAX_OFERTAS = 20;
+let currentType = 'comunidad';
+let packsCache  = {};   // tipo → [{pack + comercios + ofertas}]
+
+/* ══════════════════════════════════════════════════════════
+   SUPABASE HELPERS
+══════════════════════════════════════════════════════════ */
+function setSaveStatus(state, msg) {
+  const el = document.getElementById('saveStatus');
+  el.className = `save-status ${state}`;
+  el.textContent = msg;
+  if (state === 'saved') setTimeout(() => el.classList.add('hidden'), 3000);
+}
+
+async function uploadImage(bucket, path, file) {
+  setSaveStatus('saving','⏳ Subiendo imagen...');
+  // Comprimir con canvas antes de subir
+  const b64 = await compressToBlob(file, bucket === 'logos-comercios' ? 300 : 600, bucket === 'logos-comercios' ? 300 : 450, 0.80);
+  const { error } = await supabase.storage.from(bucket).upload(path, b64, { upsert:true, contentType:'image/jpeg' });
+  if (error) { setSaveStatus('error','❌ Error al subir imagen'); return null; }
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+  return data.publicUrl;
+}
+
+function compressToBlob(file, maxW, maxH, quality) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+        if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob(blob => resolve(blob), 'image/jpeg', quality);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   CARGAR TODOS LOS PACKS DEL TIPO ACTIVO
+══════════════════════════════════════════════════════════ */
+async function loadPacksForType(type) {
+  if (packsCache[type]) return packsCache[type];
+
+  const { data: packs, error } = await supabase
+    .from('packs')
+    .select(`
+      *,
+      comercios (
+        *,
+        ofertas ( * )
+      )
+    `)
+    .eq('tipo', type)
+    .order('id');
+
+  if (error) { showToast('❌ Error cargando packs'); return []; }
+
+  // Ordenar comercios y ofertas por orden
+  (packs || []).forEach(p => {
+    p.comercios = (p.comercios || []).sort((a,b) => a.orden - b.orden);
+    p.comercios.forEach(c => {
+      c.ofertas = (c.ofertas || []).sort((a,b) => a.orden - b.orden);
+    });
+  });
+
+  packsCache[type] = packs || [];
+  return packsCache[type];
+}
+
+async function updateCounts() {
+  for (const type of ['comunidad','barrio','exclusivo']) {
+    const packs = await loadPacksForType(type);
+    const cnt = packs.filter(p => p.activo).length;
+    document.getElementById(`cnt-${type}`).textContent = cnt;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════════════════════ */
+window.switchType = async (type, btn) => {
+  currentType = type;
+  document.querySelectorAll('.type-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  await renderPacksList();
+};
+
+async function renderPacksList() {
+  const list = document.getElementById('packsList');
+  list.innerHTML = '<div style="padding:20px;color:var(--muted);font-size:.85rem">Cargando...</div>';
+  const packs = await loadPacksForType(currentType);
+  list.innerHTML = '';
+  packs.forEach((pack, i) => list.appendChild(buildPackRow(pack, i)));
+}
+
+function buildPackRow(pack, i) {
+  const cfg    = TIPOS[pack.tipo] || TIPOS.comunidad;
+  const row    = document.createElement('div');
+  const ofCnt  = (pack.comercios||[]).reduce((s,c) => s + (c.ofertas||[]).length, 0);
+  row.className = 'pack-row' + (pack.activo ? ' activo' : '');
+  row.id = `row-pack-${pack.id}`;
+
+  row.innerHTML = `
+    <div class="pack-row-header" onclick="toggleRow('pack-${pack.id}')">
+      <div class="pack-num">${i+1}</div>
+      <div class="pack-row-info">
+        <div class="pack-row-nombre">
+          ${esc(pack.nombre)}
+          <span class="${pack.activo ? 'badge-activo' : 'badge-inactivo'}">${pack.activo ? 'Activo' : 'Inactivo'}</span>
+        </div>
+        <div class="pack-row-meta">${cfg.numComercios} comercio${cfg.numComercios>1?'s':''} · ${cfg.precio}/mes · ${ofCnt} ofertas</div>
+      </div>
+      <label class="pack-toggle" onclick="event.stopPropagation()">
+        <input type="checkbox" ${pack.activo ? 'checked' : ''} onchange="toggleActivo(${pack.id},this.checked)">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="pack-chevron">▼</span>
+    </div>
+    <div class="pack-body" id="body-pack-${pack.id}">
+      ${buildPackBody(pack)}
+    </div>`;
+  return row;
+}
+
+function buildPackBody(pack) {
+  const comTabs = (pack.comercios||[]).map((c, i) => `
+    <button class="com-tab ${i===0?'active':''}" onclick="switchComercio('${pack.id}',${i},this)">
+      ${esc(c.nombre || `Comercio ${i+1}`)}
+    </button>`).join('');
+
+  const comForms = (pack.comercios||[]).map((c, ci) => buildComercioForm(pack, ci, c)).join('');
+
+  return `
+    <div class="pack-nombre-row">
+      <label>Nombre del pack:</label>
+      <input class="input-text" id="pnombre-${pack.id}" value="${esc(pack.nombre)}" placeholder="Ej: Pack Comunidad Centro">
+      <a href="../packs/pack.html#${pack.tipo}-${pack.id}" target="_blank" class="btn-ver">👁 Ver</a>
+    </div>
+    <div class="sep"></div>
+    <div style="font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Comercios del pack</div>
+    <div class="com-tabs" id="comTabs-${pack.id}">${comTabs}</div>
+    <div id="comForms-${pack.id}">${comForms}</div>
+    <div class="sep"></div>
+    <button class="btn-save" onclick="savePack(${pack.id})">💾 Guardar pack</button>`;
+}
+
+function buildComercioForm(pack, ci, c) {
+  const active = ci === 0 ? 'active' : '';
+  const savedOfCnt = (c.ofertas||[]).length;
+  const ofList = (c.ofertas||[]).slice(0,5).map(o => `
+    <div class="oferta-saved-item">
+      <div class="osi-num">${o.orden}</div>
+      ${o.imagen_url ? `<img src="${o.imagen_url}" class="osi-thumb">` : ''}
+      <div class="osi-nombre">${esc(o.nombre||'Sin nombre')}</div>
+      <div class="osi-precio">$${(o.precio_oferta||0).toLocaleString('es-AR')}</div>
+      <button class="osi-edit" onclick="editOferta('${pack.id}',${ci},${o.orden})">✏ Editar</button>
+    </div>`).join('');
+  const masLabel = savedOfCnt > 5 ? `<div style="font-size:.75rem;color:var(--muted);margin-top:6px">...y ${savedOfCnt-5} más</div>` : '';
+
+  return `
+  <div class="com-form ${active}" id="comform-${pack.id}-${ci}">
+    <div class="logo-upload-area" onclick="document.getElementById('logoFile-${pack.id}-${ci}').click()">
+      ${c.logo_url
+        ? `<img src="${c.logo_url}" class="logo-preview" id="logoImg-${pack.id}-${ci}">`
+        : `<div class="logo-placeholder" id="logoImg-${pack.id}-${ci}">🏪</div>`}
+      <strong>Subir logo del comercio</strong>
+      <p>JPG, PNG, WebP — se sube a Supabase Storage</p>
+      <div class="upload-progress" id="logoProgress-${pack.id}-${ci}"></div>
+    </div>
+    <input type="file" id="logoFile-${pack.id}-${ci}" accept="image/*" style="display:none"
+      onchange="handleLogo(this,'${pack.id}',${ci},${c.id})">
+
+    <div class="form-grid">
+      <div class="form-field">
+        <label>Nombre *</label>
+        <input type="text" id="f-nombre-${pack.id}-${ci}" value="${esc(c.nombre)}" placeholder="Ej: Ferretería El Tornillo">
+      </div>
+      <div class="form-field">
+        <label>Rubro</label>
+        <input type="text" id="f-rubro-${pack.id}-${ci}" value="${esc(c.rubro)}" placeholder="Ej: Ferretería y Herramientas">
+      </div>
+      <div class="form-field">
+        <label>WhatsApp (solo números)</label>
+        <input type="text" id="f-wa-${pack.id}-${ci}" value="${esc(c.whatsapp)}" placeholder="5492954000000">
+      </div>
+      <div class="form-field">
+        <label>Teléfono</label>
+        <input type="text" id="f-tel-${pack.id}-${ci}" value="${esc(c.telefono)}" placeholder="+54 9 2954 000000">
+      </div>
+      <div class="form-field">
+        <label>Email</label>
+        <input type="email" id="f-mail-${pack.id}-${ci}" value="${esc(c.mail)}" placeholder="comercio@ejemplo.com">
+      </div>
+      <div class="form-field">
+        <label>Dirección</label>
+        <input type="text" id="f-dir-${pack.id}-${ci}" value="${esc(c.direccion)}" placeholder="Av. San Martín 450">
+      </div>
+      <div class="form-field">
+        <label>Ciudad</label>
+        <input type="text" id="f-ciudad-${pack.id}-${ci}" value="${esc(c.ciudad)}" placeholder="Santa Rosa">
+      </div>
+      <div class="form-field">
+        <label>Provincia</label>
+        <input type="text" id="f-prov-${pack.id}-${ci}" value="${esc(c.provincia)}" placeholder="La Pampa">
+      </div>
+      <div class="form-field">
+        <label>Color</label>
+        <input type="color" id="f-color-${pack.id}-${ci}" value="${c.color||'#1d3557'}">
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="ofertas-admin">
+      <div class="ofertas-admin-title">
+        <span>🏷️ Ofertas (${savedOfCnt}/${MAX_OFERTAS})</span>
+      </div>
+      <div class="oferta-select-row">
+        <label>Oferta N°:</label>
+        <select id="ofSel-${pack.id}-${ci}">
+          ${Array.from({length:MAX_OFERTAS},(_,n)=>`<option value="${n+1}">${n+1}${(c.ofertas||[]).find(o=>o.orden===n+1)?' ✓':''}</option>`).join('')}
+        </select>
+        <button class="btn-secondary" onclick="loadOfertaForm('${pack.id}',${ci})">Cargar</button>
+      </div>
+      <div id="ofForm-${pack.id}-${ci}">
+        ${buildOfertaForm(pack.id, ci, 1, (c.ofertas||[]).find(o=>o.orden===1), c.id)}
+      </div>
+      <div class="ofertas-saved" id="ofList-${pack.id}-${ci}">${ofList}${masLabel}</div>
+    </div>
+  </div>`;
+}
+
+function buildOfertaForm(packId, ci, n, o, comercioId) {
+  o = o || {};
+  const pReal   = o.precio_real   || '';
+  const pOferta = o.precio_oferta || '';
+  const desc    = o.descuento     || '';
+  const calcDesc = (pReal && pOferta) ? Math.round((1 - pOferta/pReal)*100) + '% OFF' : '';
+
+  return `
+    <div class="oferta-form" id="ofertaForm-inner-${packId}-${ci}">
+      <div style="font-size:.82rem;font-weight:800;color:var(--rojo);margin-bottom:10px">Oferta #${n} ${o.id ? `<span style="color:var(--muted);font-weight:600;font-size:.72rem">(id ${o.id})</span>` : '(nueva)'}</div>
+      <div class="oferta-form-grid">
+        <div class="form-field" style="grid-column:1/-1">
+          <label>Imagen del producto</label>
+          <div class="oferta-imagen-wrap" onclick="document.getElementById('ofImg-${packId}-${ci}').click()">
+            ${o.imagen_url
+              ? `<img src="${o.imagen_url}" class="oferta-img-preview" id="ofImgPrev-${packId}-${ci}">`
+              : `<span class="oferta-img-ph" id="ofImgPrev-${packId}-${ci}">📷</span>`}
+            <p>Hacé clic para subir la foto</p>
+            <div class="upload-progress" id="ofImgProgress-${packId}-${ci}"></div>
+          </div>
+          <input type="file" id="ofImg-${packId}-${ci}" accept="image/*" style="display:none"
+            onchange="handleOfertaImg(this,'${packId}',${ci},${comercioId||0},${n})">
+        </div>
+        <div class="form-field" style="grid-column:1/-1">
+          <label>Nombre *</label>
+          <input type="text" id="of-nombre-${packId}-${ci}" value="${esc(o.nombre||'')}" placeholder="Ej: Taladro 750W">
+        </div>
+        <div class="form-field" style="grid-column:1/-1">
+          <label>Descripción</label>
+          <input type="text" id="of-desc-${packId}-${ci}" value="${esc(o.descripcion||'')}" placeholder="Características del producto">
+        </div>
+        <div class="form-field">
+          <label>Precio real $</label>
+          <input type="number" id="of-preal-${packId}-${ci}" value="${pReal}" placeholder="89999"
+            oninput="calcPrecio('${packId}',${ci})">
+        </div>
+        <div class="form-field">
+          <label>% de descuento</label>
+          <input type="number" id="of-desc-pct-${packId}-${ci}" value="${desc}" placeholder="30" min="1" max="99"
+            oninput="calcFromDesc('${packId}',${ci})">
+        </div>
+        <div class="form-field">
+          <label>Precio de oferta $ <span style="color:var(--verde);font-size:.75rem">(calculado o manual)</span></label>
+          <input type="number" id="of-poferta-${packId}-${ci}" value="${pOferta}" placeholder="59999"
+            oninput="calcDescFromPrecio('${packId}',${ci})"
+            style="font-size:1.1rem;font-weight:900;color:var(--rojo);border-color:var(--rojo)">
+          <div class="precio-auto" id="of-calc-${packId}-${ci}">${calcDesc}</div>
+        </div>
+        <div class="form-field">
+          <label>Vencimiento (opcional)</label>
+          <input type="date" id="of-vence-${packId}-${ci}" value="${o.vence||''}">
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-save-oferta" onclick="saveOferta('${packId}',${ci},${n},${comercioId||0},${o.id||0})">
+          💾 Guardar oferta #${n}
+        </button>
+        ${o.id ? `<button class="btn-del" onclick="deleteOferta(${o.id},'${packId}',${ci},${n})">🗑 Eliminar</button>` : ''}
+        <button class="btn-secondary" onclick="clearOfertaForm('${packId}',${ci},${comercioId||0})">✕ Limpiar</button>
+      </div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   INTERACCIONES UI
+══════════════════════════════════════════════════════════ */
+window.toggleRow = (id) => {
+  const row  = document.getElementById(`row-${id}`);
+  const isOpen = row.classList.contains('open');
+  document.querySelectorAll('.pack-row.open').forEach(r => r.classList.remove('open'));
+  if (!isOpen) row.classList.add('open');
+};
+
+window.toggleActivo = async (packId, checked) => {
+  setSaveStatus('saving','⏳ Guardando...');
+  const { error } = await supabase.from('packs').update({ activo: checked }).eq('id', packId);
+  if (error) { setSaveStatus('error','❌ Error'); showToast('❌ Error al guardar'); return; }
+  setSaveStatus('saved','✅ Guardado');
+  // actualizar caché
+  if (packsCache[currentType]) {
+    const pack = packsCache[currentType].find(p => p.id === packId);
+    if (pack) {
+      pack.activo = checked;
+      const row = document.getElementById(`row-pack-${packId}`);
+      row.classList.toggle('activo', checked);
+      row.querySelector('.pack-num').style.background = checked ? 'var(--verde)' : '';
+      const badge = row.querySelector('.badge-activo, .badge-inactivo');
+      if (badge) { badge.className = checked ? 'badge-activo' : 'badge-inactivo'; badge.textContent = checked ? 'Activo' : 'Inactivo'; }
+    }
+  }
+  updateCounts();
+};
+
+window.switchComercio = (packId, ci, btn) => {
+  document.querySelectorAll(`#comTabs-${packId} .com-tab`).forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll(`#comForms-${packId} .com-form`).forEach(f => f.classList.remove('active'));
+  document.getElementById(`comform-${packId}-${ci}`)?.classList.add('active');
+};
+
+/* ══════════════════════════════════════════════════════════
+   IMÁGENES
+══════════════════════════════════════════════════════════ */
+window.handleLogo = async (input, packId, ci, comercioId) => {
+  const file = input.files[0];
+  if (!file) return;
+  const prog = document.getElementById(`logoProgress-${packId}-${ci}`);
+  prog.textContent = '⏳ Subiendo...';
+  const path = `pack-${packId}/comercio-${comercioId}-${Date.now()}.jpg`;
+  const url = await uploadImage('logos-comercios', path, file);
+  if (!url) { prog.textContent = '❌ Error al subir'; return; }
+  prog.textContent = '✅ Logo subido';
+  // actualizar preview
+  const el = document.getElementById(`logoImg-${packId}-${ci}`);
+  if (el.tagName === 'DIV') {
+    el.outerHTML = `<img src="${url}" class="logo-preview" id="logoImg-${packId}-${ci}">`;
+  } else { el.src = url; }
+  input._uploadedUrl = url;
+  setSaveStatus('saved','✅ Logo listo');
+};
+
+window.handleOfertaImg = async (input, packId, ci, comercioId, n) => {
+  const file = input.files[0];
+  if (!file) return;
+  const prog = document.getElementById(`ofImgProgress-${packId}-${ci}`);
+  prog.textContent = '⏳ Subiendo...';
+  const path = `comercio-${comercioId}/oferta-${n}-${Date.now()}.jpg`;
+  const url = await uploadImage('imagenes-ofertas', path, file);
+  if (!url) { prog.textContent = '❌ Error al subir'; return; }
+  prog.textContent = '✅ Imagen subida';
+  const el = document.getElementById(`ofImgPrev-${packId}-${ci}`);
+  if (el.tagName === 'SPAN') {
+    el.outerHTML = `<img src="${url}" class="oferta-img-preview" id="ofImgPrev-${packId}-${ci}">`;
+  } else { el.src = url; }
+  input._uploadedUrl = url;
+};
+
+/* ══════════════════════════════════════════════════════════
+   CÁLCULO DE PRECIOS
+══════════════════════════════════════════════════════════ */
+window.calcPrecio = (packId, ci) => {
+  const pr  = parseFloat(document.getElementById(`of-preal-${packId}-${ci}`)?.value) || 0;
+  const pct = parseFloat(document.getElementById(`of-desc-pct-${packId}-${ci}`)?.value) || 0;
+  if (pr && pct) {
+    const po = Math.round(pr * (1 - pct/100));
+    document.getElementById(`of-poferta-${packId}-${ci}`).value = po;
+    document.getElementById(`of-calc-${packId}-${ci}`).textContent = `= $${po.toLocaleString('es-AR')}`;
+  }
+};
+window.calcFromDesc = window.calcPrecio;
+window.calcDescFromPrecio = (packId, ci) => {
+  const pr = parseFloat(document.getElementById(`of-preal-${packId}-${ci}`)?.value) || 0;
+  const po = parseFloat(document.getElementById(`of-poferta-${packId}-${ci}`)?.value) || 0;
+  if (pr && po) {
+    const pct = Math.round((1 - po/pr)*100);
+    document.getElementById(`of-desc-pct-${packId}-${ci}`).value = pct;
+    document.getElementById(`of-calc-${packId}-${ci}`).textContent = `${pct}% OFF`;
+  }
+};
+
+/* ══════════════════════════════════════════════════════════
+   GUARDAR PACK (nombre)
+══════════════════════════════════════════════════════════ */
+window.savePack = async (packId) => {
+  const nombre = document.getElementById(`pnombre-${packId}`)?.value || '';
+  setSaveStatus('saving','⏳ Guardando pack...');
+  const { error } = await supabase.from('packs').update({ nombre }).eq('id', packId);
+  if (error) { setSaveStatus('error','❌ Error'); showToast('❌ Error al guardar pack'); return; }
+
+  // Guardar cada comercio visible
+  const pack = packsCache[currentType]?.find(p => p.id === packId);
+  if (!pack) return;
+
+  for (let ci = 0; ci < pack.comercios.length; ci++) {
+    await saveComercioData(packId, ci);
+  }
+
+  setSaveStatus('saved','✅ Pack guardado');
+  showToast('✓ Pack guardado en Supabase');
+  delete packsCache[currentType]; // invalidar caché para próxima carga
+};
+
+async function saveComercioData(packId, ci) {
+  const pack = packsCache[currentType]?.find(p => p.id === packId);
+  if (!pack || !pack.comercios[ci]) return;
+  const c = pack.comercios[ci];
+
+  const logoInput = document.getElementById(`logoFile-${packId}-${ci}`);
+  const logo_url  = logoInput?._uploadedUrl || c.logo_url || '';
+
+  const payload = {
+    nombre:          document.getElementById(`f-nombre-${packId}-${ci}`)?.value || c.nombre,
+    rubro:           document.getElementById(`f-rubro-${packId}-${ci}`)?.value  || c.rubro,
+    whatsapp:        document.getElementById(`f-wa-${packId}-${ci}`)?.value     || c.whatsapp,
+    telefono:        document.getElementById(`f-tel-${packId}-${ci}`)?.value    || c.telefono,
+    mail:            document.getElementById(`f-mail-${packId}-${ci}`)?.value   || c.mail,
+    direccion:       document.getElementById(`f-dir-${packId}-${ci}`)?.value    || c.direccion,
+    ciudad:          document.getElementById(`f-ciudad-${packId}-${ci}`)?.value || c.ciudad,
+    provincia:       document.getElementById(`f-prov-${packId}-${ci}`)?.value   || c.provincia,
+    color:           document.getElementById(`f-color-${packId}-${ci}`)?.value  || c.color,
+    logo_url,
+  };
+
+  await supabase.from('comercios').update(payload).eq('id', c.id);
+}
+
+/* ══════════════════════════════════════════════════════════
+   OFERTAS
+══════════════════════════════════════════════════════════ */
+window.loadOfertaForm = (packId, ci) => {
+  const n    = parseInt(document.getElementById(`ofSel-${packId}-${ci}`)?.value) || 1;
+  const pack = packsCache[currentType]?.find(p => p.id == packId);
+  const c    = pack?.comercios[ci];
+  const o    = c?.ofertas?.find(of => of.orden === n);
+  document.getElementById(`ofForm-${packId}-${ci}`).innerHTML = buildOfertaForm(packId, ci, n, o, c?.id);
+};
+
+window.editOferta = (packId, ci, orden) => {
+  const sel = document.getElementById(`ofSel-${packId}-${ci}`);
+  if (sel) sel.value = orden;
+  window.loadOfertaForm(packId, ci);
+  document.getElementById(`ofForm-${packId}-${ci}`)?.scrollIntoView({behavior:'smooth',block:'nearest'});
+};
+
+window.clearOfertaForm = (packId, ci, comercioId) => {
+  const n = parseInt(document.getElementById(`ofSel-${packId}-${ci}`)?.value) || 1;
+  document.getElementById(`ofForm-${packId}-${ci}`).innerHTML = buildOfertaForm(packId, ci, n, null, comercioId);
+};
+
+window.saveOferta = async (packId, ci, n, comercioId, ofertaId) => {
+  const btn = document.querySelector(`#ofertaForm-inner-${packId}-${ci} .btn-save-oferta`);
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Guardando...'; }
+
+  const imgInput = document.getElementById(`ofImg-${packId}-${ci}`);
+  const pack     = packsCache[currentType]?.find(p => p.id == packId);
+  const c        = pack?.comercios[ci];
+  const existing = c?.ofertas?.find(o => o.orden === n);
+
+  const imagen_url = imgInput?._uploadedUrl || existing?.imagen_url || '';
+  const pr   = parseFloat(document.getElementById(`of-preal-${packId}-${ci}`)?.value) || 0;
+  const po   = parseFloat(document.getElementById(`of-poferta-${packId}-${ci}`)?.value) || 0;
+  const pct  = parseInt(document.getElementById(`of-desc-pct-${packId}-${ci}`)?.value) || Math.round((1-po/pr)*100);
+  const payload = {
+    comercio_id:   comercioId,
+    orden:         n,
+    nombre:        document.getElementById(`of-nombre-${packId}-${ci}`)?.value || '',
+    descripcion:   document.getElementById(`of-desc-${packId}-${ci}`)?.value   || '',
+    precio_real:   pr,
+    precio_oferta: po,
+    descuento:     pct || 0,
+    vence:         document.getElementById(`of-vence-${packId}-${ci}`)?.value  || null,
+    imagen_url,
+    activo:        true,
+  };
+
+  setSaveStatus('saving','⏳ Guardando oferta...');
+  let error;
+  if (ofertaId) {
+    ({ error } = await supabase.from('ofertas').update(payload).eq('id', ofertaId));
+  } else {
+    ({ error } = await supabase.from('ofertas').insert(payload));
+  }
+
+  if (error) {
+    setSaveStatus('error','❌ Error');
+    showToast(`❌ Error: ${error.message}`);
+    if (btn) { btn.disabled = false; btn.textContent = `💾 Guardar oferta #${n}`; }
+    return;
+  }
+
+  setSaveStatus('saved','✅ Oferta guardada');
+  showToast(`✓ Oferta #${n} guardada`);
+
+  // marcar selector con ✓
+  const sel = document.getElementById(`ofSel-${packId}-${ci}`);
+  if (sel) sel.options[n-1].text = `${n} ✓`;
+
+  // invalidar caché
+  delete packsCache[currentType];
+  if (btn) { btn.disabled = false; btn.textContent = `💾 Guardar oferta #${n}`; }
+};
+
+window.deleteOferta = async (ofertaId, packId, ci, n) => {
+  if (!confirm(`¿Eliminar oferta #${n}?`)) return;
+  setSaveStatus('saving','⏳ Eliminando...');
+  const { error } = await supabase.from('ofertas').delete().eq('id', ofertaId);
+  if (error) { setSaveStatus('error','❌ Error'); showToast('❌ Error al eliminar'); return; }
+  setSaveStatus('saved','✅ Eliminada');
+  showToast(`✓ Oferta #${n} eliminada`);
+  delete packsCache[currentType];
+  // limpiar form
+  document.getElementById(`ofForm-${packId}-${ci}`).innerHTML = buildOfertaForm(packId, ci, n, null, null);
+  const sel = document.getElementById(`ofSel-${packId}-${ci}`);
+  if (sel) sel.options[n-1].text = `${n}`;
+};
+
+/* ══════════════════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════════════════ */
+window.showToast = (msg) => {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+};
+
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+/* ══════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════ */
+document.getElementById('loadingOverlay').classList.add('hidden');
+await renderPacksList();
+await updateCounts();
+</script>
+</body>
+</html>

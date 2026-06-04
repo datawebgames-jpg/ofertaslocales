@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de control — InfernoHost</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #060a14; color: #e2e8f0; height: 100vh; overflow: hidden; display: flex; }
+    h1, h2, h3, .font-gaming { font-family: 'Rajdhani', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #1e2a45; border-radius: 2px; }
+
+    /* Sidebar */
+    #sidebar {
+      width: 240px;
+      min-width: 240px;
+      background: #0a0e1a;
+      border-right: 1px solid #1a2540;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-logo {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid #1a2540;
+    }
+
+    .server-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin: 2px 0;
+    }
+    .server-item:hover { background: #0f1629; }
+    .server-item.active { background: #0f1629; border: 1px solid #1e2a45; }
+    .server-item .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .status-dot.online { background: #10b981; box-shadow: 0 0 6px #10b98166; }
+    .status-dot.offline { background: #374151; }
+    .status-dot.starting { background: #f59e0b; animation: blink 1s infinite; }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* Main area */
+    #main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Top bar */
+    #topbar {
+      background: #0a0e1a;
+      border-bottom: 1px solid #1a2540;
+      padding: 0 24px;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    /* Content area */
+    #content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    /* Server header card */
+    .server-header {
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+
+    /* Action buttons */
+    .action-btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex; align-items: center; gap: 8px;
+      transition: all 0.2s;
+    }
+    .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-start { background: #10b981; color: #080c18; }
+    .btn-start:hover:not(:disabled) { background: #059669; box-shadow: 0 0 20px #10b98144; }
+    .btn-stop { background: #ef4444; color: white; }
+    .btn-stop:hover:not(:disabled) { background: #dc2626; box-shadow: 0 0 20px #ef444444; }
+    .btn-restart { background: #f59e0b; color: #080c18; }
+    .btn-restart:hover:not(:disabled) { background: #d97706; box-shadow: 0 0 20px #f59e0b44; }
+    .btn-secondary { background: #0f1629; border: 1px solid #1e2a45; color: #94a3b8; }
+    .btn-secondary:hover { border-color: #334155; color: #e2e8f0; }
+
+    /* Stats cards */
+    .stat-card {
+      background: #0d1525;
+      border: 1px solid #1a2540;
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+
+    /* Tabs */
+    .tab-btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: #475569;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .tab-btn.active { background: #0f1629; color: #e2e8f0; }
+    .tab-btn:hover:not(.active) { color: #94a3b8; }
+
+    /* Console */
+    #console {
+      background: #060a14;
+      border: 1px solid #1a2540;
+      border-radius: 12px;
+      height: 340px;
+      overflow-y: auto;
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .console-line { display: flex; gap: 12px; }
+    .console-time { color: #334155; flex-shrink: 0; }
+    .console-info { color: #94a3b8; }
+    .console-warn { color: #f59e0b; }
+    .console-error { color: #ef4444; }
+    .console-success { color: #10b981; }
+    .console-join { color: #60a5fa; }
+
+    /* Console input */
+    #consoleInput {
+      background: #060a14;
+      border: 1px solid #1a2540;
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      padding: 10px 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    #consoleInput input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #e2e8f0;
+    }
+    #consoleInput input::placeholder { color: #1e2a45; }
+
+    /* Config editor */
+    #configEditor {
+      background: #060a14;
+      border: 1px solid #1a2540;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .config-row {
+      display: flex; align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #0f1629;
+      gap: 16px;
+    }
+    .config-row:last-child { border-bottom: none; }
+    .config-key {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #60a5fa;
+      width: 180px;
+      flex-shrink: 0;
+    }
+    .config-input {
+      flex: 1;
+      background: #0d1525;
+      border: 1px solid #1a2540;
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: #e2e8f0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .config-input:focus { border-color: #334155; }
+
+    /* Player list */
+    .player-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .player-row:hover { background: #0f1629; }
+    .player-avatar {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      background: #0f1629;
+      border: 1px solid #1e2a45;
+      border-radius: 12px;
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 100;
+      max-width: 300px;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+
+    /* Badge */
+    .badge-online { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.2); border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+    .badge-offline { background: rgba(55,65,81,0.4); color: #6b7280; border: 1px solid #1a2540; border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+    .badge-starting { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2); border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+
+    /* Uptime bar */
+    .uptime-bar { height: 4px; background: #1a2540; border-radius: 2px; overflow: hidden; }
+    .uptime-fill { height: 100%; background: linear-gradient(90deg, #10b981, #059669); border-radius: 2px; }
+
+    /* New server indicator */
+    .new-badge { background: rgba(0,212,255,0.1); color: #00d4ff; border: 1px solid rgba(0,212,255,0.2); border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<aside id="sidebar">
+  <!-- Logo -->
+  <div class="sidebar-logo">
+    <a href="index.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+      <div style="width:30px;height:30px;background:linear-gradient(135deg,#ff6b35,#dc2626);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+        <i class="fas fa-fire" style="color:white;font-size:12px;"></i>
+      </div>
+      <span class="font-gaming" style="font-size:17px;font-weight:700;color:white;letter-spacing:0.5px;">INFERNO<span style="color:#ff6b35;">HOST</span></span>
+    </a>
+  </div>
+
+  <!-- Nav -->
+  <div style="padding:16px 12px;border-bottom:1px solid #1a2540;">
+    <div style="font-size:10px;font-weight:700;color:#334155;text-transform:uppercase;letter-spacing:1px;padding:0 6px;margin-bottom:8px;">Navegación</div>
+    <a href="#" onclick="showTab('console');return false;" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;text-decoration:none;color:#64748b;font-size:13px;font-weight:500;background:#0f162920;transition:all 0.2s;" onmouseover="this.style.background='#0f1629';this.style.color='#e2e8f0'" onmouseout="this.style.background='#0f162920';this.style.color='#64748b'">
+      <i class="fas fa-gauge" style="width:16px;font-size:12px;"></i> Panel
+    </a>
+    <a href="index.html#games" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;text-decoration:none;color:#64748b;font-size:13px;font-weight:500;margin-top:2px;transition:all 0.2s;" onmouseover="this.style.background='#0f1629';this.style.color='#e2e8f0'" onmouseout="this.style.background='transparent';this.style.color='#64748b'">
+      <i class="fas fa-plus" style="width:16px;font-size:12px;"></i> Nuevo servidor
+    </a>
+    <a href="#" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;text-decoration:none;color:#64748b;font-size:13px;font-weight:500;margin-top:2px;transition:all 0.2s;" onmouseover="this.style.background='#0f1629';this.style.color='#e2e8f0'" onmouseout="this.style.background='transparent';this.style.color='#64748b'">
+      <i class="fas fa-file-invoice" style="width:16px;font-size:12px;"></i> Facturación
+    </a>
+    <a href="#" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;text-decoration:none;color:#64748b;font-size:13px;font-weight:500;margin-top:2px;transition:all 0.2s;" onmouseover="this.style.background='#0f1629';this.style.color='#e2e8f0'" onmouseout="this.style.background='transparent';this.style.color='#64748b'">
+      <i class="fas fa-headset" style="width:16px;font-size:12px;"></i> Soporte
+    </a>
+  </div>
+
+  <!-- Server list -->
+  <div style="padding:16px 12px;flex:1;overflow-y:auto;">
+    <div style="font-size:10px;font-weight:700;color:#334155;text-transform:uppercase;letter-spacing:1px;padding:0 6px;margin-bottom:8px;">Mis servidores</div>
+    <div id="serverList"></div>
+  </div>
+
+  <!-- User -->
+  <div style="padding:14px 16px;border-top:1px solid #1a2540;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:white;">J</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Juan García</div>
+        <div style="font-size:11px;color:#334155;">Plan Pro</div>
+      </div>
+      <a href="index.html" style="color:#334155;text-decoration:none;font-size:12px;" onmouseover="this.style.color='#64748b'" onmouseout="this.style.color='#334155'" title="Cerrar sesión">
+        <i class="fas fa-right-from-bracket"></i>
+      </a>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════ MAIN ═══════════════════ -->
+<div id="main">
+
+  <!-- Top bar -->
+  <div id="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span id="topbarGame" class="font-gaming" style="font-size:20px;font-weight:700;color:white;"></span>
+      <span id="topbarStatus"></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#475569;">
+        <i class="fas fa-network-wired" style="font-size:11px;"></i>
+        <span id="topbarIP" class="mono" style="font-size:12px;color:#64748b;"></span>
+      </div>
+      <button class="action-btn btn-secondary" onclick="copyIP()" style="padding:7px 14px;font-size:12px;">
+        <i class="fas fa-copy" style="font-size:11px;"></i> Copiar IP
+      </button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div id="content">
+
+    <!-- Server header -->
+    <div id="serverHeader" class="server-header" style="background:#0d1525;border:1px solid #1a2540;">
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <div id="serverIconBig" style="width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;"></div>
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+            <span id="serverDisplayName" class="font-gaming" style="font-size:26px;font-weight:700;color:white;"></span>
+            <span id="headerStatus"></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+            <span style="font-size:13px;color:#475569;display:flex;align-items:center;gap:5px;"><i class="fas fa-users" style="font-size:11px;"></i> <span id="headerPlayers">0</span> jugadores online</span>
+            <span style="font-size:13px;color:#475569;display:flex;align-items:center;gap:5px;"><i class="fas fa-clock" style="font-size:11px;"></i> Uptime: <span id="headerUptime">0h 0m</span></span>
+            <span style="font-size:13px;color:#475569;display:flex;align-items:center;gap:5px;"><i class="fas fa-calendar" style="font-size:11px;"></i> Vence: <span id="headerExpiry">—</span></span>
+          </div>
+        </div>
+      </div>
+      <!-- Action buttons -->
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <button class="action-btn btn-start" id="btnStart" onclick="serverAction('start')">
+          <i class="fas fa-play"></i> Iniciar
+        </button>
+        <button class="action-btn btn-stop" id="btnStop" onclick="serverAction('stop')">
+          <i class="fas fa-stop"></i> Detener
+        </button>
+        <button class="action-btn btn-restart" id="btnRestart" onclick="serverAction('restart')">
+          <i class="fas fa-rotate-right"></i> Reiniciar
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;">
+      <div class="stat-card">
+        <div style="font-size:11px;color:#334155;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px;"><i class="fas fa-users" style="font-size:10px;"></i> Jugadores</div>
+        <div style="display:flex;align-items:baseline;gap:4px;">
+          <span id="statPlayers" class="font-gaming" style="font-size:28px;font-weight:700;color:white;">0</span>
+          <span id="statMaxPlayers" style="font-size:14px;color:#334155;">/20</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:11px;color:#334155;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px;"><i class="fas fa-memory" style="font-size:10px;"></i> RAM</div>
+        <div style="display:flex;align-items:baseline;gap:4px;">
+          <span id="statRAM" class="font-gaming" style="font-size:28px;font-weight:700;color:white;">0</span>
+          <span style="font-size:14px;color:#334155;">MB</span>
+        </div>
+        <div class="uptime-bar" style="margin-top:8px;">
+          <div id="ramFill" class="uptime-fill" style="width:0%;background:linear-gradient(90deg,#10b981,#059669);transition:width 0.5s;"></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:11px;color:#334155;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px;"><i class="fas fa-microchip" style="font-size:10px;"></i> CPU</div>
+        <div style="display:flex;align-items:baseline;gap:4px;">
+          <span id="statCPU" class="font-gaming" style="font-size:28px;font-weight:700;color:white;">0</span>
+          <span style="font-size:14px;color:#334155;">%</span>
+        </div>
+        <div class="uptime-bar" style="margin-top:8px;">
+          <div id="cpuFill" class="uptime-fill" style="width:0%;background:linear-gradient(90deg,#7c3aed,#6d28d9);transition:width 0.5s;"></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:11px;color:#334155;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px;"><i class="fas fa-signal" style="font-size:10px;"></i> Ping (ms)</div>
+        <div style="display:flex;align-items:baseline;gap:4px;">
+          <span id="statPing" class="font-gaming" style="font-size:28px;font-weight:700;color:#10b981;">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:4px;margin-bottom:16px;background:#0a0e1a;border:1px solid #1a2540;border-radius:10px;padding:4px;width:fit-content;">
+      <button class="tab-btn active" id="tab-console" onclick="showTab('console')"><i class="fas fa-terminal" style="font-size:11px;"></i> Consola</button>
+      <button class="tab-btn" id="tab-players" onclick="showTab('players')"><i class="fas fa-users" style="font-size:11px;"></i> Jugadores</button>
+      <button class="tab-btn" id="tab-config" onclick="showTab('config')"><i class="fas fa-sliders" style="font-size:11px;"></i> Configuración</button>
+      <button class="tab-btn" id="tab-backups" onclick="showTab('backups')"><i class="fas fa-database" style="font-size:11px;"></i> Backups</button>
+    </div>
+
+    <!-- Tab: Console -->
+    <div id="panel-console">
+      <div id="console"></div>
+      <div id="consoleInput">
+        <span style="color:#334155;font-family:'JetBrains Mono',monospace;font-size:12px;">$</span>
+        <input type="text" id="cmdInput" placeholder="Escribí un comando..." onkeydown="sendCommand(event)">
+        <button onclick="sendCommand({key:'Enter'})" style="background:transparent;border:none;color:#334155;cursor:pointer;font-size:12px;" onmouseover="this.style.color='#64748b'" onmouseout="this.style.color='#334155'">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab: Players -->
+    <div id="panel-players" style="display:none;">
+      <div style="background:#0d1525;border:1px solid #1a2540;border-radius:12px;padding:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <span style="font-size:14px;font-weight:600;color:#e2e8f0;">Jugadores conectados</span>
+          <span id="playerCountBadge" style="font-size:12px;color:#64748b;"></span>
+        </div>
+        <div id="playerList"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Config -->
+    <div id="panel-config" style="display:none;">
+      <div id="configEditor">
+        <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:13px;color:#64748b;display:flex;align-items:center;gap:6px;"><i class="fas fa-file-code" style="font-size:11px;"></i> Configuración del servidor</div>
+          <button onclick="saveConfig()" style="background:linear-gradient(135deg,#10b981,#059669);color:#080c18;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">
+            <i class="fas fa-save" style="margin-right:5px;font-size:11px;"></i>Guardar cambios
+          </button>
+        </div>
+        <div id="configFields"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Backups -->
+    <div id="panel-backups" style="display:none;">
+      <div style="background:#0d1525;border:1px solid #1a2540;border-radius:12px;padding:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+          <div>
+            <div style="font-size:15px;font-weight:600;color:#e2e8f0;margin-bottom:4px;">Backups automáticos</div>
+            <div style="font-size:13px;color:#475569;">Guardados diarios. Restaurá con un clic.</div>
+          </div>
+          <button onclick="createBackup()" style="background:#0f1629;border:1px solid #1e2a45;color:#94a3b8;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;" onmouseover="this.style.borderColor='#334155'" onmouseout="this.style.borderColor='#1e2a45'">
+            <i class="fas fa-plus" style="font-size:11px;"></i> Crear ahora
+          </button>
+        </div>
+        <div id="backupList" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">
+  <i id="toastIcon" class="fas fa-check-circle" style="color:#10b981;font-size:16px;"></i>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+  // ─── DATA ───────────────────────────────────────────────────────────────────
+  const SERVERS = [
+    { id: 1, name: 'El server de los pibes', game: 'conan', icon: 'fa-skull', color: '#dc2626', status: 'online', players: 7, maxPlayers: 40, ip: '181.47.62.93:7777', ram: 3800, maxRam: 6144, cpu: 34, uptime: 0, expiry: '2025-07-27', isNew: true },
+    { id: 2, name: 'Minecraft con familia', game: 'minecraft', icon: 'fa-cube', color: '#65a30d', status: 'online', players: 3, maxPlayers: 20, ip: '181.47.62.93:25565', ram: 1800, maxRam: 4096, cpu: 18, uptime: 0, expiry: '2025-08-14', isNew: false },
+    { id: 3, name: 'Valheim Vikingos', game: 'valheim', icon: 'fa-dragon', color: '#3b82f6', status: 'offline', players: 0, maxPlayers: 10, ip: '181.47.62.93:2456', ram: 0, maxRam: 4096, cpu: 0, uptime: 0, expiry: '2025-06-30', isNew: false },
+  ];
+
+  const CONFIGS = {
+    conan: [
+      { key: 'ServerName', value: 'El server de los pibes', type: 'text' },
+      { key: 'MaxPlayers', value: '40', type: 'number' },
+      { key: 'ServerPassword', value: 'pibes2025', type: 'password' },
+      { key: 'AdminPassword', value: 'admin123', type: 'password' },
+      { key: 'PvPEnabled', value: 'true', type: 'select', options: ['true','false'] },
+      { key: 'DayCycleSpeedScale', value: '1.0', type: 'number' },
+      { key: 'NightTimeSpeedScale', value: '1.0', type: 'number' },
+      { key: 'HarvestAmountMultiplier', value: '2.0', type: 'number' },
+    ],
+    minecraft: [
+      { key: 'server-name', value: 'Minecraft con familia', type: 'text' },
+      { key: 'max-players', value: '20', type: 'number' },
+      { key: 'server-port', value: '25565', type: 'number' },
+      { key: 'gamemode', value: 'survival', type: 'select', options: ['survival','creative','adventure','spectator'] },
+      { key: 'difficulty', value: 'normal', type: 'select', options: ['peaceful','easy','normal','hard'] },
+      { key: 'online-mode', value: 'true', type: 'select', options: ['true','false'] },
+      { key: 'pvp', value: 'true', type: 'select', options: ['true','false'] },
+      { key: 'view-distance', value: '10', type: 'number' },
+    ],
+    valheim: [
+      { key: 'ServerName', value: 'Valheim Vikingos', type: 'text' },
+      { key: 'MaxPlayers', value: '10', type: 'number' },
+      { key: 'ServerPassword', value: 'valhalla', type: 'password' },
+      { key: 'Public', value: 'true', type: 'select', options: ['true','false'] },
+    ],
+  };
+
+  const BACKUPS_DATA = [
+    { date: '2025-05-27 03:00', size: '2.4 GB', label: 'Auto' },
+    { date: '2025-05-26 03:00', size: '2.2 GB', label: 'Auto' },
+    { date: '2025-05-25 03:00', size: '2.1 GB', label: 'Auto' },
+    { date: '2025-05-24 18:42', size: '2.0 GB', label: 'Manual' },
+  ];
+
+  const PLAYERS_DATA = {
+    conan:    [{ name: 'WarriorBR_99', time: '2h 14m', color: '#dc2626' }, { name: 'GuerreroAR',  time: '1h 05m', color: '#f59e0b' }, { name: 'ConanFan21', time: '47m', color: '#3b82f6' }, { name: 'SurvivalKing', time: '38m', color: '#10b981' }, { name: 'DesertWolf',  time: '22m', color: '#8b5cf6' }, { name: 'ExilesHero',  time: '12m', color: '#ec4899' }, { name: 'StoneBreaker', time: '5m',  color: '#f97316' }],
+    minecraft: [{ name: 'Steve_AR',   time: '1h 12m', color: '#65a30d' }, { name: 'Mariela',     time: '45m', color: '#ec4899' }, { name: 'Tomás',       time: '20m', color: '#3b82f6' }],
+    valheim:   [],
+  };
+
+  const LOG_TEMPLATES = {
+    conan: [
+      ['info', 'LogNet: UChannel::Close: Sending CloseBunch.'],
+      ['success', 'Server is now online and accepting connections.'],
+      ['info', 'World saved successfully.'],
+      ['warn', 'High memory usage detected (78%).'],
+      ['join', 'Player "WarriorBR_99" joined the game.'],
+      ['info', 'Saving world data...'],
+      ['join', 'Player "ConanFan21" joined the game.'],
+      ['info', 'LogLoad: LoadMap: /ConanSandbox/Maps/game/Exiled_Lands'],
+      ['success', 'Backup completed successfully.'],
+      ['info', 'Tick rate: 30fps | Players: 7/40'],
+    ],
+    minecraft: [
+      ['success', 'Done! For help, type "help"'],
+      ['info', '[Spigot] Timings Reset'],
+      ['join', 'Steve_AR joined the game'],
+      ['info', 'Saving the game (this may take a moment!)'],
+      ['success', 'Saved the game'],
+      ['join', 'Mariela joined the game'],
+      ['info', 'Loaded 0 advancements'],
+    ],
+    valheim: [
+      ['info', 'Server offline - waiting to start'],
+    ],
+  };
+
+  // ─── STATE ─────────────────────────────────────────────────────────────────
+  let currentServerId = 1;
+  let uptimeSeconds = 14400; // 4 hours
+  let statsInterval = null;
+  let consoleInterval = null;
+  let uptimeInterval = null;
+  let currentTab = 'console';
+
+  function getCurrentServer() {
+    return SERVERS.find(s => s.id === currentServerId);
+  }
+
+  // ─── INIT ──────────────────────────────────────────────────────────────────
+  function init() {
+    // Check if coming from configurar.html
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('nuevo') === '1') {
+      const data = sessionStorage.getItem('newServer');
+      if (data) {
+        const ns = JSON.parse(data);
+        sessionStorage.removeItem('newServer');
+        // Add to server list
+        const gameMeta = {
+          minecraft: { icon: 'fa-cube', color: '#65a30d', ip: '181.47.62.93:25565' },
+          conan:     { icon: 'fa-skull', color: '#dc2626', ip: '181.47.62.93:7778' },
+          valheim:   { icon: 'fa-dragon', color: '#3b82f6', ip: '181.47.62.93:2457' },
+          cs2:       { icon: 'fa-crosshairs', color: '#f59e0b', ip: '181.47.62.93:27015' },
+          terraria:  { icon: 'fa-mountain', color: '#84cc16', ip: '181.47.62.93:7777' },
+          palworld:  { icon: 'fa-paw', color: '#14b8a6', ip: '181.47.62.93:8211' },
+          ark:       { icon: 'fa-dna', color: '#d97706', ip: '181.47.62.93:7778' },
+          rust:      { icon: 'fa-fire', color: '#ea580c', ip: '181.47.62.93:28015' },
+        };
+        const meta = gameMeta[ns.game] || gameMeta.minecraft;
+        const newServer = {
+          id: SERVERS.length + 1,
+          name: ns.name,
+          game: ns.game,
+          icon: meta.icon,
+          color: meta.color,
+          status: 'starting',
+          players: 0,
+          maxPlayers: ns.players,
+          ip: meta.ip,
+          ram: 0, maxRam: 4096, cpu: 0,
+          uptime: 0,
+          expiry: getExpiry(ns.duration),
+          isNew: true,
+        };
+        SERVERS.unshift(newServer);
+        currentServerId = newServer.id;
+        // Simulate starting → online after 4s
+        setTimeout(() => {
+          newServer.status = 'online';
+          renderSidebar();
+          renderServerView();
+          showToast('success', `¡${newServer.name} está online!`);
+        }, 4000);
+      }
+    }
+
+    renderSidebar();
+    selectServer(currentServerId);
+  }
+
+  function getExpiry(months) {
+    const d = new Date();
+    d.setMonth(d.getMonth() + months);
+    return d.toISOString().split('T')[0];
+  }
+
+  // ─── SIDEBAR ───────────────────────────────────────────────────────────────
+  function renderSidebar() {
+    const list = document.getElementById('serverList');
+    list.innerHTML = SERVERS.map(s => `
+      <div class="server-item ${s.id === currentServerId ? 'active' : ''}" onclick="selectServer(${s.id})" style="position:relative;">
+        <div class="status-dot ${s.status}"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:13px;font-weight:600;color:${s.id === currentServerId ? '#e2e8f0' : '#94a3b8'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;">${s.name}</span>
+            ${s.isNew ? '<span class="new-badge">NEW</span>' : ''}
+          </div>
+          <span style="font-size:11px;color:#334155;">${s.status === 'online' ? s.players + ' online' : s.status}</span>
+        </div>
+        <i class="fas ${s.icon}" style="color:${s.color};font-size:12px;opacity:0.7;"></i>
+      </div>
+    `).join('');
+  }
+
+  // ─── SELECT SERVER ─────────────────────────────────────────────────────────
+  function selectServer(id) {
+    currentServerId = id;
+    clearIntervals();
+    uptimeSeconds = 14400;
+    renderSidebar();
+    renderServerView();
+    showTab('console');
+    if (getCurrentServer().status === 'online') startLiveUpdates();
+  }
+
+  function renderServerView() {
+    const s = getCurrentServer();
+    if (!s) return;
+
+    // Topbar
+    document.getElementById('topbarGame').textContent = s.name;
+    document.getElementById('topbarIP').textContent = s.ip;
+    updateStatusBadge('topbarStatus', s.status);
+
+    // Header
+    const iconBig = document.getElementById('serverIconBig');
+    iconBig.style.background = s.color + '22';
+    iconBig.innerHTML = `<i class="fas ${s.icon}" style="color:${s.color};font-size:24px;"></i>`;
+    document.getElementById('serverDisplayName').textContent = s.name;
+    updateStatusBadge('headerStatus', s.status);
+    document.getElementById('headerPlayers').textContent = s.players;
+    document.getElementById('headerExpiry').textContent = s.expiry;
+
+    // Stats
+    document.getElementById('statPlayers').textContent = s.players;
+    document.getElementById('statMaxPlayers').textContent = '/' + s.maxPlayers;
+    updateStats(s);
+
+    // Buttons
+    updateButtons(s.status);
+
+    // Console
+    buildConsole(s);
+
+    // Config
+    buildConfig(s);
+
+    // Players
+    buildPlayers(s);
+
+    // Backups
+    buildBackups();
+
+    // Uptime
+    updateUptime();
+  }
+
+  function updateStatusBadge(elId, status) {
+    const el = document.getElementById(elId);
+    const map = {
+      online:   `<span class="badge-online"><i class="fas fa-circle" style="font-size:7px;margin-right:5px;"></i>Online</span>`,
+      offline:  `<span class="badge-offline"><i class="fas fa-circle" style="font-size:7px;margin-right:5px;"></i>Offline</span>`,
+      starting: `<span class="badge-starting"><i class="fas fa-circle" style="font-size:7px;margin-right:5px;animation:blink 1s infinite;display:inline-block;"></i>Iniciando...</span>`,
+    };
+    el.innerHTML = map[status] || '';
+  }
+
+  function updateButtons(status) {
+    const start = document.getElementById('btnStart');
+    const stop = document.getElementById('btnStop');
+    const restart = document.getElementById('btnRestart');
+    start.disabled = status === 'online' || status === 'starting';
+    stop.disabled = status === 'offline';
+    restart.disabled = status === 'offline';
+  }
+
+  function updateStats(s) {
+    const ramUsed = s.status === 'online' ? s.ram : 0;
+    const ramPct = Math.round(ramUsed / s.maxRam * 100);
+    document.getElementById('statRAM').textContent = ramUsed;
+    document.getElementById('ramFill').style.width = ramPct + '%';
+    document.getElementById('statCPU').textContent = s.status === 'online' ? s.cpu : 0;
+    document.getElementById('cpuFill').style.width = (s.status === 'online' ? s.cpu : 0) + '%';
+    document.getElementById('statPing').textContent = s.status === 'online' ? (Math.floor(Math.random() * 20) + 18) + ' ms' : '—';
+    document.getElementById('statPing').style.color = s.status === 'online' ? '#10b981' : '#334155';
+  }
+
+  // ─── CONSOLE ───────────────────────────────────────────────────────────────
+  function buildConsole(s) {
+    const con = document.getElementById('console');
+    con.innerHTML = '';
+    const logs = LOG_TEMPLATES[s.game] || LOG_TEMPLATES.minecraft;
+    logs.forEach(([type, msg]) => addConsoleLine(type, msg));
+  }
+
+  function addConsoleLine(type, msg) {
+    const con = document.getElementById('console');
+    const now = new Date();
+    const time = now.toTimeString().slice(0,8);
+    const div = document.createElement('div');
+    div.className = 'console-line';
+    div.innerHTML = `<span class="console-time">${time}</span><span class="console-${type}">${msg}</span>`;
+    con.appendChild(div);
+    con.scrollTop = con.scrollHeight;
+  }
+
+  function sendCommand(e) {
+    if (e.key !== 'Enter') return;
+    const input = document.getElementById('cmdInput');
+    const cmd = input.value.trim();
+    if (!cmd) return;
+    addConsoleLine('warn', `> ${cmd}`);
+    input.value = '';
+    const s = getCurrentServer();
+    if (s.status !== 'online') {
+      addConsoleLine('error', 'El servidor está offline. No se puede ejecutar el comando.');
+      return;
+    }
+    // Simulated responses
+    setTimeout(() => {
+      if (cmd.includes('list'))    addConsoleLine('success', `Jugadores online: ${s.players}`);
+      else if (cmd.includes('say')) addConsoleLine('info', '[Server] ' + cmd.split(' ').slice(1).join(' '));
+      else if (cmd.includes('stop')) { addConsoleLine('warn', 'Deteniendo servidor...'); }
+      else addConsoleLine('info', `Comando ejecutado: ${cmd}`);
+    }, 300);
+  }
+
+  // ─── CONFIG ────────────────────────────────────────────────────────────────
+  function buildConfig(s) {
+    const fields = CONFIGS[s.game] || [];
+    document.getElementById('configFields').innerHTML = fields.map(f => {
+      if (f.type === 'select') {
+        return `<div class="config-row">
+          <div class="config-key">${f.key}</div>
+          <select class="config-input" style="cursor:pointer;">
+            ${f.options.map(o => `<option ${o === f.value ? 'selected' : ''} style="background:#0d1525;">${o}</option>`).join('')}
+          </select>
+        </div>`;
+      }
+      return `<div class="config-row">
+        <div class="config-key">${f.key}</div>
+        <input type="${f.type === 'password' ? 'password' : f.type === 'number' ? 'number' : 'text'}" class="config-input" value="${f.value}">
+      </div>`;
+    }).join('');
+  }
+
+  function saveConfig() {
+    showToast('success', 'Configuración guardada. Reiniciando...');
+    setTimeout(() => addConsoleLine('success', 'Configuración aplicada correctamente.'), 1500);
+  }
+
+  // ─── PLAYERS ───────────────────────────────────────────────────────────────
+  function buildPlayers(s) {
+    const players = s.status === 'online' ? (PLAYERS_DATA[s.game] || []) : [];
+    document.getElementById('playerCountBadge').textContent = `${players.length} / ${s.maxPlayers}`;
+    const list = document.getElementById('playerList');
+    if (players.length === 0) {
+      list.innerHTML = `<div style="text-align:center;padding:40px;color:#334155;font-size:14px;">
+        ${s.status === 'online' ? 'No hay jugadores conectados' : 'El servidor está offline'}
+      </div>`;
+      return;
+    }
+    list.innerHTML = players.map(p => `
+      <div class="player-row">
+        <div class="player-avatar" style="background:${p.color}22;color:${p.color};">${p.name[0]}</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:500;color:#e2e8f0;">${p.name}</div>
+          <div style="font-size:12px;color:#334155;">Conectado hace ${p.time}</div>
+        </div>
+        <button onclick="kickPlayer('${p.name}')" style="background:transparent;border:1px solid #1e2a45;color:#475569;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444'" onmouseout="this.style.borderColor='#1e2a45';this.style.color='#475569'">
+          Kick
+        </button>
+      </div>
+    `).join('');
+  }
+
+  function kickPlayer(name) {
+    showToast('warn', `${name} fue expulsado del servidor.`);
+    addConsoleLine('warn', `[Admin] Player ${name} was kicked.`);
+  }
+
+  // ─── BACKUPS ───────────────────────────────────────────────────────────────
+  function buildBackups() {
+    const list = document.getElementById('backupList');
+    list.innerHTML = BACKUPS_DATA.map((b, i) => `
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:#0a0e1a;border:1px solid #1a2540;border-radius:10px;">
+        <i class="fas fa-database" style="color:#334155;font-size:14px;"></i>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;color:#94a3b8;">${b.date}</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:2px;">
+            <span style="font-size:12px;color:#334155;">${b.size}</span>
+            <span style="font-size:10px;background:${b.label==='Auto'?'rgba(16,185,129,0.1)':'rgba(0,212,255,0.1)'};color:${b.label==='Auto'?'#10b981':'#00d4ff'};padding:2px 7px;border-radius:4px;font-weight:600;">${b.label}</span>
+          </div>
+        </div>
+        <button onclick="restoreBackup(${i})" style="background:#0f1629;border:1px solid #1e2a45;color:#94a3b8;padding:7px 14px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;" onmouseover="this.style.borderColor='#10b981';this.style.color='#10b981'" onmouseout="this.style.borderColor='#1e2a45';this.style.color='#94a3b8'">
+          <i class="fas fa-rotate-left" style="font-size:11px;"></i> Restaurar
+        </button>
+      </div>
+    `).join('');
+  }
+
+  function createBackup() {
+    showToast('info', 'Creando backup manual...');
+    setTimeout(() => {
+      BACKUPS_DATA.unshift({ date: new Date().toLocaleString('es-AR').slice(0,16), size: '2.5 GB', label: 'Manual' });
+      buildBackups();
+      showToast('success', '¡Backup creado correctamente!');
+    }, 2000);
+  }
+
+  function restoreBackup(i) {
+    showToast('warn', `Restaurando backup del ${BACKUPS_DATA[i].date}...`);
+    setTimeout(() => { addConsoleLine('success', `Backup restaurado: ${BACKUPS_DATA[i].date}`); }, 2000);
+  }
+
+  // ─── SERVER ACTIONS ────────────────────────────────────────────────────────
+  function serverAction(action) {
+    const s = getCurrentServer();
+    if (action === 'start') {
+      s.status = 'starting';
+      updateButtons('starting');
+      updateStatusBadge('topbarStatus', 'starting');
+      updateStatusBadge('headerStatus', 'starting');
+      addConsoleLine('info', 'Iniciando servidor...');
+      addConsoleLine('info', 'Cargando configuración...');
+      setTimeout(() => {
+        s.status = 'online';
+        s.players = 0;
+        renderSidebar();
+        updateStatusBadge('topbarStatus', 'online');
+        updateStatusBadge('headerStatus', 'online');
+        updateButtons('online');
+        addConsoleLine('success', '¡Servidor iniciado correctamente!');
+        addConsoleLine('success', 'Escuchando en ' + s.ip);
+        startLiveUpdates();
+        showToast('success', '¡Servidor online!');
+      }, 3500);
+    } else if (action === 'stop') {
+      clearIntervals();
+      s.status = 'offline'; s.players = 0; s.ram = 0; s.cpu = 0;
+      renderSidebar();
+      updateStatusBadge('topbarStatus', 'offline');
+      updateStatusBadge('headerStatus', 'offline');
+      updateButtons('offline');
+      updateStats(s);
+      document.getElementById('statPlayers').textContent = '0';
+      addConsoleLine('warn', 'Deteniendo servidor...');
+      setTimeout(() => addConsoleLine('info', 'Servidor detenido correctamente.'), 800);
+      showToast('warn', 'Servidor detenido.');
+    } else if (action === 'restart') {
+      addConsoleLine('warn', 'Reiniciando servidor...');
+      serverAction('stop');
+      setTimeout(() => serverAction('start'), 1500);
+    }
+  }
+
+  // ─── LIVE STATS ────────────────────────────────────────────────────────────
+  function startLiveUpdates() {
+    clearIntervals();
+    const s = getCurrentServer();
+
+    statsInterval = setInterval(() => {
+      if (s.status !== 'online') return;
+      s.cpu = Math.max(5, Math.min(95, s.cpu + Math.floor(Math.random() * 11 - 5)));
+      s.ram = Math.max(1000, Math.min(s.maxRam, s.ram + Math.floor(Math.random() * 201 - 100)));
+      document.getElementById('statCPU').textContent = s.cpu;
+      document.getElementById('cpuFill').style.width = s.cpu + '%';
+      document.getElementById('statRAM').textContent = s.ram;
+      document.getElementById('ramFill').style.width = Math.round(s.ram / s.maxRam * 100) + '%';
+      document.getElementById('statPing').textContent = (Math.floor(Math.random() * 20) + 18) + ' ms';
+    }, 3000);
+
+    consoleInterval = setInterval(() => {
+      if (s.status !== 'online') return;
+      const logs = LOG_TEMPLATES[s.game] || LOG_TEMPLATES.minecraft;
+      const [type, msg] = logs[Math.floor(Math.random() * logs.length)];
+      addConsoleLine(type, msg);
+    }, 7000);
+
+    uptimeInterval = setInterval(() => {
+      if (s.status !== 'online') return;
+      uptimeSeconds++;
+      updateUptime();
+    }, 1000);
+  }
+
+  function clearIntervals() {
+    clearInterval(statsInterval);
+    clearInterval(consoleInterval);
+    clearInterval(uptimeInterval);
+  }
+
+  function updateUptime() {
+    const h = Math.floor(uptimeSeconds / 3600);
+    const m = Math.floor((uptimeSeconds % 3600) / 60);
+    const s = uptimeSeconds % 60;
+    const str = `${h}h ${m}m ${s}s`;
+    document.getElementById('headerUptime').textContent = str;
+  }
+
+  // ─── TABS ──────────────────────────────────────────────────────────────────
+  function showTab(tab) {
+    ['console','players','config','backups'].forEach(t => {
+      document.getElementById('panel-' + t).style.display = t === tab ? 'block' : 'none';
+      document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+    });
+    currentTab = tab;
+  }
+
+  // ─── UTILS ─────────────────────────────────────────────────────────────────
+  function copyIP() {
+    const s = getCurrentServer();
+    navigator.clipboard.writeText(s.ip).then(() => showToast('success', 'IP copiada: ' + s.ip));
+  }
+
+  function showToast(type, msg) {
+    const icons = { success: 'fa-check-circle', warn: 'fa-triangle-exclamation', error: 'fa-xmark-circle', info: 'fa-circle-info' };
+    const colors = { success: '#10b981', warn: '#f59e0b', error: '#ef4444', info: '#00d4ff' };
+    const toast = document.getElementById('toast');
+    document.getElementById('toastIcon').className = `fas ${icons[type]}`;
+    document.getElementById('toastIcon').style.color = colors[type];
+    document.getElementById('toastMsg').textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  // ─── START ─────────────────────────────────────────────────────────────────
+  init();
+</script>
+
+</body>
+</html>

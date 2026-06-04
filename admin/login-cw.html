@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login — ComercialWeb</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'DM Sans',system-ui,sans-serif;
+      background:#06122a;min-height:100vh;
+      display:flex;align-items:center;justify-content:center;
+      background-image:url('../images/hero.jpg');
+      background-size:cover;background-position:center;
+    }
+    body::before{
+      content:'';position:fixed;inset:0;
+      background:rgba(6,18,42,.88);
+    }
+    .card{
+      position:relative;z-index:1;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:20px;padding:44px 40px;
+      width:100%;max-width:400px;
+      backdrop-filter:blur(12px);
+      box-shadow:0 24px 60px rgba(0,0,0,.6);
+    }
+    .logo{
+      text-align:center;margin-bottom:32px;
+      font-size:1.6rem;font-weight:900;color:#fff;
+      letter-spacing:1px;text-transform:uppercase;
+    }
+    .logo span{color:#FFD700}
+    .logo small{display:block;font-size:.72rem;color:rgba(255,255,255,.35);font-weight:600;letter-spacing:2px;margin-top:4px}
+    label{
+      display:block;font-size:.75rem;font-weight:800;
+      color:rgba(255,255,255,.5);text-transform:uppercase;
+      letter-spacing:.8px;margin-bottom:7px;
+    }
+    input{
+      width:100%;padding:12px 16px;border-radius:10px;
+      border:1.5px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);color:#fff;
+      font-family:inherit;font-size:.95rem;
+      transition:border-color .2s;margin-bottom:18px;
+    }
+    input:focus{outline:none;border-color:#FFD700}
+    input::placeholder{color:rgba(255,255,255,.25)}
+    button{
+      width:100%;padding:14px;border-radius:10px;border:none;
+      background:linear-gradient(90deg,#cc8800,#FFD700,#cc8800);
+      color:#06122a;font-size:1rem;font-weight:900;
+      cursor:pointer;font-family:inherit;
+      transition:opacity .2s;letter-spacing:.5px;
+    }
+    button:hover{opacity:.9}
+    button:disabled{opacity:.4;cursor:not-allowed}
+    .error{
+      background:rgba(230,57,70,.15);border:1px solid rgba(230,57,70,.4);
+      color:#ff6b7a;font-size:.82rem;font-weight:700;
+      padding:10px 14px;border-radius:8px;margin-top:14px;
+      display:none;
+    }
+    .error.show{display:block}
+    .spinner{
+      display:inline-block;width:16px;height:16px;
+      border:2px solid rgba(6,18,42,.3);border-top-color:#06122a;
+      border-radius:50%;animation:spin .6s linear infinite;
+      vertical-align:middle;margin-right:6px;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    Comercial<span>Web</span>
+    <small>Panel de Administración</small>
+  </div>
+  <form id="loginForm">
+    <label>Email</label>
+    <input type="email" id="email" placeholder="admin@ejemplo.com" required autocomplete="email"/>
+    <label>Contraseña</label>
+    <input type="password" id="pass" placeholder="••••••••" required autocomplete="current-password"/>
+    <button type="submit" id="btnLogin">Ingresar al Admin</button>
+    <div class="error" id="errMsg"></div>
+  </form>
+</div>
+
+<script type="module">
+import { supabase } from '../src/supabase.js';
+
+// Si ya hay sesión, redirigir
+const { data: { session } } = await supabase.auth.getSession();
+if (session) {
+  const { data: adm } = await supabase.from('admins').select('id').eq('id', session.user.id).single();
+  if (adm) { location.href = 'packs.html'; return; }
+}
+
+document.getElementById('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn  = document.getElementById('btnLogin');
+  const err  = document.getElementById('errMsg');
+  const email = document.getElementById('email').value.trim();
+  const pass  = document.getElementById('pass').value;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Ingresando...';
+  err.classList.remove('show');
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+
+  if (error) {
+    err.textContent = 'Email o contraseña incorrectos.';
+    err.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Ingresar al Admin';
+    return;
+  }
+
+  // Verificar que sea admin
+  const { data: adm } = await supabase.from('admins').select('id,rol').eq('id', data.user.id).single();
+  if (!adm) {
+    await supabase.auth.signOut();
+    err.textContent = 'Tu usuario no tiene permisos de administrador.';
+    err.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Ingresar al Admin';
+    return;
+  }
+
+  location.href = 'packs.html';
+});
+</script>
+</body>
+</html>
