@@ -240,7 +240,7 @@
 <div class="page">
 
   <header class="header">
-    <a href="../index.html" class="marca">Comercial<span>Web</span></a>
+    <a href="pack.html" class="marca" id="btnMarca">Comercial<span>Web</span></a>
     <a href="pack.html" class="btn-volver" id="btnVolver">← Ver todos los comercios</a>
   </header>
 
@@ -279,6 +279,7 @@ const { data: com, error } = await supabase
 
 const packUrl = com?.packs ? `pack.html#${com.packs.tipo}-${com.packs.id}` : 'pack.html';
 document.getElementById('btnVolver').href = packUrl;
+document.getElementById('btnMarca').href  = packUrl;
 
 if (!com || error) {
   document.getElementById('perfilSection').innerHTML =
