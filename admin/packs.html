@@ -281,11 +281,7 @@ import { supabase } from '../src/supabase.js';
 ══════════════════════════════════════════════════════════ */
 const { data: { session } } = await supabase.auth.getSession();
 if (!session) { location.href = 'login-cw.html'; }
-else {
-  const { data: adm } = await supabase.from('admins').select('id').eq('id', session.user.id).single();
-  if (!adm) { await supabase.auth.signOut(); location.href = 'login-cw.html'; }
-  document.getElementById('userEmail').textContent = session.user.email;
-}
+else { document.getElementById('userEmail').textContent = session.user.email; }
 
 window.logout = async () => {
   await supabase.auth.signOut();

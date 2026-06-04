@@ -94,15 +94,12 @@ import { supabase } from '../src/supabase.js';
 
 // Si ya hay sesión, redirigir
 const { data: { session } } = await supabase.auth.getSession();
-if (session) {
-  const { data: adm } = await supabase.from('admins').select('id').eq('id', session.user.id).single();
-  if (adm) { location.href = 'packs.html'; return; }
-}
+if (session) { location.href = 'packs.html'; }
 
 document.getElementById('loginForm').addEventListener('submit', async e => {
   e.preventDefault();
-  const btn  = document.getElementById('btnLogin');
-  const err  = document.getElementById('errMsg');
+  const btn   = document.getElementById('btnLogin');
+  const err   = document.getElementById('errMsg');
   const email = document.getElementById('email').value.trim();
   const pass  = document.getElementById('pass').value;
 
@@ -114,17 +111,6 @@ document.getElementById('loginForm').addEventListener('submit', async e => {
 
   if (error) {
     err.textContent = 'Email o contraseña incorrectos.';
-    err.classList.add('show');
-    btn.disabled = false;
-    btn.textContent = 'Ingresar al Admin';
-    return;
-  }
-
-  // Verificar que sea admin
-  const { data: adm } = await supabase.from('admins').select('id,rol').eq('id', data.user.id).single();
-  if (!adm) {
-    await supabase.auth.signOut();
-    err.textContent = 'Tu usuario no tiene permisos de administrador.';
     err.classList.add('show');
     btn.disabled = false;
     btn.textContent = 'Ingresar al Admin';
