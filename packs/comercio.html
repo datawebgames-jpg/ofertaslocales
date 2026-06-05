@@ -16,14 +16,11 @@
     }
     body{font-family:'DM Sans',system-ui,sans-serif;background:var(--azul);color:var(--blanco);min-height:100vh}
 
-    /* ── FONDO ── */
-    .bg{position:fixed;inset:0;z-index:0;
-      background:url('../images/hero.jpg') center/cover no-repeat,#06122a;
-      filter:brightness(.3) saturate(1.1)}
+    .bg{position:fixed;inset:0;z-index:0;background:url('../images/hero.jpg') center/cover no-repeat,#06122a;filter:brightness(.3) saturate(1.1)}
     .bg-ov{position:fixed;inset:0;z-index:1;background:rgba(6,18,42,.78)}
     .page{position:relative;z-index:2}
 
-    /* ── HEADER ── */
+    /* HEADER */
     .header{
       background:rgba(6,18,42,.92);backdrop-filter:blur(12px);
       padding:0 20px;height:58px;
@@ -41,210 +38,277 @@
     }
     .btn-volver:hover{background:var(--amarillo);color:#06122a}
 
-    /* ── PERFIL HEADER ── */
-    .perfil-section{
-      padding:32px 20px 28px;
-      max-width:1100px;margin:0 auto;
+    /* BADGE ESTADO */
+    .estado-badge{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:5px 14px;border-radius:50px;
+      font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;
+      margin-bottom:12px;
     }
-    .perfil-grid{
-      display:grid;
-      grid-template-columns:auto 1fr;
-      gap:28px;align-items:start;
-    }
-    @media(max-width:640px){
-      .perfil-grid{grid-template-columns:1fr;justify-items:center;text-align:center}
-    }
+    .estado-badge.abierto{background:rgba(22,163,74,.2);border:1.5px solid #16a34a;color:#4ade80}
+    .estado-badge.cerrado{background:rgba(230,57,70,.2);border:1.5px solid #e63946;color:#ff8f96}
+    .estado-dot{width:8px;height:8px;border-radius:50%;animation:pulse 2s infinite}
+    .abierto .estado-dot{background:#4ade80}
+    .cerrado .estado-dot{background:#ff8f96;animation:none}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
 
-    /* LOGO GRANDE */
+    /* PERFIL */
+    .perfil-section{padding:32px 20px 28px;max-width:1100px;margin:0 auto}
+    .perfil-grid{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:start}
+    @media(max-width:640px){.perfil-grid{grid-template-columns:1fr;justify-items:center;text-align:center}}
     .perfil-logo{
-      width:clamp(120px,18vw,180px);
-      height:clamp(120px,18vw,180px);
-      border-radius:50%;
-      border:5px solid var(--color);
-      box-shadow:0 0 0 4px rgba(255,255,255,.1), 0 12px 40px rgba(0,0,0,.6);
-      overflow:hidden;
-      display:flex;align-items:center;justify-content:center;
+      width:clamp(120px,18vw,180px);height:clamp(120px,18vw,180px);
+      border-radius:50%;border:5px solid var(--color);
+      box-shadow:0 0 0 4px rgba(255,255,255,.1),0 12px 40px rgba(0,0,0,.6);
+      overflow:hidden;display:flex;align-items:center;justify-content:center;
       font-size:clamp(2.5rem,6vw,3.5rem);font-weight:900;
-      background:var(--color);
-      flex-shrink:0;
+      background:var(--color);flex-shrink:0;
     }
     .perfil-logo img{width:100%;height:100%;object-fit:cover}
-
-    /* INFO */
     .perfil-info{padding-top:8px}
     .perfil-rubro{
-      display:inline-block;
-      background:var(--color);color:#fff;
+      display:inline-block;background:var(--color);color:#fff;
       font-size:.72rem;font-weight:900;letter-spacing:1.5px;
-      text-transform:uppercase;padding:4px 14px;border-radius:50px;
-      margin-bottom:10px;
+      text-transform:uppercase;padding:4px 14px;border-radius:50px;margin-bottom:10px;
     }
-    .perfil-nombre{
-      font-size:clamp(1.6rem,4vw,2.4rem);font-weight:900;
-      line-height:1.1;margin-bottom:12px;
-    }
-    .datos-grid{
-      display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-      gap:8px;margin-bottom:16px;
-    }
+    .perfil-nombre{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:900;line-height:1.1;margin-bottom:12px}
+
+    .datos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-bottom:16px}
     .dato{
       display:flex;align-items:center;gap:8px;
       background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
-      border-radius:10px;padding:9px 12px;
-      font-size:.83rem;color:var(--blanco);
+      border-radius:10px;padding:9px 12px;font-size:.83rem;
     }
     .dato-ico{font-size:1.1rem;flex-shrink:0}
     .dato-txt{line-height:1.35}
     .dato-lbl{font-size:.68rem;color:var(--muted);display:block;text-transform:uppercase;letter-spacing:.5px}
 
-    /* BOTONES ACCIÓN */
     .acciones{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
     .btn-wa-grande{
       display:flex;align-items:center;gap:8px;
-      background:var(--verde);color:#fff;
-      font-size:.95rem;font-weight:900;
+      background:var(--verde);color:#fff;font-size:.95rem;font-weight:900;
       padding:12px 22px;border-radius:12px;text-decoration:none;
-      box-shadow:0 4px 16px rgba(22,163,74,.4);transition:all .2s;
+      box-shadow:0 4px 16px rgba(22,163,74,.4);transition:all .2s;cursor:pointer;
+      border:none;font-family:inherit;
     }
     .btn-wa-grande:hover{background:#15803d;transform:translateY(-2px)}
+    .btn-wa-grande.cerrado-btn{background:rgba(230,57,70,.8)}
+    .btn-wa-grande.cerrado-btn:hover{background:#c1121f}
     .btn-compartir{
       display:flex;align-items:center;gap:7px;
-      background:rgba(255,255,255,.1);color:#fff;
-      font-size:.88rem;font-weight:700;
+      background:rgba(255,255,255,.1);color:#fff;font-size:.88rem;font-weight:700;
       padding:11px 18px;border-radius:12px;border:2px solid rgba(255,255,255,.2);
       cursor:pointer;font-family:inherit;transition:all .2s;
     }
     .btn-compartir:hover{background:rgba(255,255,255,.18);border-color:#fff}
 
-    /* TOAST COMPARTIR */
+    /* HORARIO TABLE */
+    .horario-section{max-width:1100px;margin:0 auto;padding:0 20px 28px}
+    .horario-title{font-size:.8rem;font-weight:800;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+    .horario-dias{display:flex;flex-wrap:wrap;gap:6px}
+    .horario-dia-chip{
+      padding:5px 12px;border-radius:8px;font-size:.75rem;font-weight:800;
+      border:1.5px solid;
+    }
+    .horario-dia-chip.abierto-hoy{background:rgba(22,163,74,.15);border-color:#16a34a;color:#4ade80}
+    .horario-dia-chip.abierto{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.6)}
+    .horario-dia-chip.cerrado{background:rgba(0,0,0,.2);border-color:rgba(255,255,255,.07);color:rgba(255,255,255,.3)}
+    .horario-dia-chip.hoy{font-weight:900}
+
+    /* MAPA */
+    .mapa-section{max-width:1100px;margin:0 auto;padding:0 20px 28px}
+    .mapa-btn{
+      display:flex;align-items:center;gap:16px;
+      background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.12);
+      border-radius:14px;padding:16px 20px;cursor:pointer;width:100%;
+      font-family:inherit;color:#fff;text-align:left;transition:all .2s;
+    }
+    .mapa-btn:hover{border-color:var(--amarillo);background:rgba(255,215,0,.06)}
+    .mapa-pin{font-size:2rem;flex-shrink:0}
+    .mapa-dir{font-size:.95rem;font-weight:700;color:#fff;margin-bottom:3px}
+    .mapa-sub{font-size:.78rem;color:var(--amarillo);font-weight:700}
+
+    /* SEPARADOR */
+    .sep{display:flex;align-items:center;gap:14px;padding:16px 20px 12px;max-width:1100px;margin:0 auto}
+    .sep-line{flex:1;height:1px;background:rgba(255,255,255,.1)}
+    .sep-txt{font-size:1rem;font-weight:900;color:var(--amarillo);text-transform:uppercase;letter-spacing:2px;white-space:nowrap}
+
+    /* GRID OFERTAS */
+    .ofertas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:4px 20px 40px;max-width:1100px;margin:0 auto}
+    @media(max-width:700px){.ofertas-grid{grid-template-columns:repeat(2,1fr);padding:4px 12px 40px;gap:10px}}
+    .card{
+      position:relative;background:#0b1e42;border-radius:14px;overflow:hidden;
+      display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.07);
+      box-shadow:0 4px 20px rgba(0,0,0,.4);transition:transform .2s,box-shadow .2s;
+    }
+    .card:hover{transform:translateY(-5px);box-shadow:0 12px 36px rgba(0,0,0,.6);border-color:rgba(255,215,0,.3)}
+    .badge-of{position:absolute;top:10px;left:10px;z-index:3;background:rgba(6,18,42,.85);padding:4px 11px;border-radius:50px;font-size:.68rem;font-weight:900;color:#fff;display:flex;align-items:center;gap:4px;border:1px solid rgba(255,255,255,.15)}
+    .badge-pct{position:absolute;top:10px;right:10px;z-index:3;background:var(--rojo);color:#fff;padding:5px 11px;border-radius:50px;font-size:.75rem;font-weight:900}
+    .badge-vence{position:absolute;bottom:52px;left:10px;z-index:3;background:rgba(6,18,42,.9);color:var(--amarillo);font-size:.62rem;font-weight:800;padding:3px 9px;border-radius:50px;border:1px solid var(--amarillo)}
+    .card-img{width:100%;aspect-ratio:4/3;background:linear-gradient(135deg,#0d2555,#1a3a7a);display:flex;align-items:center;justify-content:center;font-size:3.5rem;overflow:hidden;flex-shrink:0}
+    .card-img img{width:100%;height:100%;object-fit:cover}
+    .card-body{padding:12px 14px 6px;flex:1;display:flex;flex-direction:column;gap:4px}
+    .card-nombre{font-size:.9rem;font-weight:800;color:#fff;line-height:1.25}
+    .card-desc{font-size:.75rem;color:var(--muted);line-height:1.4;flex:1}
+    .card-precios{padding:10px 14px 0;border-top:1px solid rgba(255,255,255,.06)}
+    .precio-antes{font-size:.78rem;color:rgba(255,255,255,.3);text-decoration:line-through;display:block}
+    .precio-oferta{font-size:clamp(1.5rem,4vw,1.9rem);font-weight:900;color:var(--amarillo);line-height:1;text-shadow:0 2px 10px rgba(255,215,0,.3)}
+    .precio-oferta small{font-size:.95rem;font-weight:700}
+    .ahorro{font-size:.67rem;font-weight:800;color:#4ade80;margin-top:3px;display:block}
+    .card-btn{
+      display:flex;align-items:center;justify-content:center;gap:7px;
+      background:var(--verde);color:#fff;font-size:.82rem;font-weight:900;
+      padding:11px 14px;margin:10px 14px 14px;border-radius:10px;
+      text-decoration:none;box-shadow:0 3px 12px rgba(22,163,74,.35);transition:background .18s;cursor:pointer;
+      border:none;font-family:inherit;width:calc(100% - 28px);
+    }
+    .card-btn:hover{background:#15803d}
+    .empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)}
+    .empty span{display:block;font-size:3rem;margin-bottom:12px}
+
+    footer{text-align:center;padding:16px;font-size:.73rem;color:rgba(255,255,255,.2);border-top:1px solid rgba(255,255,255,.05)}
+    footer a{color:var(--amarillo);text-decoration:none;opacity:.6}
+
+    /* ══ TOAST ══ */
     .toast{
       position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);
       background:#1d3557;color:#fff;padding:11px 24px;border-radius:50px;
-      font-size:.85rem;font-weight:700;z-index:999;
+      font-size:.85rem;font-weight:700;z-index:9999;
       transition:transform .3s cubic-bezier(.34,1.3,.64,1);pointer-events:none;
       box-shadow:0 4px 20px rgba(0,0,0,.3);
     }
     .toast.show{transform:translateX(-50%) translateY(0)}
 
-    /* ── MAPA ── */
-    .mapa-section{max-width:1100px;margin:0 auto;padding:0 20px 28px}
-    .mapa-link{text-decoration:none;display:block}
-    .mapa-preview{
-      display:flex;align-items:center;gap:16px;
-      background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.12);
-      border-radius:14px;padding:16px 20px;
-      transition:border-color .2s,background .2s;
+    /* ══ OVERLAY BASE ══ */
+    .overlay{
+      position:fixed;inset:0;z-index:200;
+      background:rgba(0,0,0,.7);backdrop-filter:blur(6px);
+      display:flex;align-items:flex-end;justify-content:center;
+      padding:0;
+      opacity:0;pointer-events:none;transition:opacity .25s;
     }
-    .mapa-link:hover .mapa-preview{border-color:var(--amarillo);background:rgba(255,215,0,.06)}
-    .mapa-pin{font-size:2rem;flex-shrink:0}
-    .mapa-dir{font-size:.95rem;font-weight:700;color:#fff;margin-bottom:3px}
-    .mapa-sub{font-size:.78rem;color:var(--amarillo);font-weight:700}
+    .overlay.show{opacity:1;pointer-events:all}
+    @media(min-width:600px){.overlay{align-items:center}}
 
-    /* ── SEPARADOR ── */
-    .sep{
-      display:flex;align-items:center;gap:14px;
-      padding:16px 20px 12px;max-width:1100px;margin:0 auto;
+    .modal{
+      background:#0b1e42;border:1px solid rgba(255,255,255,.12);
+      border-radius:24px 24px 0 0;width:100%;max-width:540px;
+      max-height:92vh;overflow-y:auto;
+      transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.1,.64,1);
     }
-    .sep-line{flex:1;height:1px;background:rgba(255,255,255,.1)}
-    .sep-txt{
-      font-size:1rem;font-weight:900;color:var(--amarillo);
-      text-transform:uppercase;letter-spacing:2px;white-space:nowrap;
+    .overlay.show .modal{transform:translateY(0)}
+    @media(min-width:600px){
+      .modal{border-radius:20px;transform:scale(.92);max-height:88vh}
+      .overlay.show .modal{transform:scale(1)}
     }
+    .modal-header{
+      padding:28px 24px 20px;
+      background:linear-gradient(135deg,var(--color),rgba(0,0,0,.4));
+      border-radius:24px 24px 0 0;
+      position:relative;
+    }
+    @media(min-width:600px){.modal-header{border-radius:20px 20px 0 0}}
+    .modal-close{
+      position:absolute;top:14px;right:14px;
+      background:rgba(255,255,255,.15);border:none;color:#fff;
+      width:32px;height:32px;border-radius:50%;font-size:1rem;
+      cursor:pointer;display:flex;align-items:center;justify-content:center;
+      transition:background .2s;
+    }
+    .modal-close:hover{background:rgba(255,255,255,.3)}
+    .modal-body{padding:20px 24px 28px}
 
-    /* ── GRID OFERTAS ── */
-    .ofertas-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:14px;
-      padding:4px 20px 40px;
-      max-width:1100px;margin:0 auto;
+    /* ══ POPUP CERRADO ══ */
+    .cerrado-icon{font-size:3rem;margin-bottom:8px;display:block}
+    .cerrado-title{font-size:1.3rem;font-weight:900;color:#fff;margin-bottom:4px;line-height:1.2}
+    .cerrado-sub{font-size:.85rem;color:rgba(255,255,255,.6);margin-bottom:4px}
+    .cerrado-proxima{
+      display:inline-flex;align-items:center;gap:6px;
+      background:rgba(255,215,0,.15);border:1px solid rgba(255,215,0,.3);
+      color:var(--amarillo);font-size:.78rem;font-weight:800;
+      padding:5px 12px;border-radius:50px;margin-top:8px;
     }
-    @media(max-width:700px){
-      .ofertas-grid{grid-template-columns:repeat(2,1fr);padding:4px 12px 40px;gap:10px}
+    .consulta-promo{
+      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+      border-radius:12px;padding:14px;margin-bottom:18px;
     }
+    .consulta-promo p{font-size:.82rem;color:rgba(255,255,255,.7);line-height:1.5}
+    .consulta-promo strong{color:var(--amarillo)}
+    .form-group{margin-bottom:14px}
+    .form-group label{display:block;font-size:.75rem;font-weight:800;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+    .form-group input,.form-group textarea,.form-group select{
+      width:100%;padding:11px 14px;border:1.5px solid rgba(255,255,255,.15);
+      border-radius:10px;background:rgba(255,255,255,.07);color:#fff;
+      font-family:inherit;font-size:.9rem;transition:border-color .2s;
+    }
+    .form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--color)}
+    .form-group input::placeholder,.form-group textarea::placeholder{color:rgba(255,255,255,.25)}
+    .form-group textarea{resize:none;height:80px}
+    .form-group select option{background:#0b1e42;color:#fff}
+    .btn-enviar{
+      width:100%;padding:14px;border-radius:12px;border:none;
+      background:linear-gradient(90deg,var(--verde),#22c55e);
+      color:#fff;font-size:1rem;font-weight:900;
+      cursor:pointer;font-family:inherit;letter-spacing:.5px;
+      box-shadow:0 4px 18px rgba(22,163,74,.4);transition:all .2s;
+    }
+    .btn-enviar:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(22,163,74,.5)}
+    .btn-enviar:disabled{opacity:.5;cursor:not-allowed;transform:none}
 
-    /* CARD */
-    .card{
-      position:relative;background:#0b1e42;border-radius:14px;
-      overflow:hidden;display:flex;flex-direction:column;
-      border:1px solid rgba(255,255,255,.07);
-      box-shadow:0 4px 20px rgba(0,0,0,.4);
-      transition:transform .2s,box-shadow .2s;
+    /* SUCCESS */
+    .success-screen{text-align:center;padding:20px 0}
+    .success-icon{font-size:4rem;margin-bottom:12px;display:block;animation:popIn .5s cubic-bezier(.34,1.6,.64,1)}
+    @keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+    .success-title{font-size:1.3rem;font-weight:900;color:#fff;margin-bottom:8px}
+    .success-msg{font-size:.88rem;color:rgba(255,255,255,.6);line-height:1.6;margin-bottom:16px}
+    .success-highlight{
+      background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);
+      border-radius:12px;padding:14px;margin-bottom:20px;
     }
-    .card:hover{transform:translateY(-5px);box-shadow:0 12px 36px rgba(0,0,0,.6);border-color:rgba(255,215,0,.3)}
-    .badge-of{
-      position:absolute;top:10px;left:10px;z-index:3;
-      background:rgba(6,18,42,.85);padding:4px 11px;border-radius:50px;
-      font-size:.68rem;font-weight:900;color:#fff;
-      display:flex;align-items:center;gap:4px;border:1px solid rgba(255,255,255,.15);
+    .success-highlight p{font-size:.85rem;color:rgba(255,255,255,.8);line-height:1.55}
+    .success-highlight strong{color:var(--amarillo)}
+    .btn-cerrar-success{
+      width:100%;padding:13px;border-radius:12px;border:2px solid rgba(255,255,255,.2);
+      background:transparent;color:#fff;font-size:.9rem;font-weight:800;
+      cursor:pointer;font-family:inherit;transition:all .2s;
     }
-    .badge-pct{
-      position:absolute;top:10px;right:10px;z-index:3;
-      background:var(--rojo);color:#fff;
-      padding:5px 11px;border-radius:50px;
-      font-size:.75rem;font-weight:900;
-    }
-    .badge-vence{
-      position:absolute;bottom:52px;left:10px;z-index:3;
-      background:rgba(6,18,42,.9);color:var(--amarillo);
-      font-size:.62rem;font-weight:800;padding:3px 9px;border-radius:50px;
-      border:1px solid var(--amarillo);
-    }
-    .card-img{
-      width:100%;aspect-ratio:4/3;
-      background:linear-gradient(135deg,#0d2555,#1a3a7a);
-      display:flex;align-items:center;justify-content:center;
-      font-size:3.5rem;overflow:hidden;flex-shrink:0;
-    }
-    .card-img img{width:100%;height:100%;object-fit:cover}
-    .card-body{padding:12px 14px 6px;flex:1;display:flex;flex-direction:column;gap:4px}
-    .card-nombre{font-size:.9rem;font-weight:800;color:#fff;line-height:1.25}
-    .card-desc{font-size:.75rem;color:var(--muted);line-height:1.4;flex:1}
-    .card-precios{
-      padding:10px 14px 0;border-top:1px solid rgba(255,255,255,.06);
-    }
-    .precio-antes{font-size:.78rem;color:rgba(255,255,255,.3);text-decoration:line-through;display:block}
-    .precio-oferta{
-      font-size:clamp(1.5rem,4vw,1.9rem);font-weight:900;
-      color:var(--amarillo);line-height:1;
-      text-shadow:0 2px 10px rgba(255,215,0,.3);
-    }
-    .precio-oferta small{font-size:.95rem;font-weight:700}
-    .ahorro{font-size:.67rem;font-weight:800;color:#4ade80;margin-top:3px;display:block}
-    .card-btn{
-      display:flex;align-items:center;justify-content:center;gap:7px;
-      background:var(--verde);color:#fff;
-      font-size:.82rem;font-weight:900;
-      padding:11px 14px;margin:10px 14px 14px;
-      border-radius:10px;text-decoration:none;
-      box-shadow:0 3px 12px rgba(22,163,74,.35);
-      transition:background .18s;
-    }
-    .card-btn:hover{background:#15803d}
+    .btn-cerrar-success:hover{background:rgba(255,255,255,.1)}
 
-    /* empty */
-    .empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)}
-    .empty span{display:block;font-size:3rem;margin-bottom:12px}
-
-    footer{
-      text-align:center;padding:16px;font-size:.73rem;
-      color:rgba(255,255,255,.2);border-top:1px solid rgba(255,255,255,.05);
+    /* ══ POPUP MAPA ══ */
+    .mapa-embed{width:100%;height:240px;border-radius:12px;overflow:hidden;margin-bottom:16px;border:1px solid rgba(255,255,255,.1)}
+    .mapa-embed iframe{width:100%;height:100%;border:none}
+    .mapa-acciones{display:flex;flex-direction:column;gap:10px}
+    .btn-ruta{
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      padding:13px;border-radius:12px;font-size:.92rem;font-weight:900;
+      cursor:pointer;font-family:inherit;text-decoration:none;transition:all .2s;
     }
-    footer a{color:var(--amarillo);text-decoration:none;opacity:.6}
+    .btn-ruta.principal{background:var(--amarillo);color:#06122a;border:none}
+    .btn-ruta.principal:hover{background:#ffd000;transform:translateY(-2px)}
+    .btn-ruta.secundario{background:rgba(255,255,255,.08);color:#fff;border:2px solid rgba(255,255,255,.2)}
+    .btn-ruta.secundario:hover{background:rgba(255,255,255,.15)}
+    .btn-ruta.guardar{background:rgba(22,163,74,.15);color:#4ade80;border:2px solid #16a34a}
+    .btn-ruta.guardar:hover{background:rgba(22,163,74,.25)}
+    .mapa-estado-badge{
+      text-align:center;padding:8px;border-radius:10px;margin-bottom:12px;
+      font-size:.82rem;font-weight:800;
+    }
+    .mapa-estado-badge.abierto{background:rgba(22,163,74,.15);color:#4ade80}
+    .mapa-estado-badge.cerrado{background:rgba(230,57,70,.15);color:#ff8f96}
   </style>
 </head>
 <body>
-
 <div class="bg"></div>
 <div class="bg-ov"></div>
 <div class="page">
 
   <header class="header">
     <a href="pack.html" class="marca" id="btnMarca">Comercial<span>Web</span></a>
-    <a href="pack.html" class="btn-volver" id="btnVolver">← Ver todos los comercios</a>
+    <a href="pack.html" class="btn-volver" id="btnVolver">← Volver al pack</a>
   </header>
 
   <div id="perfilSection"></div>
+  <div id="horarioSection"></div>
   <div id="mapaSection"></div>
 
   <div class="sep">
@@ -262,15 +326,120 @@
   </footer>
 </div>
 
-<div class="toast" id="toast">✓ ¡Enlace copiado!</div>
+<div class="toast" id="toast"></div>
+
+<!-- ══ POPUP CERRADO ══ -->
+<div class="overlay" id="overlayCerrado" onclick="if(event.target===this)closeModal('overlayCerrado')">
+  <div class="modal" id="modalCerrado">
+    <div class="modal-header" id="cerradoHeader">
+      <button class="modal-close" onclick="closeModal('overlayCerrado')">✕</button>
+      <span class="cerrado-icon">🔒</span>
+      <div class="cerrado-title" id="cerradoTitle"></div>
+      <div class="cerrado-sub" id="cerradoSub"></div>
+      <div class="cerrado-proxima" id="cerradoProxima"></div>
+    </div>
+    <div class="modal-body">
+      <div class="consulta-promo">
+        <p>🎁 Dejá tu consulta ahora y te responderemos <strong>apenas abramos</strong>.<br>El precio de oferta <strong>quedará reservado</strong> para vos.</p>
+      </div>
+      <div id="cerradoFormWrap">
+        <div class="form-group">
+          <label>Tu nombre *</label>
+          <input type="text" id="cNombre" placeholder="Ej: Juan García"/>
+        </div>
+        <div class="form-group">
+          <label>Tu teléfono *</label>
+          <input type="tel" id="cTelefono" placeholder="+54 9 2954 000000"/>
+        </div>
+        <div class="form-group">
+          <label>Oferta que te interesa</label>
+          <select id="cOferta"></select>
+        </div>
+        <div class="form-group">
+          <label>Tu consulta</label>
+          <textarea id="cConsulta" placeholder="¿Qué querés saber? ¿Necesitás más información?"></textarea>
+        </div>
+        <button class="btn-enviar" onclick="enviarConsulta()">📨 Enviar consulta</button>
+      </div>
+      <div id="cerradoSuccess" style="display:none">
+        <div class="success-screen">
+          <span class="success-icon">✅</span>
+          <div class="success-title">¡Consulta enviada!</div>
+          <div class="success-msg">Recibimos tu consulta y te contactaremos al número indicado.</div>
+          <div class="success-highlight" id="successMsg"></div>
+          <button class="btn-cerrar-success" onclick="closeModal('overlayCerrado')">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ POPUP MAPA ══ -->
+<div class="overlay" id="overlayMapa" onclick="if(event.target===this)closeModal('overlayMapa')">
+  <div class="modal" id="modalMapa">
+    <div class="modal-header" id="mapaHeader" style="background:linear-gradient(135deg,#1a3a7a,#06122a)">
+      <button class="modal-close" onclick="closeModal('overlayMapa')">✕</button>
+      <span style="font-size:1.8rem;display:block;margin-bottom:6px">📍</span>
+      <div style="font-size:1.1rem;font-weight:900;color:#fff" id="mapaNombre"></div>
+      <div style="font-size:.82rem;color:rgba(255,255,255,.6);margin-top:3px" id="mapaAddr"></div>
+    </div>
+    <div class="modal-body">
+      <div class="mapa-estado-badge" id="mapaEstadoBadge"></div>
+      <div class="mapa-embed" id="mapaEmbed"></div>
+      <div class="mapa-acciones" id="mapaAcciones"></div>
+    </div>
+  </div>
+</div>
 
 <script type="module">
 import { supabase } from '../src/supabase.js';
 
-// Hash: #comercio-{id}  ej: #comercio-3
+/* ══════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════ */
+const DIAS_ES = ['domingo','lunes','martes','miercoles','jueves','viernes','sabado'];
+const DIAS_LABEL = {lunes:'Lun',martes:'Mar',miercoles:'Mié',jueves:'Jue',viernes:'Vie',sabado:'Sáb',domingo:'Dom'};
+
+function isOpen(horario) {
+  if (!horario || Object.keys(horario).length === 0) return true;
+  const now   = new Date();
+  const today = DIAS_ES[now.getDay()];
+  const sched = horario[today];
+  if (!sched) return false;
+  const cur   = now.getHours() * 60 + now.getMinutes();
+  const [ah,am] = sched.abre.split(':').map(Number);
+  const [ch,cm] = sched.cierra.split(':').map(Number);
+  return cur >= ah*60+am && cur <= ch*60+cm;
+}
+
+function proximaApertura(horario) {
+  if (!horario || Object.keys(horario).length === 0) return null;
+  const now  = new Date();
+  for (let i = 1; i <= 7; i++) {
+    const d    = new Date(now); d.setDate(d.getDate() + i);
+    const key  = DIAS_ES[d.getDay()];
+    const sch  = horario[key];
+    if (sch) return `${DIAS_LABEL[key]} ${sch.abre}hs`;
+  }
+  return null;
+}
+
+window.closeModal = (id) => {
+  document.getElementById(id).classList.remove('show');
+};
+
+function showToast(msg, dur=3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+/* ══════════════════════════════════════════════
+   CARGAR DATOS
+══════════════════════════════════════════════ */
 const cid = parseInt(location.hash.replace('#','').replace('comercio-','')) || 0;
 
-/* ── CARGAR DATOS ── */
 const { data: com, error } = await supabase
   .from('comercios')
   .select(`*, ofertas(*), packs(id, tipo)`)
@@ -288,18 +457,17 @@ if (!com || error) {
   document.getElementById('ofertasTitulo').textContent = '';
 } else {
   document.title = `${com.nombre} — ComercialWeb`;
-  const color = com.color || '#e63946';
+  const color   = com.color || '#e63946';
+  const horario = com.horario || {};
+  const abierto = isOpen(horario);
   document.documentElement.style.setProperty('--color', color);
 
   /* ── PERFIL ── */
-  const ini = com.inicial || (com.nombre||'??').substring(0,2).toUpperCase();
+  const ini      = com.inicial || (com.nombre||'??').substring(0,2).toUpperCase();
   const logoHtml = com.logo_url
     ? `<img src="${com.logo_url}" alt="${com.nombre}" onerror="this.style.display='none'">`
     : `<span>${ini}</span>`;
-
-  const waMsg = encodeURIComponent(`Hola ${com.nombre}! Los contacto desde ComercialWeb. ¿Me pueden brindar información?`);
-  const waUrl = `https://wa.me/${com.whatsapp||''}?text=${waMsg}`;
-  const addr  = [com.direccion, com.ciudad, com.provincia].filter(Boolean).join(', ');
+  const addr = [com.direccion, com.ciudad, com.provincia].filter(Boolean).join(', ');
 
   document.getElementById('perfilSection').innerHTML = `
     <div class="perfil-section">
@@ -307,69 +475,88 @@ if (!com || error) {
         <div class="perfil-logo" style="background:${color};border-color:${color}">${logoHtml}</div>
         <div class="perfil-info">
           ${com.rubro ? `<div class="perfil-rubro" style="background:${color}">${com.rubro}</div>` : ''}
+          <div class="${abierto?'estado-badge abierto':'estado-badge cerrado'}">
+            <span class="estado-dot"></span>
+            ${abierto ? 'Abierto ahora' : 'Cerrado ahora'}
+          </div>
           <h1 class="perfil-nombre">${com.nombre}</h1>
           <div class="datos-grid">
             ${addr ? `<div class="dato"><span class="dato-ico">📍</span><div class="dato-txt"><span class="dato-lbl">Dirección</span>${addr}</div></div>` : ''}
             ${com.telefono ? `<div class="dato"><span class="dato-ico">📞</span><div class="dato-txt"><span class="dato-lbl">Teléfono</span>${com.telefono}</div></div>` : ''}
             ${com.telefono_ventas ? `<div class="dato"><span class="dato-ico">🛒</span><div class="dato-txt"><span class="dato-lbl">Ventas</span>${com.telefono_ventas}</div></div>` : ''}
             ${com.mail ? `<div class="dato"><span class="dato-ico">✉️</span><div class="dato-txt"><span class="dato-lbl">Email</span><a href="mailto:${com.mail}" style="color:inherit">${com.mail}</a></div></div>` : ''}
-            ${com.whatsapp ? `<div class="dato"><span class="dato-ico">💬</span><div class="dato-txt"><span class="dato-lbl">WhatsApp</span>${com.whatsapp}</div></div>` : ''}
           </div>
           <div class="acciones">
-            ${com.whatsapp ? `<a href="${waUrl}" target="_blank" class="btn-wa-grande">💬 Escribinos por WhatsApp</a>` : ''}
+            ${com.whatsapp
+              ? abierto
+                ? `<a href="https://wa.me/${com.whatsapp}?text=${encodeURIComponent('Hola '+com.nombre+'! Los contacto desde ComercialWeb.')}" target="_blank" class="btn-wa-grande">💬 WhatsApp</a>`
+                : `<button class="btn-wa-grande cerrado-btn" onclick="abrirPopupCerrado()">💬 WhatsApp — Dejar consulta</button>`
+              : ''}
             <button class="btn-compartir" onclick="compartir()">📤 Compartir</button>
           </div>
         </div>
       </div>
     </div>`;
 
+  /* ── HORARIO ── */
+  if (Object.keys(horario).length > 0) {
+    const todayKey = DIAS_ES[new Date().getDay()];
+    const diasHtml = Object.entries(DIAS_LABEL).map(([key, label]) => {
+      const sch = horario[key];
+      const esHoy = key === todayKey;
+      const cls  = !sch ? 'cerrado' : esHoy ? 'abierto-hoy hoy' : 'abierto';
+      const txt  = sch ? `${label} ${sch.abre}–${sch.cierra}` : `${label} Cerrado`;
+      return `<div class="horario-dia-chip ${cls}">${txt}</div>`;
+    }).join('');
+    document.getElementById('horarioSection').innerHTML = `
+      <div class="horario-section">
+        <div class="horario-title">🕐 Horario de atención</div>
+        <div class="horario-dias">${diasHtml}</div>
+      </div>`;
+  }
+
   /* ── MAPA ── */
   if (addr) {
-    const mapQ   = encodeURIComponent(addr);
-    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${mapQ}`;
     document.getElementById('mapaSection').innerHTML = `
       <div class="mapa-section">
-        <a href="${mapUrl}" target="_blank" rel="noopener" class="mapa-link">
-          <div class="mapa-preview">
-            <span class="mapa-pin">📍</span>
-            <div>
-              <div class="mapa-dir">${addr}</div>
-              <div class="mapa-sub">Tocá para ver en Google Maps →</div>
-            </div>
+        <button class="mapa-btn" onclick="abrirMapa()">
+          <span class="mapa-pin">📍</span>
+          <div>
+            <div class="mapa-dir">${addr}</div>
+            <div class="mapa-sub">Tocá para ver en el mapa →</div>
           </div>
-        </a>
+        </button>
       </div>`;
   }
 
   /* ── OFERTAS ── */
-  const ofertas = (com.ofertas || [])
-    .filter(o => o.activo)
-    .sort((a,b) => a.orden - b.orden);
-
+  const ofertas = (com.ofertas || []).filter(o => o.activo).sort((a,b) => a.orden - b.orden);
   document.getElementById('ofertasTitulo').textContent =
     `🏷️ ${ofertas.length} oferta${ofertas.length!==1?'s':''} de ${com.nombre}`;
 
   const fmt  = n => '$ ' + (n||0).toLocaleString('es-AR');
   const grid = document.getElementById('ofertasGrid');
-
   if (!ofertas.length) {
     grid.innerHTML = '<div class="empty"><span>🏷️</span>No hay ofertas cargadas aún.</div>';
   } else {
     const waBase = `https://wa.me/${com.whatsapp||''}`;
     grid.innerHTML = ofertas.map(o => {
-      const off    = o.descuento || (o.precio_real && o.precio_oferta ? Math.round((1 - o.precio_oferta/o.precio_real)*100) : 0);
-      const ahorro = o.precio_real && o.precio_oferta ? o.precio_real - o.precio_oferta : 0;
-      const waOfMsg = encodeURIComponent(`Hola! Vi la oferta *"${o.nombre}"* en ComercialWeb y me gustaría consultarles. ¿Me dan más información?`);
-      const waOf   = `${waBase}?text=${waOfMsg}`;
-      const imgHtml = o.imagen_url ? `<img src="${o.imagen_url}" alt="${o.nombre}">` : `<span>🏷️</span>`;
-      const vence  = o.vence
-        ? `<div class="badge-vence">⏰ Hasta ${new Date(o.vence).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})}</div>`
-        : '';
+      const off   = o.descuento || (o.precio_real&&o.precio_oferta ? Math.round((1-o.precio_oferta/o.precio_real)*100) : 0);
+      const ahorro = o.precio_real&&o.precio_oferta ? o.precio_real - o.precio_oferta : 0;
+      const waMsg  = encodeURIComponent(`Hola! Vi la oferta *"${o.nombre}"* en ComercialWeb. ¿Me dan más info?`);
+      const imgH   = o.imagen_url ? `<img src="${o.imagen_url}" alt="${o.nombre}">` : `<span>🏷️</span>`;
+      const vence  = o.vence ? `<div class="badge-vence">⏰ Hasta ${new Date(o.vence).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})}</div>` : '';
+
+      // botón WA o consulta cerrado
+      const btnHtml = abierto
+        ? `<a href="${waBase}?text=${waMsg}" target="_blank" class="card-btn">🛒 ¡Compralo Ya!</a>`
+        : `<button class="card-btn" onclick="abrirPopupCerrado('${o.nombre?.replace(/'/g,"\\'")||""}')" style="background:rgba(230,57,70,.7)">🔒 Cerrado — Dejar consulta</button>`;
+
       return `
         <div class="card">
           <div class="badge-of">🏷️ OFERTA</div>
           ${off ? `<div class="badge-pct">${off}% OFF</div>` : ''}
-          <div class="card-img">${imgHtml}</div>
+          <div class="card-img">${imgH}</div>
           ${vence}
           <div class="card-body">
             <div class="card-nombre">${o.nombre||''}</div>
@@ -380,25 +567,125 @@ if (!com || error) {
             <div class="precio-oferta"><small>$</small> ${(o.precio_oferta||0).toLocaleString('es-AR')}</div>
             ${ahorro > 0 ? `<span class="ahorro">✓ Ahorrás ${fmt(ahorro)}</span>` : ''}
           </div>
-          <a href="${waOf}" target="_blank" rel="noopener" class="card-btn">🛒 ¡Compralo Ya!</a>
+          ${btnHtml}
         </div>`;
     }).join('');
   }
-}
 
-/* ── COMPARTIR ── */
-window.compartir = () => {
-  const url = location.href;
-  if (navigator.share) {
-    navigator.share({ title: document.title, url });
-  } else {
-    navigator.clipboard.writeText(url).then(() => {
-      const t = document.getElementById('toast');
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2500);
-    });
-  }
-};
+  /* ══ POPUP CERRADO ══ */
+  window.abrirPopupCerrado = (ofertaPreseleccionada = '') => {
+    const proxima = proximaApertura(horario);
+    document.getElementById('cerradoHeader').style.background =
+      `linear-gradient(135deg,${color},rgba(0,0,0,.5))`;
+    document.getElementById('cerradoTitle').textContent = `${com.nombre} está cerrado ahora`;
+    document.getElementById('cerradoSub').textContent   = 'Pero podés dejar tu consulta y te contactamos en cuanto abramos.';
+    document.getElementById('cerradoProxima').innerHTML  = proxima
+      ? `🕐 Próxima apertura: ${proxima}`
+      : '';
+
+    // cargar ofertas en select
+    const sel = document.getElementById('cOferta');
+    sel.innerHTML = '<option value="">— Elegí una oferta —</option>' +
+      ofertas.map(o => `<option value="${o.nombre}" ${o.nombre===ofertaPreseleccionada?'selected':''}>${o.nombre} — ${fmt(o.precio_oferta)}</option>`).join('');
+
+    document.getElementById('cerradoFormWrap').style.display = 'block';
+    document.getElementById('cerradoSuccess').style.display  = 'none';
+    document.getElementById('overlayCerrado').classList.add('show');
+  };
+
+  window.enviarConsulta = () => {
+    const nombre   = document.getElementById('cNombre').value.trim();
+    const telefono = document.getElementById('cTelefono').value.trim();
+    const oferta   = document.getElementById('cOferta').value;
+    const consulta = document.getElementById('cConsulta').value.trim();
+
+    if (!nombre || !telefono) { showToast('⚠️ Completá nombre y teléfono'); return; }
+
+    const destino = com.telefono_ventas || com.whatsapp;
+    if (!destino) { showToast('⚠️ Este comercio no tiene número de contacto'); return; }
+
+    const proxima = proximaApertura(horario);
+    const msg = encodeURIComponent(
+      `🛒 *Nueva consulta — ComercialWeb*\n` +
+      `👤 Cliente: ${nombre}\n` +
+      `📱 Teléfono: ${telefono}\n` +
+      `${oferta ? `🏷️ Oferta: ${oferta}\n` : ''}` +
+      `💬 Consulta: ${consulta || '(sin comentarios)'}\n\n` +
+      `⏰ Enviado mientras el local estaba cerrado.\n` +
+      `✅ El cliente pidió que se respete el precio de oferta.`
+    );
+
+    // abrir WA al número de ventas
+    const waNum = destino.replace(/\D/g,'');
+    window.open(`https://wa.me/${waNum}?text=${msg}`, '_blank');
+
+    // mostrar pantalla de éxito
+    document.getElementById('cerradoFormWrap').style.display = 'none';
+    document.getElementById('cerradoSuccess').style.display  = 'block';
+    document.getElementById('successMsg').innerHTML = `
+      <p>
+        🙋 <strong>${nombre}</strong>, apenas <strong>${com.nombre}</strong> abra,
+        te contactarán al <strong>${telefono}</strong>.
+        ${proxima ? `<br>📅 Próxima apertura: <strong>${proxima}</strong>.` : ''}
+        ${oferta ? `<br>🏷️ Tu oferta <strong>"${oferta}"</strong> quedará con el precio reservado.` : ''}
+      </p>`;
+  };
+
+  /* ══ POPUP MAPA ══ */
+  window.abrirMapa = () => {
+    document.getElementById('mapaNombre').textContent = com.nombre;
+    document.getElementById('mapaAddr').textContent   = addr;
+
+    const estadoBadge = document.getElementById('mapaEstadoBadge');
+    estadoBadge.className = `mapa-estado-badge ${abierto?'abierto':'cerrado'}`;
+    estadoBadge.textContent = abierto ? '🟢 Abierto ahora' : '🔴 Cerrado en este momento';
+
+    // mapa embed
+    const mapQ = encodeURIComponent(addr);
+    document.getElementById('mapaEmbed').innerHTML =
+      `<iframe src="https://maps.google.com/maps?q=${mapQ}&output=embed&z=16" loading="lazy"></iframe>`;
+
+    // acciones
+    const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${mapQ}`;
+    const mapsUrl       = `https://www.google.com/maps/search/?api=1&query=${mapQ}`;
+
+    let accionesHtml = `
+      <a href="${directionsUrl}" target="_blank" rel="noopener" class="btn-ruta principal">
+        🧭 Cómo llegar — Iniciar viaje
+      </a>
+      <a href="${mapsUrl}" target="_blank" rel="noopener" class="btn-ruta secundario">
+        🗺️ Ver en Google Maps
+      </a>`;
+
+    if (!abierto) {
+      accionesHtml += `
+        <button class="btn-ruta guardar" onclick="guardarDireccion()">
+          📌 Guardar dirección para cuando abra
+        </button>`;
+    }
+
+    document.getElementById('mapaAcciones').innerHTML = accionesHtml;
+    document.getElementById('overlayMapa').classList.add('show');
+  };
+
+  window.guardarDireccion = () => {
+    const saved = JSON.parse(localStorage.getItem('cw_direcciones') || '[]');
+    const nueva = { nombre: com.nombre, direccion: addr, color, guardada: new Date().toISOString() };
+    if (!saved.find(s => s.nombre === com.nombre)) saved.push(nueva);
+    localStorage.setItem('cw_direcciones', JSON.stringify(saved));
+    showToast(`📌 Dirección de ${com.nombre} guardada`);
+    document.getElementById('overlayMapa').classList.remove('show');
+  };
+
+  /* ── COMPARTIR ── */
+  window.compartir = () => {
+    if (navigator.share) {
+      navigator.share({ title: `${com.nombre} — ComercialWeb`, url: location.href });
+    } else {
+      navigator.clipboard.writeText(location.href).then(() => showToast('✓ ¡Enlace copiado!'));
+    }
+  };
+}
 </script>
 </body>
 </html>
