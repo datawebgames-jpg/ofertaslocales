@@ -406,7 +406,12 @@ if(type && !isNaN(idxOrId) && idxOrId > 0){
     const maxC = type==='exclusivo' ? 1 : type==='barrio' ? 3 : 5;
     data.comercios = (data.comercios||[]).sort((a,b)=>a.orden-b.orden).slice(0, maxC);
     data.comercios.forEach(c=>{
-      c.ofertas=(c.ofertas||[]).filter(o=>o.activo).sort((a,b)=>a.orden-b.orden);
+      // En el pack solo mostrar destacadas (máx según tipo)
+      const maxDest = type==='exclusivo' ? 6 : type==='barrio' ? 3 : 2;
+      c.ofertas=(c.ofertas||[])
+        .filter(o=>o.activo && o.destacado)
+        .sort((a,b)=>a.orden-b.orden)
+        .slice(0, maxDest);
       c.whatsapp=c.whatsapp||''; c.color=c.color||'#1d3557';
       c.logo=c.logo_url||''; c.nombre=c.nombre||''; c.rubro=c.rubro||'';
       c.ofertas.forEach(o=>{
@@ -549,7 +554,7 @@ function renderGrid(){
   });
 
   if(!cards.length){
-    grid.innerHTML='<div class="empty"><span>🏷️</span>No hay ofertas cargadas aún.</div>';
+    grid.innerHTML='<div class="empty"><span>⭐</span>Aún no hay ofertas destacadas.<br><small style="font-size:.75rem;opacity:.6">El admin debe tildar "⭐ Destacar en pack" en cada oferta.</small></div>';
     return;
   }
 

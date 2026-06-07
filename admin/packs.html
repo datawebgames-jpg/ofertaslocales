@@ -631,9 +631,23 @@ function buildOfertaForm(packId, ci, n, o, comercioId) {
   const desc    = o.descuento     || '';
   const calcDesc = (pReal && pOferta) ? Math.round((1 - pOferta/pReal)*100) + '% OFF' : '';
 
+  // Determinar cuántas destacadas puede tener este pack
+  const pack = packsCache[currentType]?.find(p => p.id == packId);
+  const maxDest = pack?.tipo === 'exclusivo' ? 6 : pack?.tipo === 'barrio' ? 3 : 2;
+  const com     = pack?.comercios[ci];
+  const destActuales = (com?.ofertas||[]).filter(of => of.destacado && of.orden !== n).length;
+  const puedeDestacar = o.destacado || destActuales < maxDest;
+
   return `
     <div class="oferta-form" id="ofertaForm-inner-${packId}-${ci}">
-      <div style="font-size:.82rem;font-weight:800;color:var(--rojo);margin-bottom:10px">Oferta #${n} ${o.id ? `<span style="color:var(--muted);font-weight:600;font-size:.72rem">(id ${o.id})</span>` : '(nueva)'}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div style="font-size:.82rem;font-weight:800;color:var(--rojo)">Oferta #${n} ${o.id ? `<span style="color:var(--muted);font-weight:600;font-size:.72rem">(id ${o.id})</span>` : '(nueva)'}</div>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 14px;border-radius:8px;border:2px solid ${o.destacado?'#e6a800':'var(--border)'};background:${o.destacado?'rgba(255,215,0,.12)':'var(--gris)'};transition:all .2s" id="destLabel-${packId}-${ci}">
+          <input type="checkbox" id="of-dest-${packId}-${ci}" ${o.destacado?'checked':''} ${!puedeDestacar?'disabled':''} onchange="toggleDestacado('${packId}',${ci},${maxDest},this)" style="width:16px;height:16px;accent-color:#e6a800">
+          <span style="font-size:.78rem;font-weight:800;color:${o.destacado?'#cc8800':'var(--muted)'}">⭐ Destacar en pack</span>
+          <span style="font-size:.68rem;color:var(--muted)">(${destActuales}/${maxDest})</span>
+        </label>
+      </div>
       <div class="oferta-form-grid">
         <div class="form-field" style="grid-column:1/-1">
           <label>Imagen del producto</label>
@@ -929,6 +943,7 @@ window.saveOferta = async (packId, ci, n, comercioId, ofertaId) => {
     vence:         document.getElementById(`of-vence-${packId}-${ci}`)?.value  || null,
     imagen_url,
     activo:        true,
+    destacado:     document.getElementById(`of-dest-${packId}-${ci}`)?.checked || false,
   };
 
   setSaveStatus('saving','⏳ Guardando oferta...');
@@ -956,6 +971,32 @@ window.saveOferta = async (packId, ci, n, comercioId, ofertaId) => {
   // invalidar caché
   delete packsCache[currentType];
   if (btn) { btn.disabled = false; btn.textContent = `💾 Guardar oferta #${n}`; }
+};
+
+window.toggleDestacado = (packId, ci, maxDest, checkbox) => {
+  const pack = packsCache[currentType]?.find(p => p.id == packId);
+  const com  = pack?.comercios[ci];
+  const n    = parseInt(document.getElementById(`ofSel-${packId}-${ci}`)?.value) || 1;
+  const destActuales = (com?.ofertas||[]).filter(of => of.destacado && of.orden !== n).length;
+
+  if (checkbox.checked && destActuales >= maxDest) {
+    checkbox.checked = false;
+    showToast(`⭐ Máximo ${maxDest} destacada${maxDest > 1 ? 's' : ''} por comercio en este pack`);
+    return;
+  }
+
+  const label = document.getElementById(`destLabel-${packId}-${ci}`);
+  if (label) {
+    label.style.borderColor = checkbox.checked ? '#e6a800' : 'var(--border)';
+    label.style.background  = checkbox.checked ? 'rgba(255,215,0,.12)' : 'var(--gris)';
+    label.querySelector('span').style.color = checkbox.checked ? '#cc8800' : 'var(--muted)';
+  }
+  // actualizar contador visible
+  const cntEl = label?.querySelector('span:last-child');
+  if (cntEl) {
+    const nuevos = destActuales + (checkbox.checked ? 1 : 0);
+    cntEl.textContent = `(${nuevos}/${maxDest})`;
+  }
 };
 
 window.deleteOferta = async (ofertaId, packId, ci, n) => {
