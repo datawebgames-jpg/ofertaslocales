@@ -445,12 +445,19 @@ function buildPackRow(pack, i) {
 }
 
 function buildPackBody(pack) {
-  const comTabs = (pack.comercios||[]).map((c, i) => `
+  const cfg = TIPOS[pack.tipo] || TIPOS.comunidad;
+  const maxC = cfg.numComercios;
+
+  // Asegurar exactamente maxC slots (rellenar con vacíos si faltan)
+  const rawComs = (pack.comercios || []).slice(0, maxC);
+  while (rawComs.length < maxC) rawComs.push({ id: null, nombre:'', rubro:'', whatsapp:'', telefono:'', telefono_ventas:'', mail:'', direccion:'', ciudad:'', provincia:'', color:'#1d3557', logo_url:'', horario:{}, ofertas:[] });
+
+  const comTabs = rawComs.map((c, i) => `
     <button class="com-tab ${i===0?'active':''}" onclick="switchComercio('${pack.id}',${i},this)">
       ${esc(c.nombre || `Comercio ${i+1}`)}
     </button>`).join('');
 
-  const comForms = (pack.comercios||[]).map((c, ci) => buildComercioForm(pack, ci, c)).join('');
+  const comForms = rawComs.map((c, ci) => buildComercioForm(pack, ci, c)).join('');
 
   return `
     <div class="pack-nombre-row">

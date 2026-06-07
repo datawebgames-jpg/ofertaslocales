@@ -403,7 +403,8 @@ if(type && !isNaN(idxOrId) && idxOrId > 0){
     .eq('activo', true)
     .single();
   if(data){
-    data.comercios = (data.comercios||[]).sort((a,b)=>a.orden-b.orden);
+    const maxC = type==='exclusivo' ? 1 : type==='barrio' ? 3 : 5;
+    data.comercios = (data.comercios||[]).sort((a,b)=>a.orden-b.orden).slice(0, maxC);
     data.comercios.forEach(c=>{
       c.ofertas=(c.ofertas||[]).filter(o=>o.activo).sort((a,b)=>a.orden-b.orden);
       c.whatsapp=c.whatsapp||''; c.color=c.color||'#1d3557';
