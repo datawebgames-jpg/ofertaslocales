@@ -10,7 +10,7 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'DM Sans',system-ui,sans-serif;background:#06122a;color:#fff;min-height:100vh;overflow-x:hidden}
 
-    /* ── FONDO ESTADIO ── */
+    /* ── FONDO ── */
     .bg{position:fixed;inset:0;z-index:0;background:url('../images/hero.jpg') center/cover no-repeat,#06122a;filter:brightness(.35) saturate(1.2)}
     .bg-ov{position:fixed;inset:0;z-index:1;background:rgba(6,18,42,.75)}
     .page{position:relative;z-index:2}
@@ -42,15 +42,20 @@
     }
     .hero-sub-pill .cursor{animation:blink 1s step-end infinite;font-size:1rem}
     @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+    .hero-pack-name{
+      margin-top:10px;font-size:clamp(.78rem,2.5vw,1rem);
+      color:rgba(255,255,255,.45);font-weight:700;letter-spacing:1px;text-transform:uppercase;
+    }
 
     /* ══════════════════════════════
-       LOGOS / RUBROS CIRCULARES
+       LOGOS COMUNIDAD (5) / BARRIO (3)
     ══════════════════════════════ */
     .logos-section{padding:24px 10px 20px;display:flex;justify-content:center}
     .logos-row{
       display:flex;justify-content:center;flex-wrap:nowrap;
       gap:clamp(6px,1.5vw,18px);width:100%;max-width:1200px;
     }
+    .logos-row.barrio{max-width:700px;gap:clamp(14px,3vw,36px)}
 
     .logo-btn{
       flex:1;min-width:0;max-width:200px;
@@ -59,9 +64,9 @@
       background:none;border:none;padding:0;
       transition:transform .25s cubic-bezier(.34,1.4,.64,1);
     }
+    .logos-row.barrio .logo-btn{max-width:220px}
     .logo-btn:hover{transform:translateY(-8px)}
 
-    /* círculo */
     .logo-circle{
       width:100%;padding-bottom:100%;height:0;
       border-radius:50%;border:4px solid rgba(255,255,255,.4);
@@ -89,7 +94,6 @@
       filter:drop-shadow(0 3px 8px rgba(0,0,0,.5));
     }
 
-    /* etiqueta / label button */
     .logo-label{
       margin-top:9px;width:100%;padding:9px 6px;
       border-radius:8px;border:2px solid rgba(255,255,255,.2);
@@ -100,17 +104,63 @@
       display:flex;align-items:center;justify-content:center;
       transition:all .2s;box-shadow:0 3px 10px rgba(0,0,0,.3);
     }
-    .logo-btn.active .logo-label{
-      background:var(--cc,#1a3a7a);
-      border-color:var(--cc,#1a3a7a);
-      color:#fff;
-      box-shadow:0 4px 18px rgba(0,0,0,.5);
+    .logo-btn.active .logo-label{background:var(--cc,#1a3a7a);border-color:var(--cc,#1a3a7a);color:#fff;box-shadow:0 4px 18px rgba(0,0,0,.5)}
+    .logo-btn:hover .logo-label,.logo-btn.active:hover .logo-label{background:#FFD700;color:#06122a;border-color:#FFD700}
+
+    /* ══════════════════════════════
+       EXCLUSIVO HERO COMERCIO
+    ══════════════════════════════ */
+    .excl-section{padding:20px 16px}
+    .excl-card{
+      max-width:680px;margin:0 auto;
+      border-radius:22px;overflow:hidden;
+      box-shadow:0 16px 56px rgba(0,0,0,.7);
+      border:2px solid rgba(255,255,255,.1);
     }
-    .logo-btn:hover .logo-label{
-      background:#FFD700;color:#06122a;border-color:#FFD700;
+    .excl-header{
+      padding:36px 28px 28px;
+      background:var(--ecol,#1d3557);
+      display:flex;align-items:center;gap:24px;
+      position:relative;
     }
-    .logo-btn.active:hover .logo-label{
-      background:#FFD700;color:#06122a;border-color:#FFD700;
+    .excl-header::after{
+      content:'★ EXCLUSIVO ★';
+      position:absolute;top:12px;right:16px;
+      font-size:.65rem;font-weight:900;letter-spacing:2px;
+      color:rgba(255,255,255,.35);
+    }
+    .excl-logo-wrap{
+      width:90px;height:90px;flex-shrink:0;
+      border-radius:50%;border:3px solid rgba(255,255,255,.3);
+      overflow:hidden;background:rgba(255,255,255,.1);
+      display:flex;align-items:center;justify-content:center;
+      font-size:2.8rem;
+    }
+    .excl-logo-wrap img{width:100%;height:100%;object-fit:contain;padding:10%}
+    .excl-info{flex:1;min-width:0}
+    .excl-nombre{font-size:clamp(1.4rem,5vw,2rem);font-weight:900;color:#fff;line-height:1.1}
+    .excl-rubro{margin-top:4px;font-size:.82rem;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1px}
+    .excl-btns{
+      padding:18px 28px;
+      background:rgba(6,12,30,.85);
+      display:flex;gap:12px;flex-wrap:wrap;
+    }
+    .excl-btn{
+      flex:1;min-width:140px;
+      padding:13px 20px;border-radius:10px;
+      font-size:.88rem;font-weight:900;text-decoration:none;
+      display:flex;align-items:center;justify-content:center;gap:7px;
+      transition:opacity .2s,transform .15s;border:none;cursor:pointer;
+      font-family:inherit;
+    }
+    .excl-btn:hover{opacity:.88;transform:translateY(-2px)}
+    .excl-btn-wa{background:#16a34a;color:#fff}
+    .excl-btn-ver{background:rgba(255,255,255,.1);color:#fff;border:1.5px solid rgba(255,255,255,.25)}
+    .excl-divider{
+      padding:8px 16px;text-align:center;
+      font-size:.7rem;font-weight:800;color:rgba(255,215,0,.7);
+      letter-spacing:2.5px;text-transform:uppercase;
+      background:rgba(6,12,30,.6);
     }
 
     /* ══════════════════════════════
@@ -132,25 +182,36 @@
     /* ══════════════════════════════
        FILTRO ACTIVO CHIP
     ══════════════════════════════ */
-    .filter-bar{
-      display:none;align-items:center;justify-content:center;gap:10px;
-      padding:10px 16px 0;
-    }
+    .filter-bar{display:none;align-items:center;justify-content:center;gap:10px;padding:10px 16px 0}
     .filter-bar.visible{display:flex}
-    .filter-label{
-      font-size:.78rem;color:rgba(255,255,255,.5);font-weight:700;
-    }
+    .filter-label{font-size:.78rem;color:rgba(255,255,255,.5);font-weight:700}
     .filter-chip{
       background:var(--fc,#1a3a7a);color:#fff;
       font-size:.8rem;font-weight:900;padding:5px 16px;
       border-radius:50px;border:none;cursor:pointer;
-      display:flex;align-items:center;gap:6px;
-      transition:opacity .2s;
+      display:flex;align-items:center;gap:6px;transition:opacity .2s;
     }
     .filter-chip:hover{opacity:.8}
 
     /* ══════════════════════════════
-       GRID — 3 columnas
+       SEPARADOR DE COMERCIO (barrio/comunidad)
+    ══════════════════════════════ */
+    .comercio-sep{
+      display:flex;align-items:center;gap:12px;
+      padding:18px 16px 8px;max-width:1300px;margin:0 auto;
+    }
+    .comercio-sep-dot{
+      width:10px;height:10px;border-radius:50%;flex-shrink:0;
+      background:var(--sc,#FFD700);
+    }
+    .comercio-sep-name{
+      font-size:.82rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;
+      color:var(--sc,#FFD700);
+    }
+    .comercio-sep-line{flex:1;height:1px;background:rgba(255,255,255,.08)}
+
+    /* ══════════════════════════════
+       GRID
     ══════════════════════════════ */
     .ofertas-section{padding:8px 8px 50px}
     .ofertas-grid{
@@ -159,6 +220,12 @@
       gap:8px;max-width:1300px;margin:0 auto;
     }
     @media(max-width:700px){.ofertas-grid{grid-template-columns:repeat(2,1fr)}}
+    /* exclusivo: grid más ancho, cards más grandes */
+    .ofertas-grid.exclusivo{
+      grid-template-columns:repeat(2,1fr);
+      max-width:760px;gap:12px;
+    }
+    @media(max-width:540px){.ofertas-grid.exclusivo{grid-template-columns:1fr}}
 
     /* ══════════════════════════════
        CARD
@@ -176,23 +243,18 @@
 
     .badge-of{
       position:absolute;top:0;left:0;z-index:3;
-      background:rgba(6,18,42,.82);
-      padding:5px 12px;border-bottom-right-radius:10px;
-      font-size:.68rem;font-weight:900;color:#fff;
-      text-transform:uppercase;letter-spacing:.3px;
+      background:rgba(6,18,42,.82);padding:5px 12px;border-bottom-right-radius:10px;
+      font-size:.68rem;font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:.3px;
       display:flex;align-items:center;gap:4px;
     }
     .badge-pct{
       position:absolute;top:0;right:0;z-index:3;
-      background:#e63946;color:#fff;
-      padding:5px 10px;border-bottom-left-radius:10px;
+      background:#e63946;color:#fff;padding:5px 10px;border-bottom-left-radius:10px;
       font-size:.72rem;font-weight:900;
     }
-
     .card-img{
       width:100%;position:relative;padding-bottom:72%;
-      background:linear-gradient(135deg,#0d255a,#1a3a7a);
-      overflow:hidden;flex-shrink:0;
+      background:linear-gradient(135deg,#0d255a,#1a3a7a);overflow:hidden;flex-shrink:0;
     }
     .card-img img,.card-img span{
       position:absolute;inset:0;width:100%;height:100%;
@@ -205,15 +267,13 @@
       position:absolute;inset:0;z-index:5;
       background:rgba(22,163,74,.92);
       display:flex;align-items:center;justify-content:center;
-      color:#fff;font-size:.9rem;font-weight:900;
-      text-decoration:none;gap:8px;
+      color:#fff;font-size:.9rem;font-weight:900;text-decoration:none;gap:8px;
       opacity:0;transition:opacity .2s;
     }
     .card:hover .card-wa-hover{opacity:1}
 
     .card-footer{
-      background:rgba(6,12,30,.92);
-      padding:10px 12px;
+      background:rgba(6,12,30,.92);padding:10px 12px;
       display:flex;align-items:center;justify-content:space-between;gap:6px;
     }
     .card-info{flex:1;min-width:0}
@@ -222,29 +282,31 @@
 
     .precio-wrap{text-align:right;flex-shrink:0}
     .precio-antes{font-size:.65rem;color:rgba(255,255,255,.35);text-decoration:line-through;display:block;text-align:right}
-    .precio-val{
-      font-size:clamp(1.2rem,3.5vw,1.6rem);font-weight:900;
-      color:#FFD700;line-height:1;letter-spacing:-0.5px;
-      white-space:nowrap;
-    }
+    .precio-val{font-size:clamp(1.2rem,3.5vw,1.6rem);font-weight:900;color:#FFD700;line-height:1;letter-spacing:-0.5px;white-space:nowrap}
     .precio-val .sg{font-size:.8rem;font-weight:800;vertical-align:super}
 
     .card-wa-mobile{
-      display:none;
-      background:#16a34a;color:#fff;font-size:.78rem;font-weight:900;
+      display:none;background:#16a34a;color:#fff;font-size:.78rem;font-weight:900;
       padding:9px;text-align:center;text-decoration:none;
       align-items:center;justify-content:center;gap:6px;
     }
-    @media(hover:none){
-      .card-wa-mobile{display:flex}
-      .card-wa-hover{display:none}
-    }
+    @media(hover:none){.card-wa-mobile{display:flex}.card-wa-hover{display:none}}
 
     .empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:rgba(255,255,255,.3);font-size:1rem}
     .empty span{display:block;font-size:3rem;margin-bottom:12px}
 
     footer{text-align:center;padding:16px;font-size:.73rem;color:rgba(255,255,255,.2);border-top:1px solid rgba(255,255,255,.05)}
     footer a{color:#FFD700;text-decoration:none;opacity:.6}
+
+    /* ══ BARRIO BADGE ══ */
+    .pack-badge{
+      display:inline-flex;align-items:center;gap:6px;
+      margin-top:10px;padding:4px 14px;border-radius:50px;
+      font-size:.72rem;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;
+    }
+    .pack-badge.barrio{background:rgba(56,189,248,.15);color:#7dd3fc;border:1px solid rgba(56,189,248,.3)}
+    .pack-badge.exclusivo{background:rgba(255,215,0,.15);color:#FFD700;border:1px solid rgba(255,215,0,.4)}
+    .pack-badge.comunidad{background:rgba(74,222,128,.12);color:#86efac;border:1px solid rgba(74,222,128,.3)}
   </style>
 </head>
 <body>
@@ -260,19 +322,24 @@
       <div class="hero-title">COMERCIAL <span class="yw">WEB</span> 🛒</div>
     </div>
     <div class="hero-sub">
-      <div class="hero-sub-pill">TU COMPRA A UN CLICK <span class="cursor">✦</span></div>
+      <div class="hero-sub-pill" id="heroSub">TU COMPRA A UN CLICK <span class="cursor">✦</span></div>
     </div>
+    <div id="heroBadgeWrap"></div>
+    <div class="hero-pack-name" id="heroPackName"></div>
   </div>
 
-  <!-- LOGOS RUBROS -->
-  <div class="logos-section">
+  <!-- LOGOS RUBROS (comunidad / barrio) -->
+  <div class="logos-section" id="logosSection">
     <div class="logos-row" id="logosRow"></div>
   </div>
+
+  <!-- EXCLUSIVO HERO -->
+  <div class="excl-section" id="exclSection" style="display:none"></div>
 
   <!-- CTA -->
   <div class="cta-strip">
     <span class="cta-cart">🛒</span>
-    <span class="cta-text">Elegí un rubro · Cliquea y Comprá</span>
+    <span class="cta-text" id="ctaText">Elegí un rubro · Cliquea y Comprá</span>
     <span class="cta-spark">✨</span>
   </div>
 
@@ -297,120 +364,125 @@
 
 <script type="module">
 import { supabase } from '../src/supabase.js';
-import { packs as packsData } from '../src/data/packs.js'; // fallback local
+import { packs as packsData } from '../src/data/packs.js';
 
 /* ── ICON POR RUBRO ── */
 const RUBRO_ICONS = {
-  ferret:    '🔧', herramienta: '🔨',
-  pintur:    '🎨', color: '🖌️',
-  electr:    '💻', tecnolog: '📱',
-  hogar:     '🏠', deco: '🛋️',
-  salud:     '💊', belleza: '💄',
-  aliment:   '🍔', gastro: '🍕',
-  ropa:      '👕', moda: '👗',
-  deport:    '⚽',
-  hierro:    '⚙️', chapa: '🔩',
-  'árido':   '🧱', construcc: '🏗️',
-  plomer:    '🚿', agua: '💧',
-  carnicer:  '🥩',
-  farmac:    '💉', optic: '👓',
-  mueble:    '🛒', bazar: '🏪',
+  ferret:'🔧',herramienta:'🔨',pintur:'🎨',color:'🖌️',
+  electr:'💻',tecnolog:'📱',hogar:'🏠',deco:'🛋️',
+  salud:'💊',belleza:'💄',aliment:'🍔',gastro:'🍕',
+  ropa:'👕',moda:'👗',deport:'⚽',hierro:'⚙️',chapa:'🔩',
+  'árido':'🧱',construcc:'🏗️',plomer:'🚿',agua:'💧',
+  carnicer:'🥩',farmac:'💉',optic:'👓',mueble:'🛒',bazar:'🏪',
 };
-
-function getIcon(rubro) {
-  const r = (rubro||'').toLowerCase();
-  for (const [key, icon] of Object.entries(RUBRO_ICONS)) {
-    if (r.includes(key)) return icon;
-  }
+function getIcon(rubro){
+  const r=(rubro||'').toLowerCase();
+  for(const [key,icon] of Object.entries(RUBRO_ICONS))if(r.includes(key))return icon;
   return '🏪';
 }
 
-/* ── LOAD PACK ── */
-const hash  = location.hash.replace('#','');
-const parts = hash.split('-');
-const type  = parts[0];
-// El idx puede ser el id real de Supabase o un índice local
+/* ── PARSE URL ── */
+const hash    = location.hash.replace('#','');
+const parts   = hash.split('-');
+const type    = parts[0]; // comunidad | barrio | exclusivo
 const idxOrId = parseInt(parts[1] ?? '0');
 
-document.getElementById('btnAdmin').style.display = 'none';
-const { data: { session } } = await supabase.auth.getSession();
-if (session) document.getElementById('btnAdmin').style.display = 'block';
+/* ── AUTH check ── */
+document.getElementById('btnAdmin').style.display='none';
+const { data:{ session } } = await supabase.auth.getSession();
+if(session) document.getElementById('btnAdmin').style.display='block';
 
 let pack = null;
 
-/* 1. intentar cargar desde Supabase */
-if (type && !isNaN(idxOrId) && idxOrId > 0) {
+/* 1. Supabase */
+if(type && !isNaN(idxOrId) && idxOrId > 0){
   const { data } = await supabase
     .from('packs')
-    .select(`*, comercios(*, ofertas(*))`)
+    .select('*, comercios(*, ofertas(*))')
     .eq('id', idxOrId)
     .eq('activo', true)
     .single();
-  if (data) {
-    // normalizar estructura
-    data.comercios = (data.comercios || []).sort((a,b) => a.orden - b.orden);
-    data.comercios.forEach(c => {
-      c.ofertas = (c.ofertas || []).filter(o => o.activo).sort((a,b) => a.orden - b.orden);
-      // mapear campos para compatibilidad con renderGrid
-      c.whatsapp = c.whatsapp || '';
-      c.color    = c.color    || '#1d3557';
-      c.logo     = c.logo_url || '';
-      c.nombre   = c.nombre   || '';
-      c.rubro    = c.rubro    || '';
-      c.id       = c.id;
-      c.ofertas.forEach(o => {
-        o.nombre        = o.nombre        || '';
-        o.imagen        = o.imagen_url    || '';
-        o.precioReal    = o.precio_real   || 0;
-        o.precioOferta  = o.precio_oferta || 0;
-        o.descuento     = o.descuento     || 0;
-        o.vence         = o.vence         || '';
+  if(data){
+    data.comercios = (data.comercios||[]).sort((a,b)=>a.orden-b.orden);
+    data.comercios.forEach(c=>{
+      c.ofertas=(c.ofertas||[]).filter(o=>o.activo).sort((a,b)=>a.orden-b.orden);
+      c.whatsapp=c.whatsapp||''; c.color=c.color||'#1d3557';
+      c.logo=c.logo_url||''; c.nombre=c.nombre||''; c.rubro=c.rubro||'';
+      c.ofertas.forEach(o=>{
+        o.nombre=o.nombre||''; o.imagen=o.imagen_url||'';
+        o.precioReal=o.precio_real||0; o.precioOferta=o.precio_oferta||0;
+        o.descuento=o.descuento||0; o.vence=o.vence||'';
       });
     });
-    pack = data;
+    pack=data;
   }
 }
-
-/* 2. fallback: packs.js local */
-if (!pack && packsData) {
-  const found = packsData.find((p, i) => {
-    const ptype = p.tipo >= 5 ? 'comunidad' : p.tipo >= 3 ? 'barrio' : 'exclusivo';
-    return ptype === type && i === idxOrId;
-  }) || packsData[idxOrId] || packsData[0];
-  if (found) pack = found;
+/* 2. Fallback local */
+if(!pack && packsData){
+  const found=packsData.find((p,i)=>{
+    const ptype=p.tipo>=5?'comunidad':p.tipo>=3?'barrio':'exclusivo';
+    return ptype===type && i===idxOrId;
+  })||packsData[idxOrId]||packsData[0];
+  if(found) pack=found;
 }
 
-let activeComercioId = null; // null = todos
+let activeComercioId=null;
 
-/* ── RENDER ── */
-if (!pack) {
-  document.getElementById('logosRow').innerHTML = '<p style="color:#aaa;padding:40px;text-align:center">Pack no encontrado.</p>';
-  document.getElementById('ofertasGrid').innerHTML = '';
+/* ══════════════════════════════
+   RENDER PRINCIPAL
+══════════════════════════════ */
+if(!pack){
+  document.getElementById('logosRow').innerHTML='<p style="color:#aaa;padding:40px;text-align:center">Pack no encontrado.</p>';
+  document.getElementById('ofertasGrid').innerHTML='';
 } else {
-  document.title = `${pack.nombre} — ComercialWeb`;
-  renderLogos();
+  document.title=`${pack.nombre||'Pack'} — ComercialWeb`;
+  applyHero();
+  if(type==='exclusivo'){
+    renderExclusivo();
+  } else {
+    renderLogos();
+  }
   renderGrid();
 }
 
-function renderLogos() {
-  document.getElementById('logosRow').innerHTML = pack.comercios.map(c => {
-    const col   = c.color || '#1a3a7a';
-    const rub   = c.rubro || c.nombre || `Comercio ${c.id}`;
-    const icon  = getIcon(rub);
-    const isActive = activeComercioId === c.id;
+/* ── HERO ── */
+function applyHero(){
+  const badges={
+    comunidad:{cls:'comunidad',label:'🏙️ Pack Comunidad'},
+    barrio:   {cls:'barrio',   label:'🏘️ Pack Barrio'},
+    exclusivo:{cls:'exclusivo',label:'⭐ Pack Exclusivo'},
+  };
+  const b=badges[type]||badges.comunidad;
+  document.getElementById('heroBadgeWrap').innerHTML=
+    `<span class="pack-badge ${b.cls}">${b.label}</span>`;
+  if(pack.nombre){
+    document.getElementById('heroPackName').textContent=pack.nombre;
+  }
+  if(type==='exclusivo' && pack.comercios.length){
+    const c=pack.comercios[0];
+    document.getElementById('ctaText').textContent='Mirá las ofertas exclusivas · ¡Solo por hoy!';
+  } else if(type==='barrio'){
+    document.getElementById('ctaText').textContent='Elegí un rubro del barrio · Cliquea y Comprá';
+    document.getElementById('logosRow').classList.add('barrio');
+    document.getElementById('logosSection').style.padding='28px 16px 20px';
+  }
+}
 
-    let inner;
-    if (c.logo && c.logo.length > 10) {
-      inner = `<img src="${c.logo}" alt="${c.nombre}" onerror="this.style.display='none'">`;
-    } else {
-      inner = `<span class="logo-icon">${icon}</span>`;
-    }
-
+/* ── LOGOS CIRCULARES (comunidad / barrio) ── */
+function renderLogos(){
+  document.getElementById('logosRow').innerHTML=pack.comercios.map(c=>{
+    const col=c.color||'#1a3a7a';
+    const rub=c.rubro||c.nombre||`Comercio ${c.id}`;
+    const icon=getIcon(rub);
+    const isActive=activeComercioId===c.id;
+    const inner=c.logo&&c.logo.length>10
+      ?`<img src="${c.logo}" alt="${c.nombre}" onerror="this.style.display='none'">`
+      :`<span class="logo-icon">${icon}</span>`;
     return `
-      <div class="logo-btn ${isActive ? 'active' : ''}" style="--cc:${col}"
-        onclick="toggleComercio(${c.id}, '${rub}', '${col}')">
+      <div class="logo-btn ${isActive?'active':''}" style="--cc:${col}"
+        onclick="toggleComercio(${c.id},'${rub}','${col}')">
         <a href="comercio.html#comercio-${c.id}" style="display:contents;text-decoration:none">
-          <div class="logo-circle" style="background:${col}33;border-color:${isActive ? col : 'rgba(255,255,255,.4)'}">
+          <div class="logo-circle" style="background:${col}33;border-color:${isActive?col:'rgba(255,255,255,.4)'}">
             ${inner}
           </div>
         </a>
@@ -419,40 +491,95 @@ function renderLogos() {
   }).join('');
 }
 
-function renderGrid() {
-  const fmt = n => (n || 0).toLocaleString('es-AR');
-  const grid = document.getElementById('ofertasGrid');
+/* ── EXCLUSIVO HERO ── */
+function renderExclusivo(){
+  document.getElementById('logosSection').style.display='none';
+  const exclEl=document.getElementById('exclSection');
+  exclEl.style.display='block';
 
-  let cards = [];
-  pack.comercios.forEach(c => {
-    if (activeComercioId !== null && c.id !== activeComercioId) return;
-    const ofertas = c.ofertas || {};
-    // soporta tanto array (packs.js) como objeto {1:{...}} (localStorage)
-    const items = Array.isArray(ofertas)
-      ? ofertas
-      : Object.values(ofertas).sort((a,b) => (a.orden||a.id||0) - (b.orden||b.id||0));
-    items.forEach(o => cards.push({...o, _c: c}));
+  const c=pack.comercios[0];
+  if(!c){ exclEl.innerHTML=''; return; }
+
+  const col=c.color||'#1d3557';
+  const icon=getIcon(c.rubro||c.nombre);
+  const logoHtml=c.logo&&c.logo.length>10
+    ?`<img src="${c.logo}" alt="${c.nombre}">`
+    :`<span>${icon}</span>`;
+
+  const waMsg=encodeURIComponent(`Hola! Vi sus ofertas exclusivas en ComercialWeb. ¿Me dan más información?`);
+  const waUrl=`https://wa.me/${c.whatsapp||''}?text=${waMsg}`;
+
+  exclEl.innerHTML=`
+    <div class="excl-card">
+      <div class="excl-header" style="--ecol:${col};background:linear-gradient(135deg,${col},${col}cc)">
+        <div class="excl-logo-wrap" style="border-color:rgba(255,255,255,.25)">
+          ${logoHtml}
+        </div>
+        <div class="excl-info">
+          <div class="excl-nombre">${c.nombre||'Comercio Exclusivo'}</div>
+          <div class="excl-rubro">${c.rubro||''}</div>
+          ${c.ciudad?`<div style="margin-top:8px;font-size:.72rem;color:rgba(255,255,255,.4);font-weight:700">📍 ${c.ciudad}${c.provincia?', '+c.provincia:''}</div>`:''}
+        </div>
+      </div>
+      <div class="excl-btns" style="background:linear-gradient(to bottom,${col}22,rgba(6,12,30,.95))">
+        ${c.whatsapp?`<a href="${waUrl}" target="_blank" rel="noopener" class="excl-btn excl-btn-wa">💬 Consultar por WhatsApp</a>`:''}
+        <a href="comercio.html#comercio-${c.id}" class="excl-btn excl-btn-ver">🏪 Ver el local completo →</a>
+      </div>
+      <div class="excl-divider">✦ Ofertas Exclusivas ✦</div>
+    </div>`;
+}
+
+/* ── GRID ── */
+function renderGrid(){
+  const fmt=n=>(n||0).toLocaleString('es-AR');
+  const grid=document.getElementById('ofertasGrid');
+
+  // exclusivo: grid más grande
+  if(type==='exclusivo') grid.classList.add('exclusivo');
+
+  let cards=[];
+  pack.comercios.forEach(c=>{
+    if(activeComercioId!==null && c.id!==activeComercioId) return;
+    const ofertas=c.ofertas||{};
+    const items=Array.isArray(ofertas)
+      ?ofertas
+      :Object.values(ofertas).sort((a,b)=>(a.orden||a.id||0)-(b.orden||b.id||0));
+    items.forEach(o=>cards.push({...o,_c:c}));
   });
 
-  if (!cards.length) {
-    grid.innerHTML = '<div class="empty"><span>🏷️</span>No hay ofertas cargadas aún.</div>';
+  if(!cards.length){
+    grid.innerHTML='<div class="empty"><span>🏷️</span>No hay ofertas cargadas aún.</div>';
     return;
   }
 
-  grid.innerHTML = cards.map(o => {
-    const c   = o._c;
-    const off = o.descuento || (o.precioReal && o.precioOferta ? Math.round((1 - o.precioOferta / o.precioReal) * 100) : 0);
-    const waMsg = encodeURIComponent(`Hola! Vi la oferta *"${o.nombre}"* en ComercialWeb y me gustaría consultar. ¿Me dan más información?`);
-    const waUrl = `https://wa.me/${c.whatsapp || ''}?text=${waMsg}`;
-    const img   = o.imagen ? `<img src="${o.imagen}" alt="${o.nombre}">` : `<span>🏷️</span>`;
-    const vence = o.vence
-      ? `<div style="position:absolute;bottom:8px;left:8px;z-index:3;background:rgba(6,12,30,.85);color:#FFD700;font-size:.6rem;font-weight:800;padding:2px 8px;border-radius:4px;border:1px solid #FFD700">⏰ Hasta ${new Date(o.vence).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})}</div>`
-      : '';
+  // separadores por comercio (en barrio/comunidad con filter)
+  let lastCid=null;
+  grid.innerHTML=cards.map(o=>{
+    const c=o._c;
+    const off=o.descuento||(o.precioReal&&o.precioOferta?Math.round((1-o.precioOferta/o.precioReal)*100):0);
+    const waMsg=encodeURIComponent(`Hola! Vi la oferta *"${o.nombre}"* en ComercialWeb y me gustaría consultar. ¿Me dan más información?`);
+    const waUrl=`https://wa.me/${c.whatsapp||''}?text=${waMsg}`;
+    const img=o.imagen?`<img src="${o.imagen}" alt="${o.nombre}">`:`<span>🏷️</span>`;
+    const vence=o.vence
+      ?`<div style="position:absolute;bottom:8px;left:8px;z-index:3;background:rgba(6,12,30,.85);color:#FFD700;font-size:.6rem;font-weight:800;padding:2px 8px;border-radius:4px;border:1px solid #FFD700">⏰ Hasta ${new Date(o.vence).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})}</div>`:'';
 
-    return `
-      <div class="card">
-        <div class="badge-of">🏷️ OFERTAS</div>
-        ${off ? `<div class="badge-pct">${off}% OFF</div>` : ''}
+    // separador de comercio en grilla (solo si filter activo o exclusivo)
+    let sep='';
+    if(type!=='exclusivo' && activeComercioId===null && c.id!==lastCid){
+      lastCid=c.id;
+      const col=c.color||'#FFD700';
+      sep=`<div class="comercio-sep" style="--sc:${col};grid-column:1/-1">
+        <div class="comercio-sep-dot"></div>
+        <span class="comercio-sep-name">${c.nombre}</span>
+        <div class="comercio-sep-line"></div>
+        <a href="comercio.html#comercio-${c.id}" style="font-size:.7rem;font-weight:800;color:${col};text-decoration:none;opacity:.7;white-space:nowrap">Ver local →</a>
+      </div>`;
+    }
+
+    return sep+`
+      <div class="card" data-cid="${c.id}">
+        <div class="badge-of">🏷️ OFERTA</div>
+        ${off?`<div class="badge-pct">${off}% OFF</div>`:''}
         <div class="card-img">
           ${img}${vence}
           <a href="${waUrl}" target="_blank" rel="noopener" class="card-wa-hover">💬 ¡Compralo Ya!</a>
@@ -460,12 +587,12 @@ function renderGrid() {
         <div class="card-footer">
           <div class="card-info">
             <a href="comercio.html#comercio-${c.id}" style="text-decoration:none">
-              <span class="card-comercio" style="color:rgba(255,215,0,.65)">${c.nombre || ''} →</span>
+              <span class="card-comercio" style="color:rgba(255,215,0,.65)">${c.nombre||''} →</span>
             </a>
-            <span class="card-nombre">${o.nombre || ''}</span>
+            <span class="card-nombre">${o.nombre||''}</span>
           </div>
           <div class="precio-wrap">
-            ${o.precioReal ? `<span class="precio-antes">$${fmt(o.precioReal)}</span>` : ''}
+            ${o.precioReal?`<span class="precio-antes">$${fmt(o.precioReal)}</span>`:''}
             <div class="precio-val"><span class="sg">$</span> ${fmt(o.precioOferta)}</div>
           </div>
         </div>
@@ -474,30 +601,24 @@ function renderGrid() {
   }).join('');
 }
 
-function toggleComercio(id, rub, col) {
-  if (activeComercioId === id) {
-    clearFilter();
-    return;
-  }
-  activeComercioId = id;
-
-  // chip filtro
-  const bar  = document.getElementById('filterBar');
-  const chip = document.getElementById('filterChip');
-  chip.textContent = rub + '  ✕';
-  chip.style.setProperty('--fc', col);
+/* ── FILTROS ── */
+window.toggleComercio=function(id,rub,col){
+  if(activeComercioId===id){ clearFilter(); return; }
+  activeComercioId=id;
+  const bar=document.getElementById('filterBar');
+  const chip=document.getElementById('filterChip');
+  chip.textContent=rub+'  ✕';
+  chip.style.setProperty('--fc',col);
   bar.classList.add('visible');
-
   renderLogos();
   renderGrid();
-}
-
-function clearFilter() {
-  activeComercioId = null;
+};
+window.clearFilter=function(){
+  activeComercioId=null;
   document.getElementById('filterBar').classList.remove('visible');
   renderLogos();
   renderGrid();
-}
+};
 </script>
 </body>
 </html>
